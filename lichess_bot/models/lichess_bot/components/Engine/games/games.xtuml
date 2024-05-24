@@ -4,6 +4,25 @@ within lichess_bot::components::Engine is
 
 	package games is
 		class 'Active Game';
+		class 'Evaluation Engine';
+		class Move;
+		class Position;
+		relationship R1 is 'Active Game' unconditionally 'is analyzed by' one 'Evaluation Engine',
+		                   'Evaluation Engine' unconditionally analyzes one 'Active Game';
+
+		relationship R2 is Position conditionally 'is follwed by' many Position,
+		                   Position conditionally follows one Position
+		                   using one Move;
+
+		relationship R3 is 'Active Game' unconditionally 'has current' one Position,
+		                   Position conditionally 'is current for' one 'Active Game';
+
+		relationship R4 is 'Evaluation Engine' conditionally evaluates many Position,
+		                   Position unconditionally 'evaluated by' one 'Evaluation Engine';
+
+		relationship R5 is Move conditionally 'best next in' one Position,
+		                   Position conditionally 'has best next' one Move;
+
 	end package;
 
 end;

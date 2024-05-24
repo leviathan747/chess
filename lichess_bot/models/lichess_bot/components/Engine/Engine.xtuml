@@ -181,12 +181,17 @@ within lichess_bot::components is
 					game.start_color = Color::WHITE;
 				else
 					game.initial_fen = g.initialFen;
-					if STRING:: indexof(haystack: game.initial_fen, needle:" w ") != -1 then
+					if STRING::indexof(haystack: game.initial_fen, needle:" w ") != -1 then
 						game.start_color = Color::WHITE;
 					else
 						game.start_color = Color::BLACK;
 					end if;
 				end if;
+				
+				// update the initial position
+				select one initial_position related by game->Position[R3];
+				initial_position.fen = game.initial_fen;
+				initial_position.color_to_move = game.start_color;
 				
 				// update the game state
 				game.update_game_state(game_state: g.gameState);
@@ -197,15 +202,12 @@ within lichess_bot::components is
 			message gameStart(game_event: in GameEventInfo) from provider is
 				@noparse
 				LOG::LogInfo(message:"Game start: " + param.game_event.id);
-				r = chess::chat(game_id:param.game_event.id, text: "version: " + Bot::getString(name: "version", default_value: "unknown"), room:Room::PLAYER);
+				version = Bot::getString(name: "version", default_value: "unknown");
+				if version != "unknown" then
+					r = chess::chat(game_id:param.game_event.id, text: "version: " + version, room:Room::PLAYER);
+				end if;
 				r = chess::chat(game_id:param.game_event.id, text:"Good luck!", room:Room::PLAYER);
 				g = param.game_event;
-				
-				// find/create a game
-				select any game from instances of ActiveGame where selected.id == g.id;
-				if empty game then
-					game = ActiveGame::new_game(id: g.id);
-				end if;
 				@endnoparse
 			end message;
 

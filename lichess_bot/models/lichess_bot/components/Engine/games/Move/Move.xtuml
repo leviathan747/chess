@@ -1,0 +1,19 @@
+// BP 7.1.6 content: ModelClass syschar: 3 persistence-version: 7.1.6
+
+within lichess_bot::components::Engine::games is
+
+	@key_letters("Move");
+	@class_num(5);
+	class Move is
+
+		lan: string;
+
+		is_check: boolean;
+
+		is_capture: boolean;
+
+		is_attack: boolean;
+
+	end class;
+
+end;

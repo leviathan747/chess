@@ -18,6 +18,8 @@ within lichess_bot::components::Engine::games is
 
 		start_color: Color;
 
+		move_timer: timer;
+
 		preferred identifier is (id);
 
 		@dialect("oal");
@@ -62,7 +64,34 @@ within lichess_bot::components::Engine::games is
 		@operation_num(4);
 		operation update_game_state(game_state: in GameState) is
 			@noparse
+			i = self.game_state.moves.length;
 			self.game_state = param.game_state;
+			
+			// update the position tree based on the moves played
+			select one position related by self->Position[R3];
+			while i < self.game_state.moves.length loop
+				move_lan = self.game_state.moves[i];
+				
+				// get the next move
+				select any move related by position->Move[R2.'is follwed by'] where selected.lan == move_lan;
+				if empty move then
+					move = position.new_move(lan: move_lan);
+				end if;
+				select one new_position related by move->Position[R2.'is follwed by'];
+				unrelate position from self across R3;
+				relate new_position to self across R3;
+				
+				// delete any moves that were not taken
+				select any unmove related by position->Move[R2.'is follwed by'] where selected.lan != move_lan;
+				while not empty unmove loop
+					select one unposition related by unmove->Position[R2.'is follwed by'];
+					unposition.dispose();
+					select any unmove related by position->Move[R2.'is follwed by'] where selected.lan != move_lan;
+				end while;
+			
+				select one position related by self->Position[R3];
+				i = i + 1;
+			end while;
 			
 			// check if the game is over
 			if not (self.game_state.status == GameStatus::CREATED or self.game_state.status == GameStatus::STARTED) then
@@ -85,6 +114,18 @@ within lichess_bot::components::Engine::games is
 			create object instance game of ActiveGame;
 			game.id = param.id;
 			
+			// create initial position
+			create object instance initial_position of Position;
+			initial_position.fen = game.initial_fen;
+			initial_position.color_to_move = game.start_color;
+			relate initial_position to game across R3;
+			
+			// create the evaluation engine
+			create object instance engine of Engine;
+			relate engine to game across R1;
+			
+			relate initial_position to engine across R4;
+			
 			return game;
 			@endnoparse
 		end operation;
@@ -93,6 +134,17 @@ within lichess_bot::components::Engine::games is
 		@operation_num(6);
 		operation dispose() is
 			@noparse
+			select one engineR1 related by self->Engine[R1];
+			if not empty engineR1 then
+				unrelate self from engineR1 across R1;
+				engineR1.dispose();
+			end if;
+			
+			select one positionR3 related by self->Position[R3];
+			if not empty positionR3 then
+				unrelate self from positionR3 across R3;
+			end if;
+			
 			delete object instance self;
 			@endnoparse
 		end operation;

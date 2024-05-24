@@ -76,21 +76,60 @@ within lichess_bot::components::Engine::games::'Active Game' is
 			self.handle_draw_offer();
 		end if;
 		
-		// select a random legal move
-		legal_moves = ChessLib::legalMoves(fen: ChessLib::movesToFEN(initialFen: self.initial_fen, moves: self.game_state.moves));
-		i = 0;  // coerce integer
-		i = TIM::current_clock() % legal_moves.length;
-		move = legal_moves[i];
+		// TODO make this async
+		select one engine related by self->Engine[R1];
+		x = engine.positions_evaluated;
 		
-		// play the move
-		create event instance e of ActiveGame3:'play move'(move: move) to self;
-		t = TIM::timer_start(event_inst:e, microseconds: 0);
+		select one current_position related by self->Position[R3];
+		current_position.analyze_lines(depth: Bot::getInteger(name: "evaluation_depth", default_value: 2), line: "");
+		
+		select many pos related by engine->Position[R4];
+		
+		LOG::LogInfo(message: "Current position count:    " + STRING::itoa(i: cardinality  pos));
+		LOG::LogInfo(message: "New evaluated positions:   " + STRING::itoa(i: engine.positions_evaluated - x));
+		LOG::LogInfo(message: "Total evaluated positions: " + STRING::itoa(i: engine.positions_evaluated));
+		
+		create event instance e of ActiveGame3:'play move'(move: "") to self;
+		self.move_timer = TIM::timer_start(event_inst:e, microseconds: 0);
+		
+		/*
+		TODO
+		// play a move after a certain amount of time, no matter what the status of the engine is
+		max_think_time = 3000 * 1000;  // TODO parameterize this
+		create event instance e of ActiveGame3:'play move'(move: "") to self;
+		self.move_timer = TIM::timer_start(event_inst:e, microseconds: max_think_time);
+		*/
 		@endnoparse
 	end state;
 
 	state 'playing move'(move: in string) is
 		@noparse
 		move = param.move;
+		
+		r = TIM::timer_cancel(timer_inst_ref: self.move_timer);
+		
+		// if a move is not received with the event, select it
+		if move == "" then
+		
+			// select the best move from the evaluation engine
+			select one best_move related by self->Position[R3]->Move[R5];
+			if not empty best_move then
+				
+				LOG::LogInfo(message: "Playing best move: " + best_move.lan);
+				move = best_move.lan;
+				
+			else
+				
+				// select a random legal move
+				LOG::LogInfo(message: "Falling back on random move selection...");
+				legal_moves = ChessLib::legalMoves(fen: ChessLib::movesToFEN(initialFen: self.initial_fen, moves: self.game_state.moves));
+				i = 0;  // coerce integer
+				i = TIM::current_clock() % legal_moves.length;
+				move = legal_moves[i];
+		
+			end if;
+		
+		end if;
 		
 		// play the move
 		success = chess::move(game_id: self.id, move: move);
