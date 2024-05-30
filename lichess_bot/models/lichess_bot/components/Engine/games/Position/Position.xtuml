@@ -162,6 +162,16 @@ within lichess_bot::components::Engine::games is
 			
 				end for;
 				
+				// check for checkmate
+				// TODO this also rewards stalemate
+				if empty next_moves then
+					if self.color_to_move == Color::WHITE then
+						self.evaluation = MIN_EVAL;
+					else
+						self.evaluation = MAX_EVAL;
+					end if;
+				end if;
+				
 				/* TODO
 				if not empty next_moves then
 					select one best_next_move related by self->Move[R5];
