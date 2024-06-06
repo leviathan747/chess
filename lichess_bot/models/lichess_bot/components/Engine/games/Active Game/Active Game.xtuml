@@ -93,6 +93,18 @@ within lichess_bot::components::Engine::games is
 				i = i + 1;
 			end while;
 			
+			// TODO put this in a debug config
+			// print the current board
+			select one current_board related by self->Position[R3]->Board[R6];
+			if empty current_board then
+				// TODO shouldn't need to do this here
+				select one current_position related by self->Position[R3];
+				current_board = Board::fromFen(fen: current_position.fen);
+				relate current_board to current_position across R6;
+			end if;
+			current_board.print();
+			LOG::LogInfo(message: current_board.toFen());
+			
 			// check if the game is over
 			if not (self.game_state.status == GameStatus::CREATED or self.game_state.status == GameStatus::STARTED) then
 					generate ActiveGame2:'game over'(status: self.game_state.status) to self;
@@ -119,6 +131,9 @@ within lichess_bot::components::Engine::games is
 			initial_position.fen = game.initial_fen;
 			initial_position.color_to_move = game.start_color;
 			relate initial_position to game across R3;
+			
+			board = Board::fromFen(fen: initial_position.fen);
+			relate board to initial_position across R6;
 			
 			// create the evaluation engine
 			create object instance engine of Engine;

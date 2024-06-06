@@ -13,6 +13,9 @@ shapes :
   shape : Move
     render : class "lichess_bot::components::Engine::games::Move"
     bounds : x : 5664.0 y : 3192.0 width : 277.0 height : 133.0
+  shape : Board
+    render : imported_class "lichess_bot::components::Engine::games::Board"
+    bounds : x : 5663.0 y : 2711.0 width : 240.0 height : 108.0
 
 connectors :
   connector : R1
@@ -144,3 +147,23 @@ connectors :
         bounds : x : 5648.0 y : 3126.0 width : 0.0 height : 0.0 where : middle
       text :
         bounds : x : 5698.0 y : 3169.0 width : 0.0 height : 0.0 where : end
+  connector : R6
+    render : association "lichess_bot::components::Engine::games::R6"
+    polyline :
+      segment :
+        start : x : 5781.0 y : 2819.0
+        end :   x : 5781.0 y : 2928.0
+    anchors :
+      start :
+        point : x : 5781.0 y : 2819.0
+        shape : Board
+      end :
+        point : x : 5781.0 y : 2928.0
+        shape : Position
+    texts :
+      text :
+        bounds : x : 5791.0 y : 2829.0 width : 0.0 height : 0.0 where : start
+      text :
+        bounds : x : 5741.0 y : 2867.0 width : 0.0 height : 0.0 where : middle
+      text :
+        bounds : x : 5791.0 y : 2905.0 width : 0.0 height : 0.0 where : end

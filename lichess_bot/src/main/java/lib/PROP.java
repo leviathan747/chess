@@ -12,7 +12,7 @@ public class PROP {
 		return loadProperties(fileName, props);
 	}
 
-	public static <T extends Properties> T loadProperties(String fileName, T props) {
+	public static <U extends Properties> U loadProperties(String fileName, U props) {
 		try {
 			props.load(PROP.class.getClassLoader().getResourceAsStream(fileName));
 			return props;

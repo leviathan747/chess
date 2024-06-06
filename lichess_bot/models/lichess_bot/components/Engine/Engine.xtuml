@@ -5,6 +5,7 @@ within lichess_bot::components is
 	component Engine is
 		
 		package EEs is lichess_bot::EEs;
+		package 'board representation';
 		package bot;
 		package functions;
 		package games;
@@ -177,7 +178,7 @@ within lichess_bot::components is
 				
 				// set the initial FEN
 				if g.initialFen == "startpos" then
-					game.initial_fen = ChessLib::startpos();
+					game.initial_fen = startpos;
 					game.start_color = Color::WHITE;
 				else
 					game.initial_fen = g.initialFen;
@@ -192,6 +193,12 @@ within lichess_bot::components is
 				select one initial_position related by game->Position[R3];
 				initial_position.fen = game.initial_fen;
 				initial_position.color_to_move = game.start_color;
+				select one board related by initial_position->Board[R6];
+				if not empty board then
+					unrelate board from initial_position across R6;
+				end if;
+				board = Board::fromFen(fen: initial_position.fen);
+				relate board to initial_position across R6;
 				
 				// update the game state
 				game.update_game_state(game_state: g.gameState);

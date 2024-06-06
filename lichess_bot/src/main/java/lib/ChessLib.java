@@ -17,38 +17,6 @@ public class ChessLib {
 		return board.legalMoves().stream().map(Move::toString).collect(Collectors.toList());
 	}
 
-	public static String sourceFile(String move) {
-		if (move.matches("[a-h][1-8][a-h][1-8]")) {
-			return "" + move.charAt(0);
-		} else {
-			throw new IllegalArgumentException("Not a valid chess move: " + move);
-		}
-	}
-
-	public static int sourceRank(String move) {
-		if (move.matches("[a-h][1-8][a-h][1-8]")) {
-			return move.charAt(1) - '0';
-		} else {
-			throw new IllegalArgumentException("Not a valid chess move: " + move);
-		}
-	}
-
-	public static String destFile(String move) {
-		if (move.matches("[a-h][1-8][a-h][1-8]")) {
-			return "" + move.charAt(2);
-		} else {
-			throw new IllegalArgumentException("Not a valid chess move: " + move);
-		}
-	}
-
-	public static int destRank(String move) {
-		if (move.matches("[a-h][1-8][a-h][1-8]")) {
-			return move.charAt(3) - '0';
-		} else {
-			throw new IllegalArgumentException("Not a valid chess move: " + move);
-		}
-	}
-
 	public static String movesToFEN(String initialFen, List<String> moves) {
 		final var fen = initialFen == null || initialFen.isEmpty() || initialFen.equals("startpos") ? STARTPOS
 				: initialFen;
@@ -58,10 +26,6 @@ public class ChessLib {
 			return moveList.getFen();
 		}
 		return fen;
-	}
-	
-	public static String startpos() {
-		return STARTPOS;
 	}
 
 }

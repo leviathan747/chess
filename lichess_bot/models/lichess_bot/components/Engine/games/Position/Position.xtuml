@@ -123,72 +123,6 @@ within lichess_bot::components::Engine::games is
 		end operation;
 
 		@dialect("oal");
-		@operation_num(2);
-		operation analyze_lines(depth: in integer, line: in string) is
-			@noparse
-			// evaluate this position in its own right
-			self.evaluate();
-			
-			// analyze deeper and update this evaluation based on future positions
-			if param.depth > 0 then
-			
-				// create and prioritize the legal moves which follow this position
-				self.create_next_moves();
-				
-			
-				// TODO evaluate moves in priority order
-				select many next_moves related by self->Move[R2.'is follwed by'];
-				for each next_move in next_moves loop
-					
-					// analyze the next position
-					select one next_position related by next_move->Position[R2.'is follwed by'];
-					next_position.analyze_lines(depth: param.depth - 1, line: param.line + " " + next_move.lan);
-					
-					// compare to find the best next move
-					select one best_next_move related by self->Move[R5];
-					if empty best_next_move or ( self.color_to_move == Color::WHITE and next_position.evaluation > self.evaluation ) or
-							( self.color_to_move == Color::BLACK and next_position.evaluation < self.evaluation ) then
-						if not empty best_next_move then
-							unrelate best_next_move from self across R5;
-						end if;
-						relate next_move to self across R5;
-						// TODO
-						// LOG::LogInfo(message: "New best line: " + param.line + " " + next_move.lan + " : " + STRING::itoa(i: self.evaluation) + " -> " + STRING::itoa(i: next_position.evaluation));
-						self.evaluation = next_position.evaluation;
-						self.evaluation_depth = next_position.evaluation_depth + 1;
-					end if;
-				
-					// TODO prune the tree using alpha-beta pruning; for now, evaluate the whole tree
-			
-				end for;
-				
-				// check for checkmate
-				// TODO this also rewards stalemate
-				if empty next_moves then
-					if self.color_to_move == Color::WHITE then
-						self.evaluation = MIN_EVAL;
-					else
-						self.evaluation = MAX_EVAL;
-					end if;
-				end if;
-				
-				/* TODO
-				if not empty next_moves then
-					select one best_next_move related by self->Move[R5];
-					LOG::LogInfo(message: "Best line: " + param.line + " " + best_next_move.lan + " : " + STRING::itoa(i: self.evaluation));
-				end if;
-				*/
-				
-			else
-				
-				// TODO
-				// LOG::LogInfo(message: "Analyzed line: " + param.line + " = " + STRING::itoa(i: self.evaluation));
-			
-			end if;
-			@endnoparse
-		end operation;
-
-		@dialect("oal");
 		@operation_num(3);
 		operation create_next_moves() is
 			@noparse
@@ -254,6 +188,12 @@ within lichess_bot::components::Engine::games is
 				unrelate self from gameR3 across R3;
 			end if;
 			
+			select one boardR6 related by self->Board[R6];
+			if not empty boardR6 then
+				unrelate self from boardR6 across R6;
+				delete object instance boardR6;
+			end if;
+			
 			delete object instance self;
 			@endnoparse
 		end operation;
@@ -280,6 +220,11 @@ within lichess_bot::components::Engine::games is
 			end if;
 			select one engine related by self->Engine[R4];
 			relate new_position to engine across R4;
+			
+			// create the board
+			// TODO
+			//board = Board::fromFen(fen: new_position.fen);
+			//relate board to new_position across R6;
 			
 			// link the new position in the tree
 			relate new_position to self across R2.'follows' using move;

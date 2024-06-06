@@ -1,0 +1,483 @@
+// BP 7.1.6 content: ModelClass syschar: 3 persistence-version: 7.1.6
+
+within lichess_bot::components::Engine::'board representation' is
+
+	@key_letters("Board");
+	@class_num(1);
+	class Board is
+
+		white_pawns: timestamp;
+
+		white_knights: timestamp;
+
+		white_bishops: timestamp;
+
+		white_rooks: timestamp;
+
+		white_queens: timestamp;
+
+		white_king: timestamp;
+
+		black_pawns: timestamp;
+
+		black_knights: timestamp;
+
+		black_bishops: timestamp;
+
+		black_rooks: timestamp;
+
+		black_queens: timestamp;
+
+		black_king: timestamp;
+
+		en_passant_target: timestamp;
+
+		active_color: Color;
+
+		white_can_castle_kingside: boolean;
+
+		white_can_castle_queenside: boolean;
+
+		black_can_castle_kingside: boolean;
+
+		black_can_castle_queenside: boolean;
+
+		half_move_clock: integer;
+
+		full_move_number: integer;
+
+		@dialect("oal");
+		@operation_num(1);
+		class operation coordinateToBitboard(coordinate: in string) return timestamp is
+			@noparse
+			// parse the file
+			file = 0;
+			file_str = STRING::substr(s: param.coordinate, begin:0, end:1);
+			if file_str == "a" then
+				file = 0;
+			elif file_str == "b" then
+				file = 1;
+			elif file_str == "c" then
+				file = 2;
+			elif file_str == "d" then
+				file = 3;
+			elif file_str == "e" then
+				file = 4;
+			elif file_str == "f" then
+				file = 5;
+			elif file_str == "g" then
+				file = 6;
+			elif file_str == "h" then
+				file = 7;
+			else
+				LOG::LogFailure(message: "Invalid coordinates: '" + param.coordinate + "'");
+			end if;
+			
+			// parse the rank
+			rank = STRING::atoi(s: STRING::substr(s: param.coordinate, begin:1, end:-1)) - 1;
+			
+			// set the proper bit
+			return Bits::left_shift(a: 1, n: rank * 8 + file);
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(2);
+		class operation fromFen(fen: in string) return instance of Board is
+			@noparse
+			create object instance board of Board;
+			
+			// initialize bitboards
+			board.white_pawns = Bits::zero();
+			board.white_knights = Bits::zero();
+			board.white_bishops = Bits::zero();
+			board.white_rooks = Bits::zero();
+			board.white_queens = Bits::zero();
+			board.white_king = Bits::zero();
+			board.black_pawns = Bits::zero();
+			board.black_knights = Bits::zero();
+			board.black_bishops = Bits::zero();
+			board.black_rooks = Bits::zero();
+			board.black_queens = Bits::zero();
+			board.black_king = Bits::zero();
+			board.en_passant_target = Bits::zero();
+			
+			fen = param.fen;
+			if fen == "startpos" then
+				fen = startpos;
+			end if;
+			
+			// add a space to the end of the FEN string for token parsing
+			fen = fen + " ";
+			
+			// split the FEN into space delimited tokens
+			token_num = 0;
+			i = 0;
+			token_end = STRING::indexof( haystack: STRING::substr(s: fen, begin: i, end: -1), needle: " ");
+			while token_end != -1 loop
+				token = STRING::substr(s: fen, begin: i, end: i + token_end);
+				
+				// parse the piece positions
+				if token_num == 0 then
+				
+					rank_num = 7;
+					a = 0;
+					b = STRING::indexof(haystack: STRING::substr(s: token, begin: a, end: -1), needle: "/");
+					rank = STRING::substr(s: token, begin: a, end: b);
+					while rank_num >= 0 loop  // loop through each rank
+			
+						// loop through each character
+						j = 0;
+						file_num = 0;
+						while j < STRING::strlen(s: rank) loop  // loop through each file
+							character = STRING::substr(s: rank, begin: j, end: j + 1);
+							if character == "P" then
+								board.white_pawns = Bits::bitwise_or(a: board.white_pawns, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+							elif character == "N" then
+								board.white_knights = Bits::bitwise_or(a: board.white_knights, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+							elif character == "B" then
+								board.white_bishops = Bits::bitwise_or(a: board.white_bishops, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+							elif character == "R" then
+								board.white_rooks = Bits::bitwise_or(a: board.white_rooks, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+							elif character == "Q" then
+								board.white_queens = Bits::bitwise_or(a: board.white_queens, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+							elif character == "K" then
+								board.white_king = Bits::bitwise_or(a: board.white_king, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+							elif character == "p" then
+								board.black_pawns = Bits::bitwise_or(a: board.black_pawns, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+							elif character == "n" then
+								board.black_knights = Bits::bitwise_or(a: board.black_knights, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+							elif character == "b" then
+								board.black_bishops = Bits::bitwise_or(a: board.black_bishops, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+							elif character == "r" then
+								board.black_rooks = Bits::bitwise_or(a: board.black_rooks, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+							elif character == "q" then
+								board.black_queens = Bits::bitwise_or(a: board.black_queens, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+							elif character == "k" then
+								board.black_king = Bits::bitwise_or(a: board.black_king, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+							else
+								// consecutive blank spaces denoted by a number
+								file_num = file_num + STRING::atoi(s: character) - 1;
+							end if;
+							
+							file_num = file_num + 1;
+							j = j + 1;
+						end while;
+			
+						// get the next rank
+						a = b + 1;
+						if rank_num > 1 then
+							b = a + STRING::indexof(haystack: STRING::substr(s: token, begin: a, end: -1), needle: "/");
+						else
+							b = -1;
+						end if;
+						rank = STRING::substr(s: token, begin: a, end: b);
+						
+						rank_num = rank_num - 1;
+					end while;
+					
+				// parse active color
+				elif token_num == 1 then
+					
+					if token == "w" then
+						board.active_color = Color::WHITE;
+					else
+						board.active_color = Color::BLACK;
+					end if;
+					
+				// parse castling rights
+				elif token_num == 2 then
+					
+					if token != "-" then
+						board.white_can_castle_kingside = STRING::indexof(haystack: token, needle: "K") != -1;
+						board.white_can_castle_queenside = STRING::indexof(haystack: token, needle: "Q") != -1;
+						board.black_can_castle_kingside = STRING::indexof(haystack: token, needle: "k") != -1;
+						board.black_can_castle_queenside = STRING::indexof(haystack: token, needle: "q") != -1;
+					end if;
+			
+				// parse en passant target
+				elif token_num == 3 then
+					
+					if token != "-" then
+						board.en_passant_target = Board::coordinateToBitboard(coordinate: token);
+					end if;
+					
+				// parse half move clock
+				elif token_num == 4 then
+					
+					board.half_move_clock = STRING::atoi(s: token);
+			
+				// parse full move number
+				elif token_num == 5 then
+			
+					board.full_move_number = STRING::atoi(s: token);
+				
+				end if;
+				
+				token_num = token_num + 1;
+				i = i + token_end + 1;
+				token_end = STRING::indexof( haystack: STRING::substr(s: fen, begin: i, end: -1), needle: " ");
+			end while;
+			
+			return board;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(3);
+		operation clone_board() return instance of Board is
+			@noparse
+			create object instance board of Board;
+			board.white_pawns = self.white_pawns;
+			board.white_knights = self.white_knights;
+			board.white_bishops = self.white_bishops;
+			board.white_rooks = self.white_rooks;
+			board.white_queens = self.white_queens;
+			board.white_king = self.white_king;
+			board.black_pawns = self.black_pawns;
+			board.black_knights = self.black_knights;
+			board.black_bishops = self.black_bishops;
+			board.black_rooks = self.black_rooks;
+			board.black_queens = self.black_queens;
+			board.black_king = self.black_king;
+			board.en_passant_target = self.en_passant_target;
+			board.active_color = self.active_color;
+			board.white_can_castle_kingside = self.white_can_castle_kingside;
+			board.white_can_castle_queenside = self.white_can_castle_queenside;
+			board.black_can_castle_kingside = self.black_can_castle_kingside;
+			board.black_can_castle_queenside = self.black_can_castle_queenside;
+			board.half_move_clock = self.half_move_clock;
+			board.full_move_number = self.full_move_number;
+			return board;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(4);
+		operation toFen() return string is
+			@noparse
+			// TODO
+			fen = "";
+			
+			// populate piece positions section
+			rank_num = 7;
+			while rank_num >= 0 loop
+				
+				file_num = 0;
+				blank_square_count = 0;
+				while file_num < 8 loop
+					
+					// populate the piece
+					square = "";
+					if Bits::bitwise_and(a: self.white_pawns, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "P";
+					elif Bits::bitwise_and(a: self.white_knights, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "N";
+					elif Bits::bitwise_and(a: self.white_bishops, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "B";
+					elif Bits::bitwise_and(a: self.white_rooks, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "R";
+					elif Bits::bitwise_and(a: self.white_queens, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "Q";
+					elif Bits::bitwise_and(a: self.white_king, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "K";
+					elif Bits::bitwise_and(a: self.black_pawns, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "p";
+					elif Bits::bitwise_and(a: self.black_knights, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "n";
+					elif Bits::bitwise_and(a: self.black_bishops, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "b";
+					elif Bits::bitwise_and(a: self.black_rooks, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "r";
+					elif Bits::bitwise_and(a: self.black_queens, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "q";
+					elif Bits::bitwise_and(a: self.black_king, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "k";
+					end if;
+					
+					if square != "" then
+						if blank_square_count > 0 then
+							fen = fen + STRING::itoa(i: blank_square_count);
+							blank_square_count = 0;
+						end if;
+						fen = fen + square;
+					else
+						blank_square_count = blank_square_count + 1;
+					end if;
+					
+					file_num = file_num + 1;
+				end while;
+			
+				// add the blank space count if the rank doesn't end with a piece
+				if blank_square_count > 0 then
+					fen = fen + STRING::itoa(i: blank_square_count);
+				end if;
+			
+				// add the rank ender
+				if rank_num >= 1 then
+					fen = fen + "/";
+				end if;
+				
+				rank_num = rank_num - 1;
+			end while;
+			
+			fen = fen + " ";
+			
+			// populate the active color
+			if self.active_color == Color::WHITE then
+				fen = fen + "w";
+			else
+				fen = fen + "b";
+			end if;
+			
+			fen = fen + " ";
+			
+			// populate castling rights
+			castling_rights = "";
+			if self.white_can_castle_kingside then
+				castling_rights = castling_rights + "K";
+			end if;
+			if self.white_can_castle_queenside then
+				castling_rights = castling_rights + "Q";
+			end if;
+			if self.black_can_castle_kingside then
+				castling_rights = castling_rights + "k";
+			end if;
+			if self.black_can_castle_queenside then
+				castling_rights = castling_rights + "q";
+			end if;
+			if castling_rights != "" then
+				fen = fen + castling_rights;
+			else
+				fen = fen + "-";
+			end if;
+			
+			fen = fen + " ";
+			
+			// populate en passant target
+			if self.en_passant_target != Bits::zero() then
+				fen = fen + Board::bitboardToCoordinate(bitboard: self.en_passant_target);
+			else
+				fen = fen + "-";
+			end if;
+			
+			fen = fen + " ";
+			
+			// populate half move clock
+			fen = fen + STRING::itoa(i: self.half_move_clock);
+			
+			fen = fen + " ";
+			
+			// populate full move number
+			fen = fen + STRING::itoa(i: self.full_move_number);
+			
+			return fen;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(5);
+		operation print() is
+			@noparse
+			rank_num = 7;
+			while rank_num >= 0 loop
+				
+				// print the rank separator
+				LOG::LogInfo(message: "---------------------------------");
+				
+				line_string = "";
+				file_num = 0;
+				file_sep = "| ";
+				while file_num < 8 loop
+					
+					// populate the square
+					square = " ";
+					
+					if Bits::bitwise_and(a: self.white_pawns, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "P";
+					elif Bits::bitwise_and(a: self.white_knights, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "N";
+					elif Bits::bitwise_and(a: self.white_bishops, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "B";
+					elif Bits::bitwise_and(a: self.white_rooks, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "R";
+					elif Bits::bitwise_and(a: self.white_queens, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "Q";
+					elif Bits::bitwise_and(a: self.white_king, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "K";
+					elif Bits::bitwise_and(a: self.black_pawns, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "p";
+					elif Bits::bitwise_and(a: self.black_knights, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "n";
+					elif Bits::bitwise_and(a: self.black_bishops, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "b";
+					elif Bits::bitwise_and(a: self.black_rooks, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "r";
+					elif Bits::bitwise_and(a: self.black_queens, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "q";
+					elif Bits::bitwise_and(a: self.black_king, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "k";
+					elif Bits::bitwise_and(a: self.en_passant_target, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+						square = "*";
+					end if;
+					
+					// append the square
+					line_string = line_string + file_sep + square;
+					
+					
+					file_sep = " | ";
+					file_num = file_num + 1;
+				end while;
+				
+				// at the end of the rank append the final separator and rank number
+				line_string = line_string + " | " + STRING::itoa(i: rank_num + 1);
+				LOG::LogInfo(message: line_string);
+				
+				rank_num = rank_num - 1;
+			end while;
+			
+			// at the end print the last rank separator and the file letters
+			LOG::LogInfo(message: "---------------------------------");
+			LOG::LogInfo(message: "  a   b   c   d   e   f   g   h");
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(6);
+		class operation bitboardToCoordinate(bitboard: in timestamp) return string is
+			@noparse
+			// This operation assumes that the parameter is a bitboard with exactly one bit set
+			
+			bitboard = param.bitboard;
+			
+			full_rank = Bits::zero();
+			full_rank = 255;  // 0b11111111
+			
+			rank_num = 0;
+			while Bits::bitwise_and(a: bitboard, b: full_rank) == 0  and rank_num <= 7 loop
+				bitboard = Bits::right_shift(a: bitboard, n: 8);
+				rank_num = rank_num + 1;
+			end while;
+			
+			file_num = 0;
+			while bitboard != 1 and file_num <= 7 loop
+				bitboard = Bits::right_shift(a: bitboard, n: 1);
+				file_num = file_num + 1;
+			end while;
+			
+			files[7] = "h";
+			files[6] = "g";
+			files[5] = "f";
+			files[4] = "e";
+			files[3] = "d";
+			files[2] = "c";
+			files[1] = "b";
+			files[0] = "a";
+			
+			return files[file_num] + STRING::itoa(i: rank_num + 1);
+			@endnoparse
+		end operation;
+
+	end class;
+
+end;
