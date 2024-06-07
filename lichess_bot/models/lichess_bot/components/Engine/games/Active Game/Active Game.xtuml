@@ -129,7 +129,6 @@ within lichess_bot::components::Engine::games is
 			// create initial position
 			create object instance initial_position of Position;
 			initial_position.fen = game.initial_fen;
-			initial_position.color_to_move = game.start_color;
 			relate initial_position to game across R3;
 			
 			board = Board::fromFen(fen: initial_position.fen);

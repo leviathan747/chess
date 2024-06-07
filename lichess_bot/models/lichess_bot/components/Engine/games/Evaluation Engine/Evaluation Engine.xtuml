@@ -50,7 +50,8 @@ within lichess_bot::components::Engine::games is
 			
 				// create and prioritize the legal moves which follow this position
 				position.create_next_moves();
-				
+			
+				select one board related by position->Board[R6];
 			
 				// TODO evaluate moves in priority order
 				select many next_moves related by position->Move[R2.'is follwed by'];
@@ -62,8 +63,8 @@ within lichess_bot::components::Engine::games is
 					
 					// compare to find the best next move
 					select one best_next_move related by position->Move[R5];
-					if empty best_next_move or ( position.color_to_move == Color::WHITE and next_position.evaluation > position.evaluation ) or
-							( position.color_to_move == Color::BLACK and next_position.evaluation < position.evaluation ) then
+					if empty best_next_move or ( board.active_color == Color::WHITE and next_position.evaluation > position.evaluation ) or
+							( board.active_color == Color::BLACK and next_position.evaluation < position.evaluation ) then
 						if not empty best_next_move then
 							unrelate best_next_move from position across R5;
 						end if;
@@ -81,7 +82,7 @@ within lichess_bot::components::Engine::games is
 				// check for checkmate
 				// TODO this also rewards stalemate
 				if empty next_moves then
-					if position.color_to_move == Color::WHITE then
+					if board.active_color == Color::WHITE then
 						position.evaluation = MIN_EVAL;
 					else
 						position.evaluation = MAX_EVAL;

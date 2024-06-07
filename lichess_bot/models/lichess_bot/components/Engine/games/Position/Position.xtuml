@@ -8,8 +8,6 @@ within lichess_bot::components::Engine::games is
 
 		fen: string;
 
-		color_to_move: Color;
-
 		evaluation: real;
 
 		//! This attribute represents the depth to which the position has been analyzed.
@@ -36,83 +34,30 @@ within lichess_bot::components::Engine::games is
 			if not self.evaluated then
 				
 				// Count up total material on each side (measured in centipawns)
+				// The evaluation is the difference in material
 				//   pawn   = 100
 				//   knight = 300
 				//   bishop = 300
 				//   rook   = 500
 				//   queen  = 900
 			
-				white_total_material = 0;
-				black_total_material = 0;
+				select one board related by self->Board[R6];
 			
-				end_index = STRING::indexof(haystack: self.fen, needle: " ");
-				rank_num = 7;
-				a = 0;
-				b = STRING::indexof(haystack: STRING::substr(s: self.fen, begin: a, end: -1), needle: "/");
-				rank = STRING::substr(s: self.fen, begin: a, end: b);
-				while rank_num >= 0 loop  // loop through each rank
+				evaluation = 0;
+				
+				evaluation = evaluation + 100 * Board::bitboardPopulation(bitboard: board.white_pawns);
+				evaluation = evaluation + 300 * Board::bitboardPopulation(bitboard: board.white_knights);
+				evaluation = evaluation + 300 * Board::bitboardPopulation(bitboard: board.white_bishops);
+				evaluation = evaluation + 500 * Board::bitboardPopulation(bitboard: board.white_rooks);
+				evaluation = evaluation + 900 * Board::bitboardPopulation(bitboard: board.white_queens);
 			
-					// loop through each character
-					j = 0;
-					file_num = 0;
-					while j < STRING::strlen(s: rank) loop  // loop through each file
-						character = STRING::substr(s: rank, begin: j, end: j + 1);
-						weight = 0;
-						is_white = true;
-						if character == "P" then
-							weight = 100;
-						elif character == "N" or character == "B" then
-							weight = 300;
-						elif character == "R" then
-							weight = 500;
-						elif character == "Q" then
-							weight = 900;
-						elif character == "K" then
-							white_king_rank = rank_num;
-							white_king_file = file_num;
-						elif character == "p" then
-							weight = -100;
-							is_white = false;
-						elif character == "n" or character == "b" then
-							weight = -300;
-							is_white = false;
-						elif character == "r" then
-							weight = -500;
-							is_white = false;
-						elif character == "q" then
-							weight = -900;
-							is_white = false;
-						elif character == "k" then
-							black_king_rank = rank_num;
-							black_king_file = file_num;
-							is_white = false;
-						else
-							// consecutive blank spaces denoted by a number
-							file_num = file_num + STRING::atoi(s: character) - 1;
-						end if;
-						if is_white then
-							white_total_material = white_total_material + weight;
-						else
-							black_total_material = black_total_material + weight;
-						end if;
-						
-						j = j + 1;
-					end while;
+				evaluation = evaluation - 100 * Board::bitboardPopulation(bitboard: board.black_pawns);
+				evaluation = evaluation - 300 * Board::bitboardPopulation(bitboard: board.black_knights);
+				evaluation = evaluation - 300 * Board::bitboardPopulation(bitboard: board.black_bishops);
+				evaluation = evaluation - 500 * Board::bitboardPopulation(bitboard: board.black_rooks);
+				evaluation = evaluation - 900 * Board::bitboardPopulation(bitboard: board.black_queens);
 			
-					// get the next rank
-					a = b + 1;
-					if rank_num > 1 then
-						b = a + STRING::indexof(haystack: STRING::substr(s: self.fen, begin: a, end: -1), needle: "/");
-					else
-						b = a + STRING::indexof(haystack: STRING::substr(s: self.fen, begin: a, end: -1), needle: " ");
-					end if;
-					rank = STRING::substr(s: self.fen, begin: a, end: b);
-					
-					rank_num = rank_num - 1;
-				end while;
-			
-				// the evaluation is the difference in material with bonus applied calculated in centipawns
-				self.evaluation = white_total_material + black_total_material;
+				self.evaluation = evaluation;
 				self.evaluation_depth = 0;
 				select one engine related by self->Engine[R4];
 			
@@ -205,6 +150,11 @@ within lichess_bot::components::Engine::games is
 			// create a new move
 			create object instance move of Move;
 			move.lan = param.lan;
+			
+			// create the new board
+			select one current_board related by self->Board[R6];
+			board = current_board.do_move(lan: move.lan);
+			
 			// TODO populate properties of the move
 			// TODO Consider possible optimization: is this necessary if the move is being created after the fact
 			
@@ -212,19 +162,10 @@ within lichess_bot::components::Engine::games is
 			// create the new position
 			create object instance new_position of Position;
 			moves[0] = param.lan;
-			new_position.fen = ChessLib::movesToFEN(initialFen: self.fen, moves: moves);
-			if self.color_to_move == Color::WHITE then
-				new_position.color_to_move = Color::BLACK;
-			else
-				new_position.color_to_move = Color::WHITE;
-			end if;
+			new_position.fen = board.toFen();
+			relate board to new_position across R6;
 			select one engine related by self->Engine[R4];
 			relate new_position to engine across R4;
-			
-			// create the board
-			// TODO
-			//board = Board::fromFen(fen: new_position.fen);
-			//relate board to new_position across R6;
 			
 			// link the new position in the tree
 			relate new_position to self across R2.'follows' using move;

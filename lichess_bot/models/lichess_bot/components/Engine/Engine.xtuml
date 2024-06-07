@@ -9,6 +9,7 @@ within lichess_bot::components is
 		package bot;
 		package functions;
 		package games;
+		package test;
 		package types is lichess_bot::types;
 		
 		required port chess implements LichessAPI is
@@ -192,7 +193,6 @@ within lichess_bot::components is
 				// update the initial position
 				select one initial_position related by game->Position[R3];
 				initial_position.fen = game.initial_fen;
-				initial_position.color_to_move = game.start_color;
 				select one board related by initial_position->Board[R6];
 				if not empty board then
 					unrelate board from initial_position across R6;

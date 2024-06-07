@@ -478,6 +478,201 @@ within lichess_bot::components::Engine::'board representation' is
 			@endnoparse
 		end operation;
 
+		@dialect("oal");
+		@operation_num(7);
+		operation whitePiecesBitboard() return timestamp is
+			@noparse
+			return Bits::bitwise_or(a: self.white_pawns, b: Bits::bitwise_or(a: self.white_knights, b: Bits::bitwise_or(a: self.white_bishops, b: Bits::bitwise_or(a: self.white_rooks, b: Bits::bitwise_or(a: self.white_queens, b: self.white_king)))));
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(7);
+		operation blackPiecesBitboard() return timestamp is
+			@noparse
+			return Bits::bitwise_or(a: self.black_pawns, b: Bits::bitwise_or(a: self.black_knights, b: Bits::bitwise_or(a: self.black_bishops, b: Bits::bitwise_or(a: self.black_rooks, b: Bits::bitwise_or(a: self.black_queens, b: self.black_king)))));
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(8);
+		class operation bitboardPopulation(bitboard: in timestamp) return integer is
+			@noparse
+			// Brian Kernighan's algorithm for counting the number of set bits
+			bitboard = param.bitboard;
+			count = 0;
+			while bitboard != 0 loop
+				count = count + 1;
+				bitboard = Bits::bitwise_and(a: bitboard, b: bitboard - 1);  // reset LS1B
+			end while;
+			return count;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(9);
+		class operation bitboardRankNum(bitboard: in timestamp) return integer is
+			@noparse
+			bitboard = param.bitboard;
+			
+			full_rank = Bits::zero();
+			full_rank = 255;  // 0b11111111
+			
+			rank_num = 0;
+			while Bits::bitwise_and(a: bitboard, b: full_rank) == 0  and rank_num <= 7 loop
+				bitboard = Bits::right_shift(a: bitboard, n: 8);
+				rank_num = rank_num + 1;
+			end while;
+			
+			return rank_num;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(10);
+		operation do_move(lan: in string) return instance of Board is
+			@noparse
+			// create the new board
+			board = self.clone_board();
+			
+			// convert coordinates to bitboards
+			src_bitboard = Board::coordinateToBitboard(coordinate: STRING::substr(s: param.lan, begin: 0, end: 2));
+			inverse_src_bitboard = Bits::bitwise_not(a: src_bitboard);
+			dst_bitboard = Board::coordinateToBitboard(coordinate: STRING::substr(s: param.lan, begin: 2, end: -1));
+			inverse_dst_bitboard = Bits::bitwise_not(a: dst_bitboard);
+			
+			// check if this is a capture
+			is_capture = (board.active_color == Color::WHITE and Bits::bitwise_and(a: Bits::bitwise_or(a: board.blackPiecesBitboard(), b: board.en_passant_target), b: dst_bitboard) != 0) or
+				(board.active_color == Color::BLACK and Bits::bitwise_and(a: Bits::bitwise_or(a: board.whitePiecesBitboard(), b: board.en_passant_target), b: dst_bitboard) != 0);
+				
+			// get a bitboard for the pawn captured en passant
+			en_passant_captured_pawn = Bits::zero();
+			if is_capture and Bits::bitwise_and(a: board.en_passant_target, b: dst_bitboard) != 0 then
+				en_passant_captured_pawn = Board::coordinateToBitboard(coordinate: STRING::substr(s: param.lan, begin: 2, end: 3) + STRING::substr(s: param.lan, begin: 1, end: 2));
+			end if;
+			
+			// check if this is a pawn move
+			is_pawn_move = Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: board.white_pawns, b: board.black_pawns)) != 0;
+				
+			// update piece bitboards
+			if board.active_color == Color::WHITE then
+				// vacate the source square and inhabit the destination square
+				if Bits::bitwise_and(a: board.white_pawns, b: src_bitboard) != 0 then
+					board.white_pawns = Bits::bitwise_and(a: board.white_pawns, b: inverse_src_bitboard);
+					board.white_pawns = Bits::bitwise_or(a: board.white_pawns, b: dst_bitboard);
+				elif Bits::bitwise_and(a: board.white_knights, b: src_bitboard) != 0 then
+					board.white_knights = Bits::bitwise_and(a: board.white_knights, b: inverse_src_bitboard);
+					board.white_knights = Bits::bitwise_or(a: board.white_knights, b: dst_bitboard);
+				elif Bits::bitwise_and(a: board.white_bishops, b: src_bitboard) != 0 then
+					board.white_bishops = Bits::bitwise_and(a: board.white_bishops, b: inverse_src_bitboard);
+					board.white_bishops = Bits::bitwise_or(a: board.white_bishops, b: dst_bitboard);
+				elif Bits::bitwise_and(a: board.white_rooks, b: src_bitboard) != 0 then
+					board.white_rooks = Bits::bitwise_and(a: board.white_rooks, b: inverse_src_bitboard);
+					board.white_rooks = Bits::bitwise_or(a: board.white_rooks, b: dst_bitboard);
+				elif Bits::bitwise_and(a: board.white_queens, b: src_bitboard) != 0 then
+					board.white_queens = Bits::bitwise_and(a: board.white_queens, b: inverse_src_bitboard);
+					board.white_queens = Bits::bitwise_or(a: board.white_queens, b: dst_bitboard);
+				elif Bits::bitwise_and(a: board.white_king, b: src_bitboard) != 0 then
+					board.white_king = Bits::bitwise_and(a: board.white_king, b: inverse_src_bitboard);
+					board.white_king = Bits::bitwise_or(a: board.white_king, b: dst_bitboard);
+				end if;
+				// clear the destination square on opposite color bitboards
+				board.black_pawns = Bits::bitwise_and(a: board.black_pawns, b: Bits::bitwise_and(a: inverse_dst_bitboard, b: Bits::bitwise_not(a: en_passant_captured_pawn)));
+				board.black_knights = Bits::bitwise_and(a: board.black_knights, b: inverse_dst_bitboard);
+				board.black_bishops = Bits::bitwise_and(a: board.black_bishops, b: inverse_dst_bitboard);
+				board.black_rooks = Bits::bitwise_and(a: board.black_rooks, b: inverse_dst_bitboard);
+				board.black_queens = Bits::bitwise_and(a: board.black_queens, b: inverse_dst_bitboard);
+			else
+				// vacate the source square and inhabit the destination square
+				if Bits::bitwise_and(a: board.black_pawns, b: src_bitboard) != 0 then
+					board.black_pawns = Bits::bitwise_and(a: board.black_pawns, b: inverse_src_bitboard);
+					board.black_pawns = Bits::bitwise_or(a: board.black_pawns, b: dst_bitboard);
+				elif Bits::bitwise_and(a: board.black_knights, b: src_bitboard) != 0 then
+					board.black_knights = Bits::bitwise_and(a: board.black_knights, b: inverse_src_bitboard);
+					board.black_knights = Bits::bitwise_or(a: board.black_knights, b: dst_bitboard);
+				elif Bits::bitwise_and(a: board.black_bishops, b: src_bitboard) != 0 then
+					board.black_bishops = Bits::bitwise_and(a: board.black_bishops, b: inverse_src_bitboard);
+					board.black_bishops = Bits::bitwise_or(a: board.black_bishops, b: dst_bitboard);
+				elif Bits::bitwise_and(a: board.black_rooks, b: src_bitboard) != 0 then
+					board.black_rooks = Bits::bitwise_and(a: board.black_rooks, b: inverse_src_bitboard);
+					board.black_rooks = Bits::bitwise_or(a: board.black_rooks, b: dst_bitboard);
+				elif Bits::bitwise_and(a: board.black_queens, b: src_bitboard) != 0 then
+					board.black_queens = Bits::bitwise_and(a: board.black_queens, b: inverse_src_bitboard);
+					board.black_queens = Bits::bitwise_or(a: board.black_queens, b: dst_bitboard);
+				elif Bits::bitwise_and(a: board.black_king, b: src_bitboard) != 0 then
+					board.black_king = Bits::bitwise_and(a: board.black_king, b: inverse_src_bitboard);
+					board.black_king = Bits::bitwise_or(a: board.black_king, b: dst_bitboard);
+				end if;
+				// clear the destination square on opposite color bitboards
+				board.white_pawns = Bits::bitwise_and(a: board.white_pawns, b: Bits::bitwise_and(a: inverse_dst_bitboard, b: Bits::bitwise_not(a: en_passant_captured_pawn)));
+				board.white_pawns = Bits::bitwise_and(a: board.white_pawns, b: inverse_dst_bitboard);
+				board.white_knights = Bits::bitwise_and(a: board.white_knights, b: inverse_dst_bitboard);
+				board.white_bishops = Bits::bitwise_and(a: board.white_bishops, b: inverse_dst_bitboard);
+				board.white_rooks = Bits::bitwise_and(a: board.white_rooks, b: inverse_dst_bitboard);
+				board.white_queens = Bits::bitwise_and(a: board.white_queens, b: inverse_dst_bitboard);
+			end if;
+			
+			// update en passant target
+			board.en_passant_target = Bits::zero();
+			if is_pawn_move then
+				src_rank = Board::bitboardRankNum(bitboard: src_bitboard);
+				dst_rank = Board::bitboardRankNum(bitboard: dst_bitboard);
+				if dst_rank - src_rank == 2 then     // white pawn move: move the src bitboard up one rank by shifting to the left 8 bits
+					board.en_passant_target = Bits::left_shift(a: src_bitboard, n: 8);
+				elif dst_rank - src_rank == -2 then  // black pawn move: move the src bitboard down one rank by shifting to the right 8 bits
+					board.en_passant_target = Bits::right_shift(a: src_bitboard, n: 8);
+				end if;
+			end if;
+			
+			// update active color
+			if self.active_color == Color::WHITE then
+				board.active_color = Color::BLACK;
+			else
+				board.active_color = Color::WHITE;
+			end if;
+			
+			// update castling rights
+			if self.white_can_castle_kingside then
+				white_kingside_rook_home = Bits::left_shift(a: 1, n: 7);
+				if Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: white_kingside_rook_home, b: self.white_king)) != 0 then
+					board.white_can_castle_kingside = false;
+				end if;
+			end if;
+			if self.white_can_castle_queenside then
+				white_queenside_rook_home = Bits::left_shift(a: 1, n: 0);
+				if Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: white_queenside_rook_home, b: self.white_king)) != 0 then
+					board.white_can_castle_queenside = false;
+				end if;
+			end if;
+			if self.black_can_castle_kingside then
+				black_kingside_rook_home = Bits::left_shift(a: 1, n: 63);
+				if Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: black_kingside_rook_home, b: self.black_king)) != 0 then
+					board.black_can_castle_kingside = false;
+				end if;
+			end if;
+			if self.black_can_castle_queenside then
+				black_queenside_rook_home = Bits::left_shift(a: 1, n: 56);
+				if Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: black_queenside_rook_home, b: self.black_king)) != 0 then
+					board.black_can_castle_queenside = false;
+				end if;
+			end if;
+			
+			// update half move clock
+			if is_capture or is_pawn_move then
+				board.half_move_clock = 0;
+			else
+				board.half_move_clock = self.half_move_clock + 1;
+			end if;
+			
+			// update full move number
+			if self.active_color == Color::BLACK then
+				board.full_move_number = self.full_move_number + 1;
+			end if;
+			
+			return board;
+			@endnoparse
+		end operation;
+
 	end class;
 
 end;

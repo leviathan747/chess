@@ -14,6 +14,8 @@ within lichess_bot::components::Engine::games is
 
 		is_attack: boolean;
 
+		is_pawn_move: boolean;
+
 	end class;
 
 end;

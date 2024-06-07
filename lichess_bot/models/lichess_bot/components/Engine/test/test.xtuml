@@ -1,0 +1,41 @@
+// BP 7.1.6 content: Package syschar: 3 persistence-version: 7.1.6
+
+within lichess_bot::components::Engine is
+
+	package test is
+		@dialect("oal");
+		@function_num(1);
+		function test1() is
+			@noparse
+			LOG::LogInfo(message: "test1: start");
+			t0 = TIM::current_clock();
+			
+			initial_fen = startpos;
+			move_text = "e2e4 c7c6 d1h5 c6c5 h5c5 g8h6 f1b5 g7g5 g1f3 e7e6 c5g5 d8g5 f3g5 f8c5 e1g1 h8g8 d2d3 a7a6 b5a4 e8f8 b1c3 f8e7 g5f3 h6g4 c1g5 e7e8 a1e1 c5f2 f1f2 g4e5 f3e5 g8g5 f2f7 g5e5 e1f1 h7h6 f7f8 e8e7 f1f7";
+			
+			board = Board::fromFen(fen: initial_fen);
+			board.print();
+			LOG::LogInfo(message: board.toFen());
+			
+			// split the FEN into space delimited tokens
+			i = 0;
+			token_end = STRING::indexof( haystack: STRING::substr(s: move_text, begin: i, end: -1), needle: " ");
+			while token_end != -1 loop
+				token = STRING::substr(s: move_text, begin: i, end: i + token_end);
+				
+				board = board.do_move(lan: token);
+				board.print();
+				LOG::LogInfo(message: board.toFen());
+				
+				i = i + token_end + 1;
+				token_end = STRING::indexof( haystack: STRING::substr(s: move_text, begin: i, end: -1), needle: " ");
+			end while;
+			
+			t1 = TIM::current_clock();
+			LOG::LogInfo(message: "test1: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			@endnoparse
+		end function;
+
+	end package;
+
+end;
