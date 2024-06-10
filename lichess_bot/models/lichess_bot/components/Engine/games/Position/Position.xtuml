@@ -45,17 +45,17 @@ within lichess_bot::components::Engine::games is
 			
 				evaluation = 0;
 				
-				evaluation = evaluation + 100 * Board::bitboardPopulation(bitboard: board.white_pawns);
-				evaluation = evaluation + 300 * Board::bitboardPopulation(bitboard: board.white_knights);
-				evaluation = evaluation + 300 * Board::bitboardPopulation(bitboard: board.white_bishops);
-				evaluation = evaluation + 500 * Board::bitboardPopulation(bitboard: board.white_rooks);
-				evaluation = evaluation + 900 * Board::bitboardPopulation(bitboard: board.white_queens);
+				evaluation = evaluation + 100 * Board::bitboard_population(bitboard: board.white_pawns);
+				evaluation = evaluation + 300 * Board::bitboard_population(bitboard: board.white_knights);
+				evaluation = evaluation + 300 * Board::bitboard_population(bitboard: board.white_bishops);
+				evaluation = evaluation + 500 * Board::bitboard_population(bitboard: board.white_rooks);
+				evaluation = evaluation + 900 * Board::bitboard_population(bitboard: board.white_queens);
 			
-				evaluation = evaluation - 100 * Board::bitboardPopulation(bitboard: board.black_pawns);
-				evaluation = evaluation - 300 * Board::bitboardPopulation(bitboard: board.black_knights);
-				evaluation = evaluation - 300 * Board::bitboardPopulation(bitboard: board.black_bishops);
-				evaluation = evaluation - 500 * Board::bitboardPopulation(bitboard: board.black_rooks);
-				evaluation = evaluation - 900 * Board::bitboardPopulation(bitboard: board.black_queens);
+				evaluation = evaluation - 100 * Board::bitboard_population(bitboard: board.black_pawns);
+				evaluation = evaluation - 300 * Board::bitboard_population(bitboard: board.black_knights);
+				evaluation = evaluation - 300 * Board::bitboard_population(bitboard: board.black_bishops);
+				evaluation = evaluation - 500 * Board::bitboard_population(bitboard: board.black_rooks);
+				evaluation = evaluation - 900 * Board::bitboard_population(bitboard: board.black_queens);
 			
 				self.evaluation = evaluation;
 				self.evaluation_depth = 0;
@@ -162,7 +162,7 @@ within lichess_bot::components::Engine::games is
 			// create the new position
 			create object instance new_position of Position;
 			moves[0] = param.lan;
-			new_position.fen = board.toFen();
+			new_position.fen = board.to_fen();
 			relate board to new_position across R6;
 			select one engine related by self->Engine[R4];
 			relate new_position to engine across R4;

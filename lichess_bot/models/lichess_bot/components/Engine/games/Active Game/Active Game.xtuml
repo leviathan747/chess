@@ -99,11 +99,11 @@ within lichess_bot::components::Engine::games is
 			if empty current_board then
 				// TODO shouldn't need to do this here
 				select one current_position related by self->Position[R3];
-				current_board = Board::fromFen(fen: current_position.fen);
+				current_board = Board::from_fen(fen: current_position.fen);
 				relate current_board to current_position across R6;
 			end if;
 			current_board.print();
-			LOG::LogInfo(message: current_board.toFen());
+			LOG::LogInfo(message: current_board.to_fen());
 			
 			// check if the game is over
 			if not (self.game_state.status == GameStatus::CREATED or self.game_state.status == GameStatus::STARTED) then
@@ -131,7 +131,7 @@ within lichess_bot::components::Engine::games is
 			initial_position.fen = game.initial_fen;
 			relate initial_position to game across R3;
 			
-			board = Board::fromFen(fen: initial_position.fen);
+			board = Board::from_fen(fen: initial_position.fen);
 			relate board to initial_position across R6;
 			
 			// create the evaluation engine
