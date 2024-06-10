@@ -104,9 +104,19 @@ within lichess_bot::components::Engine::'board representation' is
 			dst_bitboard = Board::coordinate_to_bitboard(coordinate: STRING::substr(s: param.lan, begin: 2, end: 4));
 			inverse_dst_bitboard = Bits::bitwise_not(a: dst_bitboard);
 			
+			// get the promotion character
+			promotion = "";
+			if STRING::strlen(s: param.lan) > 4 then
+				promotion = STRING::substr(s: param.lan, begin: 4, end: 5);
+			end if;
+			
+			// check if this is a pawn move
+			is_pawn_move = Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: board.white_pawns, b: board.black_pawns)) != 0;
+			
 			// check if this is a capture
-			is_capture = (board.active_color == Color::WHITE and Bits::bitwise_and(a: Bits::bitwise_or(a: board.black_pieces_bitboard(), b: board.en_passant_target), b: dst_bitboard) != 0) or
-				(board.active_color == Color::BLACK and Bits::bitwise_and(a: Bits::bitwise_or(a: board.white_pieces_bitboard(), b: board.en_passant_target), b: dst_bitboard) != 0);
+			is_capture = (board.active_color == Color::WHITE and Bits::bitwise_and(a: board.black_pieces_bitboard(), b: dst_bitboard) != 0) or
+				(board.active_color == Color::BLACK and Bits::bitwise_and(a: board.white_pieces_bitboard(), b: dst_bitboard) != 0) or
+				(is_pawn_move and Bits::bitwise_and(a: board.en_passant_target, b: dst_bitboard) != 0);
 				
 			// get a bitboard for the pawn captured en passant
 			en_passant_captured_pawn = Bits::zero();
@@ -116,20 +126,17 @@ within lichess_bot::components::Engine::'board representation' is
 				en_passant_captured_pawn =  Bits::left_shift(a: 1, n: src_file_rank[1] * 8 + dst_file_rank[0]);
 			end if;
 			
-			// check if this is a pawn move
-			is_pawn_move = Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: board.white_pawns, b: board.black_pawns)) != 0;
-			
 			// if this is a castling move, update the position of the rook first
-			if src_bitboard == Bits::left_shift(a: 1, n: 4) and dst_bitboard == Bits::left_shift(a: 1, n: 6) then      // e1g1 -- white kingside castle
+			if board.white_can_castle_kingside and src_bitboard == Bits::left_shift(a: 1, n: 4) and dst_bitboard == Bits::left_shift(a: 1, n: 6) then       // e1g1 -- white kingside castle
 				board.white_rooks = Bits::bitwise_and(a: board.white_rooks, b: Bits::bitwise_not(a: Bits::left_shift(a: 1, n: 7)));
 				board.white_rooks = Bits::bitwise_or(a: board.white_rooks, b: Bits::left_shift(a: 1, n: 5));
-			elif src_bitboard == Bits::left_shift(a: 1, n: 4) and dst_bitboard == Bits::left_shift(a: 1, n: 2) then    // e1c1 -- white queenside castle
+			elif board.white_can_castle_queenside and src_bitboard == Bits::left_shift(a: 1, n: 4) and dst_bitboard == Bits::left_shift(a: 1, n: 2) then    // e1c1 -- white queenside castle
 				board.white_rooks = Bits::bitwise_and(a: board.white_rooks, b: Bits::bitwise_not(a: Bits::left_shift(a: 1, n: 0)));
 				board.white_rooks = Bits::bitwise_or(a: board.white_rooks, b: Bits::left_shift(a: 1, n: 3));
-			elif src_bitboard == Bits::left_shift(a: 1, n: 60) and dst_bitboard == Bits::left_shift(a: 1, n: 62) then  // e8g8 -- black kingside castle
+			elif board.black_can_castle_kingside and src_bitboard == Bits::left_shift(a: 1, n: 60) and dst_bitboard == Bits::left_shift(a: 1, n: 62) then   // e8g8 -- black kingside castle
 				board.black_rooks = Bits::bitwise_and(a: board.black_rooks, b: Bits::bitwise_not(a: Bits::left_shift(a: 1, n: 63)));
 				board.black_rooks = Bits::bitwise_or(a: board.black_rooks, b: Bits::left_shift(a: 1, n: 61));
-			elif src_bitboard == Bits::left_shift(a: 1, n: 60) and dst_bitboard == Bits::left_shift(a: 1, n: 58) then  // e8c8 -- black queenside castle
+			elif board.black_can_castle_queenside and src_bitboard == Bits::left_shift(a: 1, n: 60) and dst_bitboard == Bits::left_shift(a: 1, n: 58) then  // e8c8 -- black queenside castle
 				board.black_rooks = Bits::bitwise_and(a: board.black_rooks, b: Bits::bitwise_not(a: Bits::left_shift(a: 1, n: 56)));
 				board.black_rooks = Bits::bitwise_or(a: board.black_rooks, b: Bits::left_shift(a: 1, n: 59));
 			end if;
@@ -139,7 +146,17 @@ within lichess_bot::components::Engine::'board representation' is
 				// vacate the source square and inhabit the destination square
 				if Bits::bitwise_and(a: board.white_pawns, b: src_bitboard) != 0 then
 					board.white_pawns = Bits::bitwise_and(a: board.white_pawns, b: inverse_src_bitboard);
-					board.white_pawns = Bits::bitwise_or(a: board.white_pawns, b: dst_bitboard);
+					if promotion == "n" then
+						board.white_knights = Bits::bitwise_or(a: board.white_knights, b: dst_bitboard);
+					elif promotion == "b" then
+						board.white_bishops = Bits::bitwise_or(a: board.white_bishops, b: dst_bitboard);
+					elif promotion == "r" then
+						board.white_rooks = Bits::bitwise_or(a: board.white_rooks, b: dst_bitboard);
+					elif promotion == "q" then
+						board.white_queens = Bits::bitwise_or(a: board.white_queens, b: dst_bitboard);
+					else
+						board.white_pawns = Bits::bitwise_or(a: board.white_pawns, b: dst_bitboard);
+					end if;
 				elif Bits::bitwise_and(a: board.white_knights, b: src_bitboard) != 0 then
 					board.white_knights = Bits::bitwise_and(a: board.white_knights, b: inverse_src_bitboard);
 					board.white_knights = Bits::bitwise_or(a: board.white_knights, b: dst_bitboard);
@@ -166,7 +183,17 @@ within lichess_bot::components::Engine::'board representation' is
 				// vacate the source square and inhabit the destination square
 				if Bits::bitwise_and(a: board.black_pawns, b: src_bitboard) != 0 then
 					board.black_pawns = Bits::bitwise_and(a: board.black_pawns, b: inverse_src_bitboard);
-					board.black_pawns = Bits::bitwise_or(a: board.black_pawns, b: dst_bitboard);
+					if promotion == "n" then
+						board.black_knights = Bits::bitwise_or(a: board.black_knights, b: dst_bitboard);
+					elif promotion == "b" then
+						board.black_bishops = Bits::bitwise_or(a: board.black_bishops, b: dst_bitboard);
+					elif promotion == "r" then
+						board.black_rooks = Bits::bitwise_or(a: board.black_rooks, b: dst_bitboard);
+					elif promotion == "q" then
+						board.black_queens = Bits::bitwise_or(a: board.black_queens, b: dst_bitboard);
+					else
+						board.black_pawns = Bits::bitwise_or(a: board.black_pawns, b: dst_bitboard);
+					end if;
 				elif Bits::bitwise_and(a: board.black_knights, b: src_bitboard) != 0 then
 					board.black_knights = Bits::bitwise_and(a: board.black_knights, b: inverse_src_bitboard);
 					board.black_knights = Bits::bitwise_or(a: board.black_knights, b: dst_bitboard);
@@ -214,25 +241,25 @@ within lichess_bot::components::Engine::'board representation' is
 			// update castling rights
 			if self.white_can_castle_kingside then
 				white_kingside_rook_home = Bits::left_shift(a: 1, n: 7);
-				if Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: white_kingside_rook_home, b: self.white_king)) != 0 then
+				if Bits::bitwise_and(a: board.white_rooks, b: white_kingside_rook_home) == 0 or Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: white_kingside_rook_home, b: self.white_king)) != 0 then
 					board.white_can_castle_kingside = false;
 				end if;
 			end if;
 			if self.white_can_castle_queenside then
 				white_queenside_rook_home = Bits::left_shift(a: 1, n: 0);
-				if Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: white_queenside_rook_home, b: self.white_king)) != 0 then
+				if Bits::bitwise_and(a: board.white_rooks, b: white_queenside_rook_home) == 0 or Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: white_queenside_rook_home, b: self.white_king)) != 0 then
 					board.white_can_castle_queenside = false;
 				end if;
 			end if;
 			if self.black_can_castle_kingside then
 				black_kingside_rook_home = Bits::left_shift(a: 1, n: 63);
-				if Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: black_kingside_rook_home, b: self.black_king)) != 0 then
+				if Bits::bitwise_and(a: board.black_rooks, b: black_kingside_rook_home) == 0 or Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: black_kingside_rook_home, b: self.black_king)) != 0 then
 					board.black_can_castle_kingside = false;
 				end if;
 			end if;
 			if self.black_can_castle_queenside then
 				black_queenside_rook_home = Bits::left_shift(a: 1, n: 56);
-				if Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: black_queenside_rook_home, b: self.black_king)) != 0 then
+				if Bits::bitwise_and(a: board.black_rooks, b: black_queenside_rook_home) == 0 or Bits::bitwise_and(a: src_bitboard, b: Bits::bitwise_or(a: black_queenside_rook_home, b: self.black_king)) != 0 then
 					board.black_can_castle_queenside = false;
 				end if;
 			end if;
@@ -590,7 +617,7 @@ within lichess_bot::components::Engine::'board representation' is
 		class operation coordinate_to_bitboard(coordinate: in string) return timestamp is
 			@noparse
 			file_num = STRING::indexof( haystack: "abcdefgh", needle: STRING::substr(s: param.coordinate, begin:0, end:1));
-			rank_num = STRING::atoi(s: STRING::substr(s: param.coordinate, begin:1, end:-1)) - 1;
+			rank_num = STRING::atoi(s: STRING::substr(s: param.coordinate, begin:1, end:2)) - 1;
 			return Bits::left_shift(a: 1, n: rank_num * 8 + file_num);
 			@endnoparse
 		end operation;

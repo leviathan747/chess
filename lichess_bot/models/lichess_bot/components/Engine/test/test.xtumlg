@@ -1,5 +1,8 @@
 render : "lichess_bot::components::Engine::test"
 
 shapes :
+  shape : do_move_test_cases
+    render : package "lichess_bot::components::Engine::test::do_move_test_cases"
+    bounds : x : 0.0 y : 0.0 width : 200.0 height : 150.0
 
 connectors :

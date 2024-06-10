@@ -1,0 +1,5 @@
+render : "lichess_bot::components::Engine::test::do_move_test_cases"
+
+shapes :
+
+connectors :
