@@ -677,7 +677,29 @@ within lichess_bot::components::Engine::'board representation' is
 		@operation_num(11);
 		class operation bitboard_print(bitboard: in timestamp) is
 			@noparse
-			// TODO
+			// create a bitboard for the A file
+			a_file = Bits::zero();
+			i = 0;
+			while i < 8 loop
+				a_file = Bits::bitwise_or(a: a_file, b: Bits::left_shift(a: 1, n: i * 8));
+				i = i + 1;
+			end while;
+			
+			// start at the 63rd bit and descend
+			bitboard_string = "";
+			mask = Bits::left_shift(a: 1, n: 63);
+			while mask != 0 loop
+				if Bits::bitwise_and(a: param.bitboard, b: mask) != 0 then
+					bitboard_string = "*" + bitboard_string;
+				else
+					bitboard_string = "." + bitboard_string;
+				end if;
+				if Bits::bitwise_and(a: a_file, b: mask) != 0 then
+					LOG::LogInfo(message: bitboard_string);
+					bitboard_string = "";
+				end if;
+				mask = Bits::right_shift(a: mask, n: 1);
+			end while;
 			@endnoparse
 		end operation;
 

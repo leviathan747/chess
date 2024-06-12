@@ -25,6 +25,9 @@ within lichess_bot is
 			bridge right_shift(a: in timestamp, n: in integer) return timestamp;
 
 			@dialect("oal");
+			bridge to_binary_string(a: in timestamp) return string;
+
+			@dialect("oal");
 			bridge zero() return timestamp;
 
 		end external;

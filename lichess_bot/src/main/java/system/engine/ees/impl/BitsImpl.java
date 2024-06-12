@@ -31,11 +31,19 @@ public class BitsImpl<C extends IComponent<C>> extends Utility<C> implements Bit
 	}
 
 	public long right_shift(final long a, final int n) {
-		return a >> n;
+		return a >>> n;
 	}
 
 	public long zero() {
 		return 0L;
+	}
+	
+	public String to_binary_string(final long a) {
+		String binaryString = Long.toBinaryString(a);
+		while (binaryString.length() < 64) {
+			binaryString = "0" + binaryString;
+		}
+		return "0b" + binaryString;
 	}
 
 }
