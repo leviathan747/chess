@@ -23,6 +23,10 @@ public class Bits {
 	}
 
 	public static long right_shift(long a, int n) {
+		return a >> n;
+	}
+
+	public static long unsigned_right_shift(long a, int n) {
 		return a >>> n;
 	}
 

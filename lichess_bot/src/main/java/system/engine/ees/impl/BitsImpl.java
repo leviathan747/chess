@@ -31,6 +31,10 @@ public class BitsImpl<C extends IComponent<C>> extends Utility<C> implements Bit
 	}
 
 	public long right_shift(final long a, final int n) {
+		return a >> n;
+	}
+
+	public long unsigned_right_shift(final long a, final int n) {
 		return a >>> n;
 	}
 

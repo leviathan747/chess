@@ -3,585 +3,24 @@
 within lichess_bot::components::Engine::test is
 
 	package do_move_test_cases is
-
 		@dialect("oal");
 		function test1() return boolean is
 			@noparse
 			LOG::LogInfo(message: "test1: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "h2h3 e7e6 f2f3 e6e5";
 			fens[3] = "rnbqkbnr/pppp1ppp/8/4p3/8/5P1P/PPPPP1P1/RNBQKBNR w KQkq - 0 3";
 			fens[2] = "rnbqkbnr/pppp1ppp/4p3/8/8/5P1P/PPPPP1P1/RNBQKBNR b KQkq - 0 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/4p3/8/8/7P/PPPPPPP1/RNBQKBNR w KQkq - 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/8/7P/PPPPPPP1/RNBQKBNR b KQkq - 0 1";
-
+			
 			result = ::test_do_move(name: "test1", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test1: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
-			return result;
-			@endnoparse
-		end function;
-
-		@dialect("oal");
-		function test2() return boolean is
-			@noparse
-			LOG::LogInfo(message: "test2: start");
-			t0 = TIM::current_clock();
-
-			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-			move_text = "d2d4 c7c5 c2c3 d7d5 c1f4 b8c6 e2e3 g8f6 g1f3 f6e4 d1c2 e7e6 f1d3 f7f5 b1d2 f8d6 d2e4 f5e4 d3b5 e8g8 f3g5 e6e5 d4e5 c6e5 e1g1 c5c4 c2e2 e5d3 e2h5 c8f5 g2g4 f5g6 h5h3 d3f4 e3f4 d6f4 g5e6 d8f6 e6f8 a8f8 a1d1 e4e3 d1d5 e3f2 f1f2 g6e4 d5d7 f4e3 b5c4 g8h8 h3e3 f6h4 f2f8";
-			fens[52] = "5R1k/pp1R2pp/8/8/2B1b1Pq/2P1Q3/PP5P/6K1 b - - 0 27";
-			fens[51] = "5r1k/pp1R2pp/8/8/2B1b1Pq/2P1Q3/PP3R1P/6K1 w - - 1 27";
-			fens[50] = "5r1k/pp1R2pp/5q2/8/2B1b1P1/2P1Q3/PP3R1P/6K1 b - - 0 26";
-			fens[49] = "5r1k/pp1R2pp/5q2/8/2B1b1P1/2P1b2Q/PP3R1P/6K1 w - - 1 26";
-			fens[48] = "5rk1/pp1R2pp/5q2/8/2B1b1P1/2P1b2Q/PP3R1P/6K1 b - - 0 25";
-			fens[47] = "5rk1/pp1R2pp/5q2/1B6/2p1b1P1/2P1b2Q/PP3R1P/6K1 w - - 3 25";
-			fens[46] = "5rk1/pp1R2pp/5q2/1B6/2p1bbP1/2P4Q/PP3R1P/6K1 b - - 2 24";
-			fens[45] = "5rk1/pp4pp/5q2/1B1R4/2p1bbP1/2P4Q/PP3R1P/6K1 w - - 1 24";
-			fens[44] = "5rk1/pp4pp/5qb1/1B1R4/2p2bP1/2P4Q/PP3R1P/6K1 b - - 0 23";
-			fens[43] = "5rk1/pp4pp/5qb1/1B1R4/2p2bP1/2P4Q/PP3p1P/5RK1 w - - 0 23";
-			fens[42] = "5rk1/pp4pp/5qb1/1B1R4/2p2bP1/2P1p2Q/PP3P1P/5RK1 b - - 0 22";
-			fens[41] = "5rk1/pp4pp/5qb1/1B1p4/2p2bP1/2P1p2Q/PP3P1P/3R1RK1 w - - 0 22";
-			fens[40] = "5rk1/pp4pp/5qb1/1B1p4/2p1pbP1/2P4Q/PP3P1P/3R1RK1 b - - 1 21";
-			fens[39] = "5rk1/pp4pp/5qb1/1B1p4/2p1pbP1/2P4Q/PP3P1P/R4RK1 w - - 0 21";
-			fens[38] = "r4Nk1/pp4pp/5qb1/1B1p4/2p1pbP1/2P4Q/PP3P1P/R4RK1 b - - 0 20";
-			fens[37] = "r4rk1/pp4pp/4Nqb1/1B1p4/2p1pbP1/2P4Q/PP3P1P/R4RK1 w - - 2 20";
-			fens[36] = "r2q1rk1/pp4pp/4N1b1/1B1p4/2p1pbP1/2P4Q/PP3P1P/R4RK1 b - - 1 19";
-			fens[35] = "r2q1rk1/pp4pp/6b1/1B1p2N1/2p1pbP1/2P4Q/PP3P1P/R4RK1 w - - 0 19";
-			fens[34] = "r2q1rk1/pp4pp/3b2b1/1B1p2N1/2p1pPP1/2P4Q/PP3P1P/R4RK1 b - - 0 18";
-			fens[33] = "r2q1rk1/pp4pp/3b2b1/1B1p2N1/2p1pnP1/2P1P2Q/PP3P1P/R4RK1 w - - 0 18";
-			fens[32] = "r2q1rk1/pp4pp/3b2b1/1B1p2N1/2p1pBP1/2PnP2Q/PP3P1P/R4RK1 b - - 2 17";
-			fens[31] = "r2q1rk1/pp4pp/3b2b1/1B1p2NQ/2p1pBP1/2PnP3/PP3P1P/R4RK1 w - - 1 17";
-			fens[30] = "r2q1rk1/pp4pp/3b4/1B1p1bNQ/2p1pBP1/2PnP3/PP3P1P/R4RK1 b - g3 0 16";
-			fens[29] = "r2q1rk1/pp4pp/3b4/1B1p1bNQ/2p1pB2/2PnP3/PP3PPP/R4RK1 w - - 4 16";
-			fens[28] = "r1bq1rk1/pp4pp/3b4/1B1p2NQ/2p1pB2/2PnP3/PP3PPP/R4RK1 b - - 3 15";
-			fens[27] = "r1bq1rk1/pp4pp/3b4/1B1p2N1/2p1pB2/2PnP3/PP2QPPP/R4RK1 w - - 2 15";
-			fens[26] = "r1bq1rk1/pp4pp/3b4/1B1pn1N1/2p1pB2/2P1P3/PP2QPPP/R4RK1 b - - 1 14";
-			fens[25] = "r1bq1rk1/pp4pp/3b4/1B1pn1N1/2p1pB2/2P1P3/PPQ2PPP/R4RK1 w - - 0 14";
-			fens[24] = "r1bq1rk1/pp4pp/3b4/1Bppn1N1/4pB2/2P1P3/PPQ2PPP/R4RK1 b - - 1 13";
-			fens[23] = "r1bq1rk1/pp4pp/3b4/1Bppn1N1/4pB2/2P1P3/PPQ2PPP/R3K2R w KQ - 0 13";
-			fens[22] = "r1bq1rk1/pp4pp/2nb4/1BppP1N1/4pB2/2P1P3/PPQ2PPP/R3K2R b KQ - 0 12";
-			fens[21] = "r1bq1rk1/pp4pp/2nb4/1Bppp1N1/3PpB2/2P1P3/PPQ2PPP/R3K2R w KQ - 0 12";
-			fens[20] = "r1bq1rk1/pp4pp/2nbp3/1Bpp2N1/3PpB2/2P1P3/PPQ2PPP/R3K2R b KQ - 3 11";
-			fens[19] = "r1bq1rk1/pp4pp/2nbp3/1Bpp4/3PpB2/2P1PN2/PPQ2PPP/R3K2R w KQ - 2 11";
-			fens[18] = "r1bqk2r/pp4pp/2nbp3/1Bpp4/3PpB2/2P1PN2/PPQ2PPP/R3K2R b KQkq - 1 10";
-			fens[17] = "r1bqk2r/pp4pp/2nbp3/2pp4/3PpB2/2PBPN2/PPQ2PPP/R3K2R w KQkq - 0 10";
-			fens[16] = "r1bqk2r/pp4pp/2nbp3/2pp1p2/3PNB2/2PBPN2/PPQ2PPP/R3K2R b KQkq - 0 9";
-			fens[15] = "r1bqk2r/pp4pp/2nbp3/2pp1p2/3PnB2/2PBPN2/PPQN1PPP/R3K2R w KQkq - 2 9";
-			fens[14] = "r1bqkb1r/pp4pp/2n1p3/2pp1p2/3PnB2/2PBPN2/PPQN1PPP/R3K2R b KQkq - 1 8";
-			fens[13] = "r1bqkb1r/pp4pp/2n1p3/2pp1p2/3PnB2/2PBPN2/PPQ2PPP/RN2K2R w KQkq f6 0 8";
-			fens[12] = "r1bqkb1r/pp3ppp/2n1p3/2pp4/3PnB2/2PBPN2/PPQ2PPP/RN2K2R b KQkq - 1 7";
-			fens[11] = "r1bqkb1r/pp3ppp/2n1p3/2pp4/3PnB2/2P1PN2/PPQ2PPP/RN2KB1R w KQkq - 0 7";
-			fens[10] = "r1bqkb1r/pp2pppp/2n5/2pp4/3PnB2/2P1PN2/PPQ2PPP/RN2KB1R b KQkq - 4 6";
-			fens[9] = "r1bqkb1r/pp2pppp/2n5/2pp4/3PnB2/2P1PN2/PP3PPP/RN1QKB1R w KQkq - 3 6";
-			fens[8] = "r1bqkb1r/pp2pppp/2n2n2/2pp4/3P1B2/2P1PN2/PP3PPP/RN1QKB1R b KQkq - 2 5";
-			fens[7] = "r1bqkb1r/pp2pppp/2n2n2/2pp4/3P1B2/2P1P3/PP3PPP/RN1QKBNR w KQkq - 1 5";
-			fens[6] = "r1bqkbnr/pp2pppp/2n5/2pp4/3P1B2/2P1P3/PP3PPP/RN1QKBNR b KQkq - 0 4";
-			fens[5] = "r1bqkbnr/pp2pppp/2n5/2pp4/3P1B2/2P5/PP2PPPP/RN1QKBNR w KQkq - 2 4";
-			fens[4] = "rnbqkbnr/pp2pppp/8/2pp4/3P1B2/2P5/PP2PPPP/RN1QKBNR b KQkq - 1 3";
-			fens[3] = "rnbqkbnr/pp2pppp/8/2pp4/3P4/2P5/PP2PPPP/RNBQKBNR w KQkq d6 0 3";
-			fens[2] = "rnbqkbnr/pp1ppppp/8/2p5/3P4/2P5/PP2PPPP/RNBQKBNR b KQkq - 0 2";
-			fens[1] = "rnbqkbnr/pp1ppppp/8/2p5/3P4/8/PPP1PPPP/RNBQKBNR w KQkq c6 0 2";
-			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
-			result = ::test_do_move(name: "test2", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
-			t1 = TIM::current_clock();
-			LOG::LogInfo(message: "test2: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
-			return result;
-			@endnoparse
-		end function;
-
-		@dialect("oal");
-		function test3() return boolean is
-			@noparse
-			LOG::LogInfo(message: "test3: start");
-			t0 = TIM::current_clock();
-
-			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-			move_text = "d2d4 d7d5 c1f4 b8c6 g1f3 c8f5 b1d2 g8f6 e2e3 e7e6 c2c3 f8d6 f1d3 e8g8 d1c2 f8e8 e1g1 e6e5 d4e5 c6e5 d3f5 e5f3 d2f3 d6f4 e3f4 f6e4 f1e1 c7c6 b2b3 d8e7 c3c4 e7b4 f3g5 e4g5 f4g5 e8e1 a1e1 b4e1";
-			fens[37] = "r5k1/pp3ppp/2p5/3p1BP1/2P5/1P6/P1Q2PPP/4q1K1 w - - 0 20";
-			fens[36] = "r5k1/pp3ppp/2p5/3p1BP1/1qP5/1P6/P1Q2PPP/4R1K1 b - - 0 19";
-			fens[35] = "r5k1/pp3ppp/2p5/3p1BP1/1qP5/1P6/P1Q2PPP/R3r1K1 w - - 0 19";
-			fens[34] = "r3r1k1/pp3ppp/2p5/3p1BP1/1qP5/1P6/P1Q2PPP/R3R1K1 b - - 0 18";
-			fens[33] = "r3r1k1/pp3ppp/2p5/3p1Bn1/1qP2P2/1P6/P1Q2PPP/R3R1K1 w - - 0 18";
-			fens[32] = "r3r1k1/pp3ppp/2p5/3p1BN1/1qP1nP2/1P6/P1Q2PPP/R3R1K1 b - - 2 17";
-			fens[31] = "r3r1k1/pp3ppp/2p5/3p1B2/1qP1nP2/1P3N2/P1Q2PPP/R3R1K1 w - - 1 17";
-			fens[30] = "r3r1k1/pp2qppp/2p5/3p1B2/2P1nP2/1P3N2/P1Q2PPP/R3R1K1 b - - 0 16";
-			fens[29] = "r3r1k1/pp2qppp/2p5/3p1B2/4nP2/1PP2N2/P1Q2PPP/R3R1K1 w - - 1 16";
-			fens[28] = "r2qr1k1/pp3ppp/2p5/3p1B2/4nP2/1PP2N2/P1Q2PPP/R3R1K1 b - - 0 15";
-			fens[27] = "r2qr1k1/pp3ppp/2p5/3p1B2/4nP2/2P2N2/PPQ2PPP/R3R1K1 w - - 0 15";
-			fens[26] = "r2qr1k1/ppp2ppp/8/3p1B2/4nP2/2P2N2/PPQ2PPP/R3R1K1 b - - 2 14";
-			fens[25] = "r2qr1k1/ppp2ppp/8/3p1B2/4nP2/2P2N2/PPQ2PPP/R4RK1 w - - 1 14";
-			fens[24] = "r2qr1k1/ppp2ppp/5n2/3p1B2/5P2/2P2N2/PPQ2PPP/R4RK1 b - - 0 13";
-			fens[23] = "r2qr1k1/ppp2ppp/5n2/3p1B2/5b2/2P1PN2/PPQ2PPP/R4RK1 w - - 0 13";
-			fens[22] = "r2qr1k1/ppp2ppp/3b1n2/3p1B2/5B2/2P1PN2/PPQ2PPP/R4RK1 b - - 0 12";
-			fens[21] = "r2qr1k1/ppp2ppp/3b1n2/3p1B2/5B2/2P1Pn2/PPQN1PPP/R4RK1 w - - 0 12";
-			fens[20] = "r2qr1k1/ppp2ppp/3b1n2/3pnB2/5B2/2P1PN2/PPQN1PPP/R4RK1 b - - 0 11";
-			fens[19] = "r2qr1k1/ppp2ppp/3b1n2/3pnb2/5B2/2PBPN2/PPQN1PPP/R4RK1 w - - 0 11";
-			fens[18] = "r2qr1k1/ppp2ppp/2nb1n2/3pPb2/5B2/2PBPN2/PPQN1PPP/R4RK1 b - - 0 10";
-			fens[17] = "r2qr1k1/ppp2ppp/2nb1n2/3ppb2/3P1B2/2PBPN2/PPQN1PPP/R4RK1 w - - 0 10";
-			fens[16] = "r2qr1k1/ppp2ppp/2nbpn2/3p1b2/3P1B2/2PBPN2/PPQN1PPP/R4RK1 b - - 6 9";
-			fens[15] = "r2qr1k1/ppp2ppp/2nbpn2/3p1b2/3P1B2/2PBPN2/PPQN1PPP/R3K2R w KQ - 5 9";
-			fens[14] = "r2q1rk1/ppp2ppp/2nbpn2/3p1b2/3P1B2/2PBPN2/PPQN1PPP/R3K2R b KQ - 4 8";
-			fens[13] = "r2q1rk1/ppp2ppp/2nbpn2/3p1b2/3P1B2/2PBPN2/PP1N1PPP/R2QK2R w KQ - 3 8";
-			fens[12] = "r2qk2r/ppp2ppp/2nbpn2/3p1b2/3P1B2/2PBPN2/PP1N1PPP/R2QK2R b KQkq - 2 7";
-			fens[11] = "r2qk2r/ppp2ppp/2nbpn2/3p1b2/3P1B2/2P1PN2/PP1N1PPP/R2QKB1R w KQkq - 1 7";
-			fens[10] = "r2qkb1r/ppp2ppp/2n1pn2/3p1b2/3P1B2/2P1PN2/PP1N1PPP/R2QKB1R b KQkq - 0 6";
-			fens[9] = "r2qkb1r/ppp2ppp/2n1pn2/3p1b2/3P1B2/4PN2/PPPN1PPP/R2QKB1R w KQkq - 0 6";
-			fens[8] = "r2qkb1r/ppp1pppp/2n2n2/3p1b2/3P1B2/4PN2/PPPN1PPP/R2QKB1R b KQkq - 0 5";
-			fens[7] = "r2qkb1r/ppp1pppp/2n2n2/3p1b2/3P1B2/5N2/PPPNPPPP/R2QKB1R w KQkq - 6 5";
-			fens[6] = "r2qkbnr/ppp1pppp/2n5/3p1b2/3P1B2/5N2/PPPNPPPP/R2QKB1R b KQkq - 5 4";
-			fens[5] = "r2qkbnr/ppp1pppp/2n5/3p1b2/3P1B2/5N2/PPP1PPPP/RN1QKB1R w KQkq - 4 4";
-			fens[4] = "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R b KQkq - 3 3";
-			fens[3] = "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 2 3";
-			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
-			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
-			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
-			result = ::test_do_move(name: "test3", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
-			t1 = TIM::current_clock();
-			LOG::LogInfo(message: "test3: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
-			return result;
-			@endnoparse
-		end function;
-
-		@dialect("oal");
-		function test4() return boolean is
-			@noparse
-			LOG::LogInfo(message: "test4: start");
-			t0 = TIM::current_clock();
-
-			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-			move_text = "e2e4 d7d6 b1c3 g8f6 d1f3 g7g6 f1c4 c8e6 c3d5 f8g7 d5f6 g7f6 d2d3 e8g8 e4e5 f6e5 c4e6 f7e6 f3b7 b8d7 c1h6 d7c5 b7b4 f8f6 d3d4 c5a6 b4a4 e5f4 h6f4 f6f4 a4a6 d8b8 e1c1 f4f2 a6c4 b8b2 c1b2 f2g2 c4e6 g8g7 e6d5 a8b8 b2c3 g2g3 g1f3 g3h3 d1e1 b8f8 e1e7 g7h8 e7f7 h3f3 d5f3 f8f7 f3f7 g6g5 f7f8";
-			fens[56] = "5Q1k/p1p4p/3p4/6p1/3P4/2K5/P1P4P/7R b - - 1 29";
-			fens[55] = "7k/p1p2Q1p/3p4/6p1/3P4/2K5/P1P4P/7R w - - 0 29";
-			fens[54] = "7k/p1p2Q1p/3p2p1/8/3P4/2K5/P1P4P/7R b - - 0 28";
-			fens[53] = "7k/p1p2r1p/3p2p1/8/3P4/2K2Q2/P1P4P/7R w - - 0 28";
-			fens[52] = "5r1k/p1p2R1p/3p2p1/8/3P4/2K2Q2/P1P4P/7R b - - 0 27";
-			fens[51] = "5r1k/p1p2R1p/3p2p1/3Q4/3P4/2K2r2/P1P4P/7R w - - 0 27";
-			fens[50] = "5r1k/p1p2R1p/3p2p1/3Q4/3P4/2K2N1r/P1P4P/7R b - - 2 26";
-			fens[49] = "5r1k/p1p1R2p/3p2p1/3Q4/3P4/2K2N1r/P1P4P/7R w - - 1 26";
-			fens[48] = "5r2/p1p1R1kp/3p2p1/3Q4/3P4/2K2N1r/P1P4P/7R b - - 0 25";
-			fens[47] = "5r2/p1p1p1kp/3p2p1/3Q4/3P4/2K2N1r/P1P4P/4R2R w - - 9 25";
-			fens[46] = "1r6/p1p1p1kp/3p2p1/3Q4/3P4/2K2N1r/P1P4P/4R2R b - - 8 24";
-			fens[45] = "1r6/p1p1p1kp/3p2p1/3Q4/3P4/2K2N1r/P1P4P/3R3R w - - 7 24";
-			fens[44] = "1r6/p1p1p1kp/3p2p1/3Q4/3P4/2K2Nr1/P1P4P/3R3R b - - 6 23";
-			fens[43] = "1r6/p1p1p1kp/3p2p1/3Q4/3P4/2K3r1/P1P4P/3R2NR w - - 5 23";
-			fens[42] = "1r6/p1p1p1kp/3p2p1/3Q4/3P4/2K5/P1P3rP/3R2NR b - - 4 22";
-			fens[41] = "1r6/p1p1p1kp/3p2p1/3Q4/3P4/8/PKP3rP/3R2NR w - - 3 22";
-			fens[40] = "r7/p1p1p1kp/3p2p1/3Q4/3P4/8/PKP3rP/3R2NR b - - 2 21";
-			fens[39] = "r7/p1p1p1kp/3pQ1p1/8/3P4/8/PKP3rP/3R2NR w - - 1 21";
-			fens[38] = "r5k1/p1p1p2p/3pQ1p1/8/3P4/8/PKP3rP/3R2NR b - - 0 20";
-			fens[37] = "r5k1/p1p1p2p/3pp1p1/8/2QP4/8/PKP3rP/3R2NR w - - 0 20";
-			fens[36] = "r5k1/p1p1p2p/3pp1p1/8/2QP4/8/PKP2rPP/3R2NR b - - 0 19";
-			fens[35] = "r5k1/p1p1p2p/3pp1p1/8/2QP4/8/PqP2rPP/2KR2NR w - - 0 19";
-			fens[34] = "rq4k1/p1p1p2p/3pp1p1/8/2QP4/8/PPP2rPP/2KR2NR b - - 1 18";
-			fens[33] = "rq4k1/p1p1p2p/Q2pp1p1/8/3P4/8/PPP2rPP/2KR2NR w - - 0 18";
-			fens[32] = "rq4k1/p1p1p2p/Q2pp1p1/8/3P1r2/8/PPP2PPP/2KR2NR b - - 2 17";
-			fens[31] = "rq4k1/p1p1p2p/Q2pp1p1/8/3P1r2/8/PPP2PPP/R3K1NR w KQ - 1 17";
-			fens[30] = "r2q2k1/p1p1p2p/Q2pp1p1/8/3P1r2/8/PPP2PPP/R3K1NR b KQ - 0 16";
-			fens[29] = "r2q2k1/p1p1p2p/n2pp1p1/8/Q2P1r2/8/PPP2PPP/R3K1NR w KQ - 0 16";
-			fens[28] = "r2q2k1/p1p1p2p/n2pprp1/8/Q2P1B2/8/PPP2PPP/R3K1NR b KQ - 0 15";
-			fens[27] = "r2q2k1/p1p1p2p/n2pprpB/8/Q2P1b2/8/PPP2PPP/R3K1NR w KQ - 3 15";
-			fens[26] = "r2q2k1/p1p1p2p/n2pprpB/4b3/Q2P4/8/PPP2PPP/R3K1NR b KQ - 2 14";
-			fens[25] = "r2q2k1/p1p1p2p/n2pprpB/4b3/1Q1P4/8/PPP2PPP/R3K1NR w KQ - 1 14";
-			fens[24] = "r2q2k1/p1p1p2p/3pprpB/2n1b3/1Q1P4/8/PPP2PPP/R3K1NR b KQ - 0 13";
-			fens[23] = "r2q2k1/p1p1p2p/3pprpB/2n1b3/1Q6/3P4/PPP2PPP/R3K1NR w KQ - 5 13";
-			fens[22] = "r2q1rk1/p1p1p2p/3pp1pB/2n1b3/1Q6/3P4/PPP2PPP/R3K1NR b KQ - 4 12";
-			fens[21] = "r2q1rk1/pQp1p2p/3pp1pB/2n1b3/8/3P4/PPP2PPP/R3K1NR w KQ - 3 12";
-			fens[20] = "r2q1rk1/pQpnp2p/3pp1pB/4b3/8/3P4/PPP2PPP/R3K1NR b KQ - 2 11";
-			fens[19] = "r2q1rk1/pQpnp2p/3pp1p1/4b3/8/3P4/PPP2PPP/R1B1K1NR w KQ - 1 11";
-			fens[18] = "rn1q1rk1/pQp1p2p/3pp1p1/4b3/8/3P4/PPP2PPP/R1B1K1NR b KQ - 0 10";
-			fens[17] = "rn1q1rk1/ppp1p2p/3pp1p1/4b3/8/3P1Q2/PPP2PPP/R1B1K1NR w KQ - 0 10";
-			fens[16] = "rn1q1rk1/ppp1pp1p/3pB1p1/4b3/8/3P1Q2/PPP2PPP/R1B1K1NR b KQ - 0 9";
-			fens[15] = "rn1q1rk1/ppp1pp1p/3pb1p1/4b3/2B5/3P1Q2/PPP2PPP/R1B1K1NR w KQ - 0 9";
-			fens[14] = "rn1q1rk1/ppp1pp1p/3pbbp1/4P3/2B5/3P1Q2/PPP2PPP/R1B1K1NR b KQ - 0 8";
-			fens[13] = "rn1q1rk1/ppp1pp1p/3pbbp1/8/2B1P3/3P1Q2/PPP2PPP/R1B1K1NR w KQ - 1 8";
-			fens[12] = "rn1qk2r/ppp1pp1p/3pbbp1/8/2B1P3/3P1Q2/PPP2PPP/R1B1K1NR b KQkq - 0 7";
-			fens[11] = "rn1qk2r/ppp1pp1p/3pbbp1/8/2B1P3/5Q2/PPPP1PPP/R1B1K1NR w KQkq - 0 7";
-			fens[10] = "rn1qk2r/ppp1ppbp/3pbNp1/8/2B1P3/5Q2/PPPP1PPP/R1B1K1NR b KQkq - 0 6";
-			fens[9] = "rn1qk2r/ppp1ppbp/3pbnp1/3N4/2B1P3/5Q2/PPPP1PPP/R1B1K1NR w KQkq - 4 6";
-			fens[8] = "rn1qkb1r/ppp1pp1p/3pbnp1/3N4/2B1P3/5Q2/PPPP1PPP/R1B1K1NR b KQkq - 3 5";
-			fens[7] = "rn1qkb1r/ppp1pp1p/3pbnp1/8/2B1P3/2N2Q2/PPPP1PPP/R1B1K1NR w KQkq - 2 5";
-			fens[6] = "rnbqkb1r/ppp1pp1p/3p1np1/8/2B1P3/2N2Q2/PPPP1PPP/R1B1K1NR b KQkq - 1 4";
-			fens[5] = "rnbqkb1r/ppp1pp1p/3p1np1/8/4P3/2N2Q2/PPPP1PPP/R1B1KBNR w KQkq - 0 4";
-			fens[4] = "rnbqkb1r/ppp1pppp/3p1n2/8/4P3/2N2Q2/PPPP1PPP/R1B1KBNR b KQkq - 3 3";
-			fens[3] = "rnbqkb1r/ppp1pppp/3p1n2/8/4P3/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 3";
-			fens[2] = "rnbqkbnr/ppp1pppp/3p4/8/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 1 2";
-			fens[1] = "rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
-			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
-			result = ::test_do_move(name: "test4", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
-			t1 = TIM::current_clock();
-			LOG::LogInfo(message: "test4: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
-			return result;
-			@endnoparse
-		end function;
-
-		@dialect("oal");
-		function test5() return boolean is
-			@noparse
-			LOG::LogInfo(message: "test5: start");
-			t0 = TIM::current_clock();
-
-			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-			move_text = "e2e4 d7d6 d2d4 g8f6 e4e5 f6g4 d4d5 g7g6 d1e2 d6e5 f2f3 g4f6 e2e5 f8g7 f1b5 c8d7 b5c4 e8g8 c1g5 c7c6 d5d6 e7d6 e5d6 f8e8 g1e2 d8a5 d6d2 e8e2 e1e2 a5e5 d2e3 e5b2 b1d2 b2c2 a1c1 c2f5 h2h4 h7h6 e3e7 h6g5 g2g4 f5e6 c4e6 d7e6 e7d8 g7f8 d8f6 b8d7 f6c3 a8e8 h4g5 f7f6 g5f6 d7f6 c3f6 f8g7 f6g6 e6d5 e2f2 g8f8 h1h7 g7d4 f2g2 e8e2 g2f1 e2d2 g6g7 f8e8 h7h8 d5g8 h8g8";
-			fens[70] = "4k1R1/pp4Q1/2p5/8/3b2P1/5P2/P2r4/2R2K2 b - - 0 36";
-			fens[69] = "4k1bR/pp4Q1/2p5/8/3b2P1/5P2/P2r4/2R2K2 w - - 4 36";
-			fens[68] = "4k2R/pp4Q1/2p5/3b4/3b2P1/5P2/P2r4/2R2K2 b - - 3 35";
-			fens[67] = "4k3/pp4QR/2p5/3b4/3b2P1/5P2/P2r4/2R2K2 w - - 2 35";
-			fens[66] = "5k2/pp4QR/2p5/3b4/3b2P1/5P2/P2r4/2R2K2 b - - 1 34";
-			fens[65] = "5k2/pp5R/2p3Q1/3b4/3b2P1/5P2/P2r4/2R2K2 w - - 0 34";
-			fens[64] = "5k2/pp5R/2p3Q1/3b4/3b2P1/5P2/P2Nr3/2R2K2 b - - 8 33";
-			fens[63] = "5k2/pp5R/2p3Q1/3b4/3b2P1/5P2/P2Nr1K1/2R5 w - - 7 33";
-			fens[62] = "4rk2/pp5R/2p3Q1/3b4/3b2P1/5P2/P2N2K1/2R5 b - - 6 32";
-			fens[61] = "4rk2/pp5R/2p3Q1/3b4/3b2P1/5P2/P2N1K2/2R5 w - - 5 32";
-			fens[60] = "4rk2/pp4bR/2p3Q1/3b4/6P1/5P2/P2N1K2/2R5 b - - 4 31";
-			fens[59] = "4rk2/pp4b1/2p3Q1/3b4/6P1/5P2/P2N1K2/2R4R w - - 3 31";
-			fens[58] = "4r1k1/pp4b1/2p3Q1/3b4/6P1/5P2/P2N1K2/2R4R b - - 2 30";
-			fens[57] = "4r1k1/pp4b1/2p3Q1/3b4/6P1/5P2/P2NK3/2R4R w - - 1 30";
-			fens[56] = "4r1k1/pp4b1/2p1b1Q1/8/6P1/5P2/P2NK3/2R4R b - - 0 29";
-			fens[55] = "4r1k1/pp4b1/2p1bQp1/8/6P1/5P2/P2NK3/2R4R w - - 1 29";
-			fens[54] = "4rbk1/pp6/2p1bQp1/8/6P1/5P2/P2NK3/2R4R b - - 0 28";
-			fens[53] = "4rbk1/pp6/2p1bnp1/8/6P1/2Q2P2/P2NK3/2R4R w - - 0 28";
-			fens[52] = "4rbk1/pp1n4/2p1bPp1/8/6P1/2Q2P2/P2NK3/2R4R b - - 0 27";
-			fens[51] = "4rbk1/pp1n4/2p1bpp1/6P1/6P1/2Q2P2/P2NK3/2R4R w - - 0 27";
-			fens[50] = "4rbk1/pp1n1p2/2p1b1p1/6P1/6P1/2Q2P2/P2NK3/2R4R b - - 0 26";
-			fens[49] = "4rbk1/pp1n1p2/2p1b1p1/6p1/6PP/2Q2P2/P2NK3/2R4R w - - 3 26";
-			fens[48] = "r4bk1/pp1n1p2/2p1b1p1/6p1/6PP/2Q2P2/P2NK3/2R4R b - - 2 25";
-			fens[47] = "r4bk1/pp1n1p2/2p1bQp1/6p1/6PP/5P2/P2NK3/2R4R w - - 1 25";
-			fens[46] = "rn3bk1/pp3p2/2p1bQp1/6p1/6PP/5P2/P2NK3/2R4R b - - 0 24";
-			fens[45] = "rn1Q1bk1/pp3p2/2p1bnp1/6p1/6PP/5P2/P2NK3/2R4R w - - 2 24";
-			fens[44] = "rn1Q2k1/pp3pb1/2p1bnp1/6p1/6PP/5P2/P2NK3/2R4R b - - 1 23";
-			fens[43] = "rn4k1/pp2Qpb1/2p1bnp1/6p1/6PP/5P2/P2NK3/2R4R w - - 0 23";
-			fens[42] = "rn4k1/pp1bQpb1/2p1Bnp1/6p1/6PP/5P2/P2NK3/2R4R b - - 0 22";
-			fens[41] = "rn4k1/pp1bQpb1/2p1qnp1/6p1/2B3PP/5P2/P2NK3/2R4R w - - 1 22";
-			fens[40] = "rn4k1/pp1bQpb1/2p2np1/5qp1/2B3PP/5P2/P2NK3/2R4R b - g3 0 21";
-			fens[39] = "rn4k1/pp1bQpb1/2p2np1/5qp1/2B4P/5P2/P2NK1P1/2R4R w - - 0 21";
-			fens[38] = "rn4k1/pp1bQpb1/2p2npp/5qB1/2B4P/5P2/P2NK1P1/2R4R b - - 1 20";
-			fens[37] = "rn4k1/pp1b1pb1/2p2npp/5qB1/2B4P/4QP2/P2NK1P1/2R4R w - - 0 20";
-			fens[36] = "rn4k1/pp1b1pbp/2p2np1/5qB1/2B4P/4QP2/P2NK1P1/2R4R b - h3 0 19";
-			fens[35] = "rn4k1/pp1b1pbp/2p2np1/5qB1/2B5/4QP2/P2NK1PP/2R4R w - - 2 19";
-			fens[34] = "rn4k1/pp1b1pbp/2p2np1/6B1/2B5/4QP2/P1qNK1PP/2R4R b - - 1 18";
-			fens[33] = "rn4k1/pp1b1pbp/2p2np1/6B1/2B5/4QP2/P1qNK1PP/R6R w - - 0 18";
-			fens[32] = "rn4k1/pp1b1pbp/2p2np1/6B1/2B5/4QP2/PqPNK1PP/R6R b - - 1 17";
-			fens[31] = "rn4k1/pp1b1pbp/2p2np1/6B1/2B5/4QP2/PqP1K1PP/RN5R w - - 0 17";
-			fens[30] = "rn4k1/pp1b1pbp/2p2np1/4q1B1/2B5/4QP2/PPP1K1PP/RN5R b - - 2 16";
-			fens[29] = "rn4k1/pp1b1pbp/2p2np1/4q1B1/2B5/5P2/PPPQK1PP/RN5R w - - 1 16";
-			fens[28] = "rn4k1/pp1b1pbp/2p2np1/q5B1/2B5/5P2/PPPQK1PP/RN5R b - - 0 15";
-			fens[27] = "rn4k1/pp1b1pbp/2p2np1/q5B1/2B5/5P2/PPPQr1PP/RN2K2R w KQ - 0 15";
-			fens[26] = "rn2r1k1/pp1b1pbp/2p2np1/q5B1/2B5/5P2/PPPQN1PP/RN2K2R b KQ - 4 14";
-			fens[25] = "rn2r1k1/pp1b1pbp/2pQ1np1/q5B1/2B5/5P2/PPP1N1PP/RN2K2R w KQ - 3 14";
-			fens[24] = "rn1qr1k1/pp1b1pbp/2pQ1np1/6B1/2B5/5P2/PPP1N1PP/RN2K2R b KQ - 2 13";
-			fens[23] = "rn1qr1k1/pp1b1pbp/2pQ1np1/6B1/2B5/5P2/PPP3PP/RN2K1NR w KQ - 1 13";
-			fens[22] = "rn1q1rk1/pp1b1pbp/2pQ1np1/6B1/2B5/5P2/PPP3PP/RN2K1NR b KQ - 0 12";
-			fens[21] = "rn1q1rk1/pp1b1pbp/2pp1np1/4Q1B1/2B5/5P2/PPP3PP/RN2K1NR w KQ - 0 12";
-			fens[20] = "rn1q1rk1/pp1bppbp/2pP1np1/4Q1B1/2B5/5P2/PPP3PP/RN2K1NR b KQ - 0 11";
-			fens[19] = "rn1q1rk1/pp1bppbp/2p2np1/3PQ1B1/2B5/5P2/PPP3PP/RN2K1NR w KQ - 0 11";
-			fens[18] = "rn1q1rk1/pppbppbp/5np1/3PQ1B1/2B5/5P2/PPP3PP/RN2K1NR b KQ - 6 10";
-			fens[17] = "rn1q1rk1/pppbppbp/5np1/3PQ3/2B5/5P2/PPP3PP/RNB1K1NR w KQ - 5 10";
-			fens[16] = "rn1qk2r/pppbppbp/5np1/3PQ3/2B5/5P2/PPP3PP/RNB1K1NR b KQkq - 4 9";
-			fens[15] = "rn1qk2r/pppbppbp/5np1/1B1PQ3/8/5P2/PPP3PP/RNB1K1NR w KQkq - 3 9";
-			fens[14] = "rnbqk2r/ppp1ppbp/5np1/1B1PQ3/8/5P2/PPP3PP/RNB1K1NR b KQkq - 2 8";
-			fens[13] = "rnbqk2r/ppp1ppbp/5np1/3PQ3/8/5P2/PPP3PP/RNB1KBNR w KQkq - 1 8";
-			fens[12] = "rnbqkb1r/ppp1pp1p/5np1/3PQ3/8/5P2/PPP3PP/RNB1KBNR b KQkq - 0 7";
-			fens[11] = "rnbqkb1r/ppp1pp1p/5np1/3Pp3/8/5P2/PPP1Q1PP/RNB1KBNR w KQkq - 1 7";
-			fens[10] = "rnbqkb1r/ppp1pp1p/6p1/3Pp3/6n1/5P2/PPP1Q1PP/RNB1KBNR b KQkq - 0 6";
-			fens[9] = "rnbqkb1r/ppp1pp1p/6p1/3Pp3/6n1/8/PPP1QPPP/RNB1KBNR w KQkq - 0 6";
-			fens[8] = "rnbqkb1r/ppp1pp1p/3p2p1/3PP3/6n1/8/PPP1QPPP/RNB1KBNR b KQkq - 1 5";
-			fens[7] = "rnbqkb1r/ppp1pp1p/3p2p1/3PP3/6n1/8/PPP2PPP/RNBQKBNR w KQkq - 0 5";
-			fens[6] = "rnbqkb1r/ppp1pppp/3p4/3PP3/6n1/8/PPP2PPP/RNBQKBNR b KQkq - 0 4";
-			fens[5] = "rnbqkb1r/ppp1pppp/3p4/4P3/3P2n1/8/PPP2PPP/RNBQKBNR w KQkq - 1 4";
-			fens[4] = "rnbqkb1r/ppp1pppp/3p1n2/4P3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3";
-			fens[3] = "rnbqkb1r/ppp1pppp/3p1n2/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 1 3";
-			fens[2] = "rnbqkbnr/ppp1pppp/3p4/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 2";
-			fens[1] = "rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
-			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
-			result = ::test_do_move(name: "test5", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
-			t1 = TIM::current_clock();
-			LOG::LogInfo(message: "test5: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
-			return result;
-			@endnoparse
-		end function;
-
-		@dialect("oal");
-		function test6() return boolean is
-			@noparse
-			LOG::LogInfo(message: "test6: start");
-			t0 = TIM::current_clock();
-
-			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-			move_text = "d2d4 d7d5 c1f4 b8c6 g1f3 c8f5 b1d2 e7e6 e2e3 f8d6 f4d6 d8d6 f1d3 f5d3 c2d3 c6b4 f3e5 f7f6 d1h5 g7g6 e5g6 b4c2 e1e2 e8c8 g6h8 c2a1 h1a1 d6f8 h8f7 f8e8 a1c1 f6f5 f7d6 d8d6 h5e8 d6d8 e8e6";
-			fens[36] = "2kr2n1/ppp4p/4Q3/3p1p2/3P4/3PP3/PP1NKPPP/2R5 b - - 0 19";
-			fens[35] = "2krQ1n1/ppp4p/4p3/3p1p2/3P4/3PP3/PP1NKPPP/2R5 w - - 1 19";
-			fens[34] = "2k1Q1n1/ppp4p/3rp3/3p1p2/3P4/3PP3/PP1NKPPP/2R5 b - - 0 18";
-			fens[33] = "2k1q1n1/ppp4p/3rp3/3p1p1Q/3P4/3PP3/PP1NKPPP/2R5 w - - 0 18";
-			fens[32] = "2krq1n1/ppp4p/3Np3/3p1p1Q/3P4/3PP3/PP1NKPPP/2R5 b - - 1 17";
-			fens[31] = "2krq1n1/ppp2N1p/4p3/3p1p1Q/3P4/3PP3/PP1NKPPP/2R5 w - - 0 17";
-			fens[30] = "2krq1n1/ppp2N1p/4pp2/3p3Q/3P4/3PP3/PP1NKPPP/2R5 b - - 4 16";
-			fens[29] = "2krq1n1/ppp2N1p/4pp2/3p3Q/3P4/3PP3/PP1NKPPP/R7 w - - 3 16";
-			fens[28] = "2kr1qn1/ppp2N1p/4pp2/3p3Q/3P4/3PP3/PP1NKPPP/R7 b - - 2 15";
-			fens[27] = "2kr1qnN/ppp4p/4pp2/3p3Q/3P4/3PP3/PP1NKPPP/R7 w - - 1 15";
-			fens[26] = "2kr2nN/ppp4p/3qpp2/3p3Q/3P4/3PP3/PP1NKPPP/R7 b - - 0 14";
-			fens[25] = "2kr2nN/ppp4p/3qpp2/3p3Q/3P4/3PP3/PP1NKPPP/n6R w - - 0 14";
-			fens[24] = "2kr2nN/ppp4p/3qpp2/3p3Q/3P4/3PP3/PPnNKPPP/R6R b - - 0 13";
-			fens[23] = "2kr2nr/ppp4p/3qppN1/3p3Q/3P4/3PP3/PPnNKPPP/R6R w - - 3 13";
-			fens[22] = "r3k1nr/ppp4p/3qppN1/3p3Q/3P4/3PP3/PPnNKPPP/R6R b kq - 2 12";
-			fens[21] = "r3k1nr/ppp4p/3qppN1/3p3Q/3P4/3PP3/PPnN1PPP/R3K2R w KQkq - 1 12";
-			fens[20] = "r3k1nr/ppp4p/3qppN1/3p3Q/1n1P4/3PP3/PP1N1PPP/R3K2R b KQkq - 0 11";
-			fens[19] = "r3k1nr/ppp4p/3qppp1/3pN2Q/1n1P4/3PP3/PP1N1PPP/R3K2R w KQkq - 0 11";
-			fens[18] = "r3k1nr/ppp3pp/3qpp2/3pN2Q/1n1P4/3PP3/PP1N1PPP/R3K2R b KQkq - 1 10";
-			fens[17] = "r3k1nr/ppp3pp/3qpp2/3pN3/1n1P4/3PP3/PP1N1PPP/R2QK2R w KQkq - 0 10";
-			fens[16] = "r3k1nr/ppp2ppp/3qp3/3pN3/1n1P4/3PP3/PP1N1PPP/R2QK2R b KQkq - 2 9";
-			fens[15] = "r3k1nr/ppp2ppp/3qp3/3p4/1n1P4/3PPN2/PP1N1PPP/R2QK2R w KQkq - 1 9";
-			fens[14] = "r3k1nr/ppp2ppp/2nqp3/3p4/3P4/3PPN2/PP1N1PPP/R2QK2R b KQkq - 0 8";
-			fens[13] = "r3k1nr/ppp2ppp/2nqp3/3p4/3P4/3bPN2/PPPN1PPP/R2QK2R w KQkq - 0 8";
-			fens[12] = "r3k1nr/ppp2ppp/2nqp3/3p1b2/3P4/3BPN2/PPPN1PPP/R2QK2R b KQkq - 1 7";
-			fens[11] = "r3k1nr/ppp2ppp/2nqp3/3p1b2/3P4/4PN2/PPPN1PPP/R2QKB1R w KQkq - 0 7";
-			fens[10] = "r2qk1nr/ppp2ppp/2nBp3/3p1b2/3P4/4PN2/PPPN1PPP/R2QKB1R b KQkq - 0 6";
-			fens[9] = "r2qk1nr/ppp2ppp/2nbp3/3p1b2/3P1B2/4PN2/PPPN1PPP/R2QKB1R w KQkq - 1 6";
-			fens[8] = "r2qkbnr/ppp2ppp/2n1p3/3p1b2/3P1B2/4PN2/PPPN1PPP/R2QKB1R b KQkq - 0 5";
-			fens[7] = "r2qkbnr/ppp2ppp/2n1p3/3p1b2/3P1B2/5N2/PPPNPPPP/R2QKB1R w KQkq - 0 5";
-			fens[6] = "r2qkbnr/ppp1pppp/2n5/3p1b2/3P1B2/5N2/PPPNPPPP/R2QKB1R b KQkq - 5 4";
-			fens[5] = "r2qkbnr/ppp1pppp/2n5/3p1b2/3P1B2/5N2/PPP1PPPP/RN1QKB1R w KQkq - 4 4";
-			fens[4] = "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R b KQkq - 3 3";
-			fens[3] = "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 2 3";
-			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
-			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
-			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
-			result = ::test_do_move(name: "test6", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
-			t1 = TIM::current_clock();
-			LOG::LogInfo(message: "test6: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
-			return result;
-			@endnoparse
-		end function;
-
-		@dialect("oal");
-		function test7() return boolean is
-			@noparse
-			LOG::LogInfo(message: "test7: start");
-			t0 = TIM::current_clock();
-
-			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-			move_text = "e2e4 d7d6 f2f4 g8f6 e4e5 f6g4 d1g4 g7g6 f4f5 g6f5 g4f4 e7e6 g1f3 f8g7 f1c4 e8g8 d2d4 d6e5 d4e5 b8c6 e1g1 d8d4 f3d4 c6d4 f4d4";
-			fens[24] = "r1b2rk1/ppp2pbp/4p3/4Pp2/2BQ4/8/PPP3PP/RNB2RK1 b - - 0 13";
-			fens[23] = "r1b2rk1/ppp2pbp/4p3/4Pp2/2Bn1Q2/8/PPP3PP/RNB2RK1 w - - 0 13";
-			fens[22] = "r1b2rk1/ppp2pbp/2n1p3/4Pp2/2BN1Q2/8/PPP3PP/RNB2RK1 b - - 0 12";
-			fens[21] = "r1b2rk1/ppp2pbp/2n1p3/4Pp2/2Bq1Q2/5N2/PPP3PP/RNB2RK1 w - - 3 12";
-			fens[20] = "r1bq1rk1/ppp2pbp/2n1p3/4Pp2/2B2Q2/5N2/PPP3PP/RNB2RK1 b - - 2 11";
-			fens[19] = "r1bq1rk1/ppp2pbp/2n1p3/4Pp2/2B2Q2/5N2/PPP3PP/RNB1K2R w KQ - 1 11";
-			fens[18] = "rnbq1rk1/ppp2pbp/4p3/4Pp2/2B2Q2/5N2/PPP3PP/RNB1K2R b KQ - 0 10";
-			fens[17] = "rnbq1rk1/ppp2pbp/4p3/4pp2/2BP1Q2/5N2/PPP3PP/RNB1K2R w KQ - 0 10";
-			fens[16] = "rnbq1rk1/ppp2pbp/3pp3/4Pp2/2BP1Q2/5N2/PPP3PP/RNB1K2R b KQ d3 0 9";
-			fens[15] = "rnbq1rk1/ppp2pbp/3pp3/4Pp2/2B2Q2/5N2/PPPP2PP/RNB1K2R w KQ - 4 9";
-			fens[14] = "rnbqk2r/ppp2pbp/3pp3/4Pp2/2B2Q2/5N2/PPPP2PP/RNB1K2R b KQkq - 3 8";
-			fens[13] = "rnbqk2r/ppp2pbp/3pp3/4Pp2/5Q2/5N2/PPPP2PP/RNB1KB1R w KQkq - 2 8";
-			fens[12] = "rnbqkb1r/ppp2p1p/3pp3/4Pp2/5Q2/5N2/PPPP2PP/RNB1KB1R b KQkq - 1 7";
-			fens[11] = "rnbqkb1r/ppp2p1p/3pp3/4Pp2/5Q2/8/PPPP2PP/RNB1KBNR w KQkq - 0 7";
-			fens[10] = "rnbqkb1r/ppp1pp1p/3p4/4Pp2/5Q2/8/PPPP2PP/RNB1KBNR b KQkq - 1 6";
-			fens[9] = "rnbqkb1r/ppp1pp1p/3p4/4Pp2/6Q1/8/PPPP2PP/RNB1KBNR w KQkq - 0 6";
-			fens[8] = "rnbqkb1r/ppp1pp1p/3p2p1/4PP2/6Q1/8/PPPP2PP/RNB1KBNR b KQkq - 0 5";
-			fens[7] = "rnbqkb1r/ppp1pp1p/3p2p1/4P3/5PQ1/8/PPPP2PP/RNB1KBNR w KQkq - 0 5";
-			fens[6] = "rnbqkb1r/ppp1pppp/3p4/4P3/5PQ1/8/PPPP2PP/RNB1KBNR b KQkq - 0 4";
-			fens[5] = "rnbqkb1r/ppp1pppp/3p4/4P3/5Pn1/8/PPPP2PP/RNBQKBNR w KQkq - 1 4";
-			fens[4] = "rnbqkb1r/ppp1pppp/3p1n2/4P3/5P2/8/PPPP2PP/RNBQKBNR b KQkq - 0 3";
-			fens[3] = "rnbqkb1r/ppp1pppp/3p1n2/8/4PP2/8/PPPP2PP/RNBQKBNR w KQkq - 1 3";
-			fens[2] = "rnbqkbnr/ppp1pppp/3p4/8/4PP2/8/PPPP2PP/RNBQKBNR b KQkq f3 0 2";
-			fens[1] = "rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
-			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
-			result = ::test_do_move(name: "test7", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
-			t1 = TIM::current_clock();
-			LOG::LogInfo(message: "test7: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
-			return result;
-			@endnoparse
-		end function;
-
-		@dialect("oal");
-		function test8() return boolean is
-			@noparse
-			LOG::LogInfo(message: "test8: start");
-			t0 = TIM::current_clock();
-
-			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-			move_text = "d2d4 g8f6 c1f4 g7g6 b1c3 f8g7 e2e4 d7d6 e4e5 d6e5 f4e5 e8g8 g1f3 b8c6 c3b5 f6e8 c2c3 c8g4 f1e2 c6e5 f3e5 g7e5 d4e5 d8d1 a1d1 g4e2 e1e2 f7f6 e5e6 c7c6 b5d4 a8d8 f2f3 e8c7 g2g4 d8d5 c3c4 d5c5 d1c1 c5e5 e2f2 c7e6 d4e6 e5e6 c1e1 e6d6 c4c5 d6d7 b2b4 f8d8 f2e2 d7d2 e2e3 d2a2 e1d1 d8d1 h1d1 g8f7 d1d2 a2d2 e3d2 f7e6 d2c3 e6d5 f3f4 f6f5 g4f5 g6f5 c3d3 e7e5 f4e5 d5e5 d3e3 f5f4 e3f3 e5d4 f3f4 d4c4 f4e3 c4b4 e3d4 a7a5";
-			fens[81] = "8/1p5p/2p5/p1P5/1k1K4/8/7P/8 w - a6 0 42";
-			fens[80] = "8/pp5p/2p5/2P5/1k1K4/8/7P/8 b - - 1 41";
-			fens[79] = "8/pp5p/2p5/2P5/1k6/4K3/7P/8 w - - 0 41";
-			fens[78] = "8/pp5p/2p5/2P5/1Pk5/4K3/7P/8 b - - 2 40";
-			fens[77] = "8/pp5p/2p5/2P5/1Pk2K2/8/7P/8 w - - 1 40";
-			fens[76] = "8/pp5p/2p5/2P5/1P1k1K2/8/7P/8 b - - 0 39";
-			fens[75] = "8/pp5p/2p5/2P5/1P1k1p2/5K2/7P/8 w - - 2 39";
-			fens[74] = "8/pp5p/2p5/2P1k3/1P3p2/5K2/7P/8 b - - 1 38";
-			fens[73] = "8/pp5p/2p5/2P1k3/1P3p2/4K3/7P/8 w - - 0 38";
-			fens[72] = "8/pp5p/2p5/2P1kp2/1P6/4K3/7P/8 b - - 1 37";
-			fens[71] = "8/pp5p/2p5/2P1kp2/1P6/3K4/7P/8 w - - 0 37";
-			fens[70] = "8/pp5p/2p5/2PkPp2/1P6/3K4/7P/8 b - - 0 36";
-			fens[69] = "8/pp5p/2p5/2Pkpp2/1P3P2/3K4/7P/8 w - e6 0 36";
-			fens[68] = "8/pp2p2p/2p5/2Pk1p2/1P3P2/3K4/7P/8 b - - 1 35";
-			fens[67] = "8/pp2p2p/2p5/2Pk1p2/1P3P2/2K5/7P/8 w - - 0 35";
-			fens[66] = "8/pp2p2p/2p3p1/2Pk1P2/1P3P2/2K5/7P/8 b - - 0 34";
-			fens[65] = "8/pp2p2p/2p3p1/2Pk1p2/1P3PP1/2K5/7P/8 w - - 0 34";
-			fens[64] = "8/pp2p2p/2p2pp1/2Pk4/1P3PP1/2K5/7P/8 b - - 0 33";
-			fens[63] = "8/pp2p2p/2p2pp1/2Pk4/1P4P1/2K2P2/7P/8 w - - 3 33";
-			fens[62] = "8/pp2p2p/2p1kpp1/2P5/1P4P1/2K2P2/7P/8 b - - 2 32";
-			fens[61] = "8/pp2p2p/2p1kpp1/2P5/1P4P1/5P2/3K3P/8 w - - 1 32";
-			fens[60] = "8/pp2pk1p/2p2pp1/2P5/1P4P1/5P2/3K3P/8 b - - 0 31";
-			fens[59] = "8/pp2pk1p/2p2pp1/2P5/1P4P1/4KP2/3r3P/8 w - - 0 31";
-			fens[58] = "8/pp2pk1p/2p2pp1/2P5/1P4P1/4KP2/r2R3P/8 b - - 2 30";
-			fens[57] = "8/pp2pk1p/2p2pp1/2P5/1P4P1/4KP2/r6P/3R4 w - - 1 30";
-			fens[56] = "6k1/pp2p2p/2p2pp1/2P5/1P4P1/4KP2/r6P/3R4 b - - 0 29";
-			fens[55] = "6k1/pp2p2p/2p2pp1/2P5/1P4P1/4KP2/r6P/3r3R w - - 0 29";
-			fens[54] = "3r2k1/pp2p2p/2p2pp1/2P5/1P4P1/4KP2/r6P/3R3R b - - 1 28";
-			fens[53] = "3r2k1/pp2p2p/2p2pp1/2P5/1P4P1/4KP2/r6P/4R2R w - - 0 28";
-			fens[52] = "3r2k1/pp2p2p/2p2pp1/2P5/1P4P1/4KP2/P2r3P/4R2R b - - 4 27";
-			fens[51] = "3r2k1/pp2p2p/2p2pp1/2P5/1P4P1/5P2/P2rK2P/4R2R w - - 3 27";
-			fens[50] = "3r2k1/pp1rp2p/2p2pp1/2P5/1P4P1/5P2/P3K2P/4R2R b - - 2 26";
-			fens[49] = "3r2k1/pp1rp2p/2p2pp1/2P5/1P4P1/5P2/P4K1P/4R2R w - - 1 26";
-			fens[48] = "5rk1/pp1rp2p/2p2pp1/2P5/1P4P1/5P2/P4K1P/4R2R b - b3 0 25";
-			fens[47] = "5rk1/pp1rp2p/2p2pp1/2P5/6P1/5P2/PP3K1P/4R2R w - - 1 25";
-			fens[46] = "5rk1/pp2p2p/2pr1pp1/2P5/6P1/5P2/PP3K1P/4R2R b - - 0 24";
-			fens[45] = "5rk1/pp2p2p/2pr1pp1/8/2P3P1/5P2/PP3K1P/4R2R w - - 2 24";
-			fens[44] = "5rk1/pp2p2p/2p1rpp1/8/2P3P1/5P2/PP3K1P/4R2R b - - 1 23";
-			fens[43] = "5rk1/pp2p2p/2p1rpp1/8/2P3P1/5P2/PP3K1P/2R4R w - - 0 23";
-			fens[42] = "5rk1/pp2p2p/2p1Npp1/4r3/2P3P1/5P2/PP3K1P/2R4R b - - 0 22";
-			fens[41] = "5rk1/pp2p2p/2p1npp1/4r3/2PN2P1/5P2/PP3K1P/2R4R w - - 0 22";
-			fens[40] = "5rk1/ppn1p2p/2p1Ppp1/4r3/2PN2P1/5P2/PP3K1P/2R4R b - - 4 21";
-			fens[39] = "5rk1/ppn1p2p/2p1Ppp1/4r3/2PN2P1/5P2/PP2K2P/2R4R w - - 3 21";
-			fens[38] = "5rk1/ppn1p2p/2p1Ppp1/2r5/2PN2P1/5P2/PP2K2P/2R4R b - - 2 20";
-			fens[37] = "5rk1/ppn1p2p/2p1Ppp1/2r5/2PN2P1/5P2/PP2K2P/3R3R w - - 1 20";
-			fens[36] = "5rk1/ppn1p2p/2p1Ppp1/3r4/2PN2P1/5P2/PP2K2P/3R3R b - - 0 19";
-			fens[35] = "5rk1/ppn1p2p/2p1Ppp1/3r4/3N2P1/2P2P2/PP2K2P/3R3R w - - 1 19";
-			fens[34] = "3r1rk1/ppn1p2p/2p1Ppp1/8/3N2P1/2P2P2/PP2K2P/3R3R b - g3 0 18";
-			fens[33] = "3r1rk1/ppn1p2p/2p1Ppp1/8/3N4/2P2P2/PP2K1PP/3R3R w - - 1 18";
-			fens[32] = "3rnrk1/pp2p2p/2p1Ppp1/8/3N4/2P2P2/PP2K1PP/3R3R b - - 0 17";
-			fens[31] = "3rnrk1/pp2p2p/2p1Ppp1/8/3N4/2P5/PP2KPPP/3R3R w - - 2 17";
-			fens[30] = "r3nrk1/pp2p2p/2p1Ppp1/8/3N4/2P5/PP2KPPP/3R3R b - - 1 16";
-			fens[29] = "r3nrk1/pp2p2p/2p1Ppp1/1N6/8/2P5/PP2KPPP/3R3R w - - 0 16";
-			fens[28] = "r3nrk1/ppp1p2p/4Ppp1/1N6/8/2P5/PP2KPPP/3R3R b - - 0 15";
-			fens[27] = "r3nrk1/ppp1p2p/5pp1/1N2P3/8/2P5/PP2KPPP/3R3R w - - 0 15";
-			fens[26] = "r3nrk1/ppp1pp1p/6p1/1N2P3/8/2P5/PP2KPPP/3R3R b - - 0 14";
-			fens[25] = "r3nrk1/ppp1pp1p/6p1/1N2P3/8/2P5/PP2bPPP/3RK2R w K - 0 14";
-			fens[24] = "r3nrk1/ppp1pp1p/6p1/1N2P3/6b1/2P5/PP2BPPP/3RK2R b K - 0 13";
-			fens[23] = "r3nrk1/ppp1pp1p/6p1/1N2P3/6b1/2P5/PP2BPPP/R2qK2R w KQ - 0 13";
-			fens[22] = "r2qnrk1/ppp1pp1p/6p1/1N2P3/6b1/2P5/PP2BPPP/R2QK2R b KQ - 0 12";
-			fens[21] = "r2qnrk1/ppp1pp1p/6p1/1N2b3/3P2b1/2P5/PP2BPPP/R2QK2R w KQ - 0 12";
-			fens[20] = "r2qnrk1/ppp1ppbp/6p1/1N2N3/3P2b1/2P5/PP2BPPP/R2QK2R b KQ - 0 11";
-			fens[19] = "r2qnrk1/ppp1ppbp/6p1/1N2n3/3P2b1/2P2N2/PP2BPPP/R2QK2R w KQ - 0 11";
-			fens[18] = "r2qnrk1/ppp1ppbp/2n3p1/1N2B3/3P2b1/2P2N2/PP2BPPP/R2QK2R b KQ - 2 10";
-			fens[17] = "r2qnrk1/ppp1ppbp/2n3p1/1N2B3/3P2b1/2P2N2/PP3PPP/R2QKB1R w KQ - 1 10";
-			fens[16] = "r1bqnrk1/ppp1ppbp/2n3p1/1N2B3/3P4/2P2N2/PP3PPP/R2QKB1R b KQ - 0 9";
-			fens[15] = "r1bqnrk1/ppp1ppbp/2n3p1/1N2B3/3P4/5N2/PPP2PPP/R2QKB1R w KQ - 5 9";
-			fens[14] = "r1bq1rk1/ppp1ppbp/2n2np1/1N2B3/3P4/5N2/PPP2PPP/R2QKB1R b KQ - 4 8";
-			fens[13] = "r1bq1rk1/ppp1ppbp/2n2np1/4B3/3P4/2N2N2/PPP2PPP/R2QKB1R w KQ - 3 8";
-			fens[12] = "rnbq1rk1/ppp1ppbp/5np1/4B3/3P4/2N2N2/PPP2PPP/R2QKB1R b KQ - 2 7";
-			fens[11] = "rnbq1rk1/ppp1ppbp/5np1/4B3/3P4/2N5/PPP2PPP/R2QKBNR w KQ - 1 7";
-			fens[10] = "rnbqk2r/ppp1ppbp/5np1/4B3/3P4/2N5/PPP2PPP/R2QKBNR b KQkq - 0 6";
-			fens[9] = "rnbqk2r/ppp1ppbp/5np1/4p3/3P1B2/2N5/PPP2PPP/R2QKBNR w KQkq - 0 6";
-			fens[8] = "rnbqk2r/ppp1ppbp/3p1np1/4P3/3P1B2/2N5/PPP2PPP/R2QKBNR b KQkq - 0 5";
-			fens[7] = "rnbqk2r/ppp1ppbp/3p1np1/8/3PPB2/2N5/PPP2PPP/R2QKBNR w KQkq - 0 5";
-			fens[6] = "rnbqk2r/ppppppbp/5np1/8/3PPB2/2N5/PPP2PPP/R2QKBNR b KQkq e3 0 4";
-			fens[5] = "rnbqk2r/ppppppbp/5np1/8/3P1B2/2N5/PPP1PPPP/R2QKBNR w KQkq - 2 4";
-			fens[4] = "rnbqkb1r/pppppp1p/5np1/8/3P1B2/2N5/PPP1PPPP/R2QKBNR b KQkq - 1 3";
-			fens[3] = "rnbqkb1r/pppppp1p/5np1/8/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 0 3";
-			fens[2] = "rnbqkb1r/pppppppp/5n2/8/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 2 2";
-			fens[1] = "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2";
-			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
-			result = ::test_do_move(name: "test8", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
-			t1 = TIM::current_clock();
-			LOG::LogInfo(message: "test8: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
-			return result;
-			@endnoparse
-		end function;
-
-		@dialect("oal");
-		function test9() return boolean is
-			@noparse
-			LOG::LogInfo(message: "test9: start");
-			t0 = TIM::current_clock();
-
-			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-			move_text = "d2d4 d7d5 c1f4 c7c6 g1f3 d8a5 c2c3 b7b5 a2a3 e7e6 e2e3 b5b4 c3b4 a5b6 f1d3 f8b4 a3b4 b6b4 b1c3 b4b2 d1c1 b2b4 e1g1 c8a6 f3e5 f7f6 d3a6 f6e5 f4e5 b8a6 a1a6 b4c4 a6a4 c4d3 e5g7 d3g6 g7h8 g8f6 h8f6 g6f6 c1a1 c6c5 a4a7 a8a7 a1a7 c5d4 e3d4 h7h5 f1b1 f6e7 b1b8 e8f7 b8b7";
-			fens[52] = "8/QR2qk2/4p3/3p3p/3P4/2N5/5PPP/6K1 b - - 5 27";
-			fens[51] = "1R6/Q3qk2/4p3/3p3p/3P4/2N5/5PPP/6K1 w - - 4 27";
-			fens[50] = "1R2k3/Q3q3/4p3/3p3p/3P4/2N5/5PPP/6K1 b - - 3 26";
-			fens[49] = "4k3/Q3q3/4p3/3p3p/3P4/2N5/5PPP/1R4K1 w - - 2 26";
-			fens[48] = "4k3/Q7/4pq2/3p3p/3P4/2N5/5PPP/1R4K1 b - - 1 25";
-			fens[47] = "4k3/Q7/4pq2/3p3p/3P4/2N5/5PPP/5RK1 w - h6 0 25";
-			fens[46] = "4k3/Q6p/4pq2/3p4/3P4/2N5/5PPP/5RK1 b - - 0 24";
-			fens[45] = "4k3/Q6p/4pq2/3p4/3p4/2N1P3/5PPP/5RK1 w - - 0 24";
-			fens[44] = "4k3/Q6p/4pq2/2pp4/3P4/2N1P3/5PPP/5RK1 b - - 0 23";
-			fens[43] = "4k3/r6p/4pq2/2pp4/3P4/2N1P3/5PPP/Q4RK1 w - - 0 23";
-			fens[42] = "r3k3/R6p/4pq2/2pp4/3P4/2N1P3/5PPP/Q4RK1 b q - 0 22";
-			fens[41] = "r3k3/p6p/4pq2/2pp4/R2P4/2N1P3/5PPP/Q4RK1 w q - 0 22";
-			fens[40] = "r3k3/p6p/2p1pq2/3p4/R2P4/2N1P3/5PPP/Q4RK1 b q - 1 21";
-			fens[39] = "r3k3/p6p/2p1pq2/3p4/R2P4/2N1P3/5PPP/2Q2RK1 w q - 0 21";
-			fens[38] = "r3k3/p6p/2p1pBq1/3p4/R2P4/2N1P3/5PPP/2Q2RK1 b q - 0 20";
-			fens[37] = "r3k2B/p6p/2p1pnq1/3p4/R2P4/2N1P3/5PPP/2Q2RK1 w q - 1 20";
-			fens[36] = "r3k1nB/p6p/2p1p1q1/3p4/R2P4/2N1P3/5PPP/2Q2RK1 b q - 0 19";
-			fens[35] = "r3k1nr/p5Bp/2p1p1q1/3p4/R2P4/2N1P3/5PPP/2Q2RK1 w kq - 1 19";
-			fens[34] = "r3k1nr/p5Bp/2p1p3/3p4/R2P4/2NqP3/5PPP/2Q2RK1 b kq - 0 18";
-			fens[33] = "r3k1nr/p5pp/2p1p3/3pB3/R2P4/2NqP3/5PPP/2Q2RK1 w kq - 3 18";
-			fens[32] = "r3k1nr/p5pp/2p1p3/3pB3/R1qP4/2N1P3/5PPP/2Q2RK1 b kq - 2 17";
-			fens[31] = "r3k1nr/p5pp/R1p1p3/3pB3/2qP4/2N1P3/5PPP/2Q2RK1 w kq - 1 17";
-			fens[30] = "r3k1nr/p5pp/R1p1p3/3pB3/1q1P4/2N1P3/5PPP/2Q2RK1 b kq - 0 16";
-			fens[29] = "r3k1nr/p5pp/n1p1p3/3pB3/1q1P4/2N1P3/5PPP/R1Q2RK1 w kq - 0 16";
-			fens[28] = "rn2k1nr/p5pp/B1p1p3/3pB3/1q1P4/2N1P3/5PPP/R1Q2RK1 b kq - 0 15";
-			fens[27] = "rn2k1nr/p5pp/B1p1p3/3pp3/1q1P1B2/2N1P3/5PPP/R1Q2RK1 w kq - 0 15";
-			fens[26] = "rn2k1nr/p5pp/B1p1pp2/3pN3/1q1P1B2/2N1P3/5PPP/R1Q2RK1 b kq - 0 14";
-			fens[25] = "rn2k1nr/p5pp/b1p1pp2/3pN3/1q1P1B2/2NBP3/5PPP/R1Q2RK1 w kq - 0 14";
-			fens[24] = "rn2k1nr/p4ppp/b1p1p3/3pN3/1q1P1B2/2NBP3/5PPP/R1Q2RK1 b kq - 5 13";
-			fens[23] = "rn2k1nr/p4ppp/b1p1p3/3p4/1q1P1B2/2NBPN2/5PPP/R1Q2RK1 w kq - 4 13";
-			fens[22] = "rnb1k1nr/p4ppp/2p1p3/3p4/1q1P1B2/2NBPN2/5PPP/R1Q2RK1 b kq - 3 12";
-			fens[21] = "rnb1k1nr/p4ppp/2p1p3/3p4/1q1P1B2/2NBPN2/5PPP/R1Q1K2R w KQkq - 2 12";
-			fens[20] = "rnb1k1nr/p4ppp/2p1p3/3p4/3P1B2/2NBPN2/1q3PPP/R1Q1K2R b KQkq - 1 11";
-			fens[19] = "rnb1k1nr/p4ppp/2p1p3/3p4/3P1B2/2NBPN2/1q3PPP/R2QK2R w KQkq - 0 11";
-			fens[18] = "rnb1k1nr/p4ppp/2p1p3/3p4/1q1P1B2/2NBPN2/1P3PPP/R2QK2R b KQkq - 1 10";
-			fens[17] = "rnb1k1nr/p4ppp/2p1p3/3p4/1q1P1B2/3BPN2/1P3PPP/RN1QK2R w KQkq - 0 10";
-			fens[16] = "rnb1k1nr/p4ppp/1qp1p3/3p4/1P1P1B2/3BPN2/1P3PPP/RN1QK2R b KQkq - 0 9";
-			fens[15] = "rnb1k1nr/p4ppp/1qp1p3/3p4/1b1P1B2/P2BPN2/1P3PPP/RN1QK2R w KQkq - 0 9";
-			fens[14] = "rnb1kbnr/p4ppp/1qp1p3/3p4/1P1P1B2/P2BPN2/1P3PPP/RN1QK2R b KQkq - 2 8";
-			fens[13] = "rnb1kbnr/p4ppp/1qp1p3/3p4/1P1P1B2/P3PN2/1P3PPP/RN1QKB1R w KQkq - 1 8";
-			fens[12] = "rnb1kbnr/p4ppp/2p1p3/q2p4/1P1P1B2/P3PN2/1P3PPP/RN1QKB1R b KQkq - 0 7";
-			fens[11] = "rnb1kbnr/p4ppp/2p1p3/q2p4/1p1P1B2/P1P1PN2/1P3PPP/RN1QKB1R w KQkq - 0 7";
-			fens[10] = "rnb1kbnr/p4ppp/2p1p3/qp1p4/3P1B2/P1P1PN2/1P3PPP/RN1QKB1R b KQkq - 0 6";
-			fens[9] = "rnb1kbnr/p4ppp/2p1p3/qp1p4/3P1B2/P1P2N2/1P2PPPP/RN1QKB1R w KQkq - 0 6";
-			fens[8] = "rnb1kbnr/p3pppp/2p5/qp1p4/3P1B2/P1P2N2/1P2PPPP/RN1QKB1R b KQkq - 0 5";
-			fens[7] = "rnb1kbnr/p3pppp/2p5/qp1p4/3P1B2/2P2N2/PP2PPPP/RN1QKB1R w KQkq b6 0 5";
-			fens[6] = "rnb1kbnr/pp2pppp/2p5/q2p4/3P1B2/2P2N2/PP2PPPP/RN1QKB1R b KQkq - 0 4";
-			fens[5] = "rnb1kbnr/pp2pppp/2p5/q2p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R w KQkq - 2 4";
-			fens[4] = "rnbqkbnr/pp2pppp/2p5/3p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R b KQkq - 1 3";
-			fens[3] = "rnbqkbnr/pp2pppp/2p5/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 0 3";
-			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
-			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
-			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
-			result = ::test_do_move(name: "test9", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
-			t1 = TIM::current_clock();
-			LOG::LogInfo(message: "test9: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -591,7 +30,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test10: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 b8c6 g1f3 c8f5 b1d2 c6b4 c2c3 b4c2 d1c2 f5c2 b2b3 d8d7 f3e5 d7f5 e2e3 e8c8 a1c1 e7e6 c3c4 f8a3 f1d3 c2d3 e5d3 f5d3 c1d1 d3c3 e1g1 g8f6 d2b1 c3b2 d1d2 b2a1 f4e5 f6e4 e5g7 e4d2 b1d2 a1a2 g7h8 d8h8 d2b1 a2c2 b1a3 c2e4 a3b5 h8g8 g2g3 h7h5 f1a1 h5h4 a1a7 e4b1 g1g2 g8g7 a7a8 c8d7 c4c5 b1c2 b3b4 h4g3 h2g3 c2e4 g2f1 g7h7 f1e2 e4c2 e2f3 c2e4 f3e2 c7c6 b5c3 e4g4 e2d3 h7h2 b4b5 h2f2 b5c6 d7c6 a8c8 c6d7 c8b8 g4f5 e3e4 f5f3";
 			fens[85] = "1R6/1p1k1p2/4p3/2Pp4/3PP3/2NK1qP1/5r2/8 w - - 1 44";
@@ -680,12 +119,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test10", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test10: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -695,7 +134,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test11: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 e7e5 g1f3 b8c6 c2c3 c6a5 c1g5 a5c4 g5d8 e8d8 f3e5 f8d6 e5c4 b7b5 c4d6 c7d6 e2e4 d6d5 f2f3 b5b4 f1d3 d5e4 d3e4 g8f6 e4a8 h8e8 a8e4 e8e4 f3e4 f6e4 e1g1 e4c3 b2c3 b4c3 b1c3 c8a6 f1e1 a6c4 d1b1 c4a2 b1b8";
 			fens[40] = "1Q1k4/p2p1ppp/8/8/3P4/2N5/b5PP/R3R1K1 b - - 1 21";
@@ -739,12 +178,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/3P4/8/PPP1PPPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test11", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test11: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -754,7 +193,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test12: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 d7d6 f1c4 g8f6 d2d3 g7g6 g1f3 f8g7 f3g5 e8g8 d1f3 e7e5 f3g3 d8d7 b1c3 b8c6 g3h4 c6d4 e1d1 d7g4 h4g4 f6g4 h1f1 g8h8 c3d5 c7c6 d5e3 g4e3 d1e1 e3f1 e1f1 d4c2 a1b1 f7f6 g5e6 f8e8 e6c7 d6d5 c7e8 g7f8 c4b3 c2d4 e8f6 d4b3 a2b3 c8e6 e4d5 c6d5 c1g5 f8e7 b1e1 a8f8 e1e5 e7f6 e5e6 f6g5 e6e5 g5h4 e5d5 f8f2 f1g1 f2b2 g2g3 h4f6 d5b5 f6d4 g1f1 a7a6 b5b7 b2h2 b7d7 d4e5 d3d4 e5g3 d4d5 h2d2 d5d6 h7h5 d7a7 d2a2 d6d7 a2d2 a7a8 h8h7 d7d8q d2d8 a8d8 h5h4 f1g2 h7h6 g2h3 g6g5 d8g8 h6h5 g8f8 g5g4 h3g2 h4h3 g2h1 g3f2 f8f2 h5h4 h1h2 g4g3 h2g1 g3f2 g1f2 h3h2 f2g2 h2h1q g2h1 h4g4 h1g2 g4f4 g2f2 f4e4 f2e2 e4d4 e2d2 d4c5 d2c3 c5b5 b3b4 a6a5 b4a5 b5a5";
 			fens[125] = "8/8/8/k7/8/2K5/8/8 w - - 0 64";
@@ -883,12 +322,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/3p4/8/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test12", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test12: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -898,7 +337,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test13: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1f3 f8c5 f3e5 g8f6 f1c4 c5f2 e1f2 f6e4 f2g1 d8f6 d1e1 f6e5 d2d3 e5c5 c1e3 c5e5 b2b4 e8g8 e3c5 e5a1 c5f8 a1d4 g1f1 e4g3 e1g3 d4f6 g3f3 g8f8 f3f6 g7f6 b1c3 b8c6 f1e1 d7d6 e1d2 c8f5 b4b5 c6e5 h1e1 a8e8 d3d4 e5f3 g2f3 e8e1 d2e1 a7a6 b5a6 b7a6 c4a6 f5c2 e1d2 c2f5 a2a4 h7h5 h2h4 f5h3 d2e3 c7c5 d4c5 d6c5 c3e4 f6f5 e4c5 f8e7 a6b7 e7d6 e3d4 h3g2 f3f4 d6c7 a4a5 c7b8 a5a6 g2b7 a6b7 b8c7 d4e5 c7b6 b7b8q b6c5 b8d8";
 			fens[82] = "3Q4/5p2/8/2k1Kp1p/5P1P/8/8/8 b - - 1 42";
@@ -984,12 +423,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test13", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test13: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -999,7 +438,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test14: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 d7d6 d1f3 g8f6 f1c4 g7g6 g1h3 f8g7 h3f4 e8g8 f4g6 f8e8 d2d3 e7e5 c1g5 c8e6 g5f6 g7f6 c4e6 e8e6 b1c3 f7g6 c3d5 g8g7 e1g1 c7c6 d5e3 b8d7 e3f5 g7h8 f5e3 d8e7 f3h3 a8f8 f2f4 b7b5 f4f5 g6f5 h3f5 f6g5 f5f8 d7f8 e3f5 e7f7 f1f2 g5e3 a1f1 e3f2 f1f2 e6g6 g2g3 f7e6 f5h4 g6f6 h4f3 f8g6 h2h4 d6d5 b2b3 d5e4 d3e4 a7a6 h4h5 g6e7 g3g4 f6f4 f3g5 f4g4 f2g2 g4g2 g1g2";
 			fens[70] = "7k/4n2p/p1p1q3/1p2p1NP/4P3/1P6/P1P3K1/8 b - - 0 36";
@@ -1073,12 +512,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/3p4/8/4P3/5Q2/PPPP1PPP/RNB1KBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test14", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test14: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1088,7 +527,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test15: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e3 g8f6 b1c3 g7g6 d1f3 f8g7 f1c4 e8g8 c3e4 d7d5 e4f6 e7f6 c4d5 b8d7 g1e2 d8e7 d5b7 a8b8 b7c8 b8c8 e2d4 f6f5 d4c6 e7c5 c6a7 c5a7 e1g1 c8e8 f3d5 e8e7 a2a4 a7a6";
 			fens[31] = "5rk1/2pnrpbp/q5p1/3Q1p2/P7/4P3/1PPP1PPP/R1B2RK1 w - - 1 17";
@@ -1123,12 +562,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkb1r/pppppppp/5n2/8/8/2N1P3/PPPP1PPP/R1BQKBNR b KQkq - 2 2";
 			fens[1] = "rnbqkb1r/pppppppp/5n2/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 1 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR b KQkq - 0 1";
-
+			
 			result = ::test_do_move(name: "test15", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test15: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1138,7 +577,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test16: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 d7d6 f1c4 g8f6 g1f3 g7g6 f3g5 f8g7 g5f7 e8g8 f7d8";
 			fens[10] = "rnbN1rk1/ppp1p1bp/3p1np1/8/2B1P3/8/PPPP1PPP/RNBQK2R b KQ - 0 6";
@@ -1152,12 +591,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/3p4/8/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test16", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test16: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1167,7 +606,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test17: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1f3 f8d6 b1c3 g8f6 f1c4 e8g8 d2d3 c7c5 e1g1 h7h5 f3g5 b8c6 c3d5 b7b6 d5f6 g8h8 d1h5";
 			fens[18] = "r1bq1r1k/p2p1pp1/1pnb1N2/2p1p1NQ/2B1P3/3P4/PPP2PPP/R1B2RK1 b - - 0 10";
@@ -1189,12 +628,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test17", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test17: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1204,7 +643,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test18: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 e7e6 g1f3 c7c5 e2e3 c5c4 c2c3 b8c6 b1d2 f8d6 g2g3 g8f6 f1g2 f6g4 e1g1 e6e5 f4g5 f7f6 g5h4 e5e4 h2h3 g4f2 f1f2 e4f3 g2f3 c8h3 d1a4 e8g8 f3d5 g8h8 d2c4 g7g5 a4a5 d8a5 c4a5 c6a5 f2h2 h3g4 a1f1 g5h4 h2h4 g4e2 f1f2 e2b5 d5e4 d6g3 h4h7 h8g8 f2g2 f8f7 g2g3 g8f8 h7h8 f8e7 e4g6 a8h8 g6f7 e7f7 g3f3 b5c6 f3f2 h8h1";
 			fens[63] = "8/pp3k2/2b2p2/n7/3P4/2P1P3/PP3R2/6Kr w - - 4 33";
@@ -1271,12 +710,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test18", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test18: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1286,7 +725,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test19: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 d2d3 d7d6 e1g1 c8g4 h2h3 g4h5 c2c3 g8e7 c1e3 d8d7 b1d2 g7g6 b2b4 c6b4 c3b4 c5b4 d1b3 b4d2 f3d2 f7f5 f2f4 e5f4 e3f4 f5e4 d2e4 h8f8 f4e3 e8c8 c4e6 d7e6 b3e6 c8b8 e6e7 d8e8 f1f8 e8f8 e7f8";
 			fens[42] = "1k3Q2/ppp4p/3p2p1/7b/4N3/3PB2P/P5P1/R5K1 b - - 0 22";
@@ -1332,12 +771,83 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test19", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test19: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
+			return result;
+			@endnoparse
+		end function;
 
+		@dialect("oal");
+		function test2() return boolean is
+			@noparse
+			LOG::LogInfo(message: "test2: start");
+			t0 = TIM::current_clock();
+			
+			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+			move_text = "d2d4 c7c5 c2c3 d7d5 c1f4 b8c6 e2e3 g8f6 g1f3 f6e4 d1c2 e7e6 f1d3 f7f5 b1d2 f8d6 d2e4 f5e4 d3b5 e8g8 f3g5 e6e5 d4e5 c6e5 e1g1 c5c4 c2e2 e5d3 e2h5 c8f5 g2g4 f5g6 h5h3 d3f4 e3f4 d6f4 g5e6 d8f6 e6f8 a8f8 a1d1 e4e3 d1d5 e3f2 f1f2 g6e4 d5d7 f4e3 b5c4 g8h8 h3e3 f6h4 f2f8";
+			fens[52] = "5R1k/pp1R2pp/8/8/2B1b1Pq/2P1Q3/PP5P/6K1 b - - 0 27";
+			fens[51] = "5r1k/pp1R2pp/8/8/2B1b1Pq/2P1Q3/PP3R1P/6K1 w - - 1 27";
+			fens[50] = "5r1k/pp1R2pp/5q2/8/2B1b1P1/2P1Q3/PP3R1P/6K1 b - - 0 26";
+			fens[49] = "5r1k/pp1R2pp/5q2/8/2B1b1P1/2P1b2Q/PP3R1P/6K1 w - - 1 26";
+			fens[48] = "5rk1/pp1R2pp/5q2/8/2B1b1P1/2P1b2Q/PP3R1P/6K1 b - - 0 25";
+			fens[47] = "5rk1/pp1R2pp/5q2/1B6/2p1b1P1/2P1b2Q/PP3R1P/6K1 w - - 3 25";
+			fens[46] = "5rk1/pp1R2pp/5q2/1B6/2p1bbP1/2P4Q/PP3R1P/6K1 b - - 2 24";
+			fens[45] = "5rk1/pp4pp/5q2/1B1R4/2p1bbP1/2P4Q/PP3R1P/6K1 w - - 1 24";
+			fens[44] = "5rk1/pp4pp/5qb1/1B1R4/2p2bP1/2P4Q/PP3R1P/6K1 b - - 0 23";
+			fens[43] = "5rk1/pp4pp/5qb1/1B1R4/2p2bP1/2P4Q/PP3p1P/5RK1 w - - 0 23";
+			fens[42] = "5rk1/pp4pp/5qb1/1B1R4/2p2bP1/2P1p2Q/PP3P1P/5RK1 b - - 0 22";
+			fens[41] = "5rk1/pp4pp/5qb1/1B1p4/2p2bP1/2P1p2Q/PP3P1P/3R1RK1 w - - 0 22";
+			fens[40] = "5rk1/pp4pp/5qb1/1B1p4/2p1pbP1/2P4Q/PP3P1P/3R1RK1 b - - 1 21";
+			fens[39] = "5rk1/pp4pp/5qb1/1B1p4/2p1pbP1/2P4Q/PP3P1P/R4RK1 w - - 0 21";
+			fens[38] = "r4Nk1/pp4pp/5qb1/1B1p4/2p1pbP1/2P4Q/PP3P1P/R4RK1 b - - 0 20";
+			fens[37] = "r4rk1/pp4pp/4Nqb1/1B1p4/2p1pbP1/2P4Q/PP3P1P/R4RK1 w - - 2 20";
+			fens[36] = "r2q1rk1/pp4pp/4N1b1/1B1p4/2p1pbP1/2P4Q/PP3P1P/R4RK1 b - - 1 19";
+			fens[35] = "r2q1rk1/pp4pp/6b1/1B1p2N1/2p1pbP1/2P4Q/PP3P1P/R4RK1 w - - 0 19";
+			fens[34] = "r2q1rk1/pp4pp/3b2b1/1B1p2N1/2p1pPP1/2P4Q/PP3P1P/R4RK1 b - - 0 18";
+			fens[33] = "r2q1rk1/pp4pp/3b2b1/1B1p2N1/2p1pnP1/2P1P2Q/PP3P1P/R4RK1 w - - 0 18";
+			fens[32] = "r2q1rk1/pp4pp/3b2b1/1B1p2N1/2p1pBP1/2PnP2Q/PP3P1P/R4RK1 b - - 2 17";
+			fens[31] = "r2q1rk1/pp4pp/3b2b1/1B1p2NQ/2p1pBP1/2PnP3/PP3P1P/R4RK1 w - - 1 17";
+			fens[30] = "r2q1rk1/pp4pp/3b4/1B1p1bNQ/2p1pBP1/2PnP3/PP3P1P/R4RK1 b - g3 0 16";
+			fens[29] = "r2q1rk1/pp4pp/3b4/1B1p1bNQ/2p1pB2/2PnP3/PP3PPP/R4RK1 w - - 4 16";
+			fens[28] = "r1bq1rk1/pp4pp/3b4/1B1p2NQ/2p1pB2/2PnP3/PP3PPP/R4RK1 b - - 3 15";
+			fens[27] = "r1bq1rk1/pp4pp/3b4/1B1p2N1/2p1pB2/2PnP3/PP2QPPP/R4RK1 w - - 2 15";
+			fens[26] = "r1bq1rk1/pp4pp/3b4/1B1pn1N1/2p1pB2/2P1P3/PP2QPPP/R4RK1 b - - 1 14";
+			fens[25] = "r1bq1rk1/pp4pp/3b4/1B1pn1N1/2p1pB2/2P1P3/PPQ2PPP/R4RK1 w - - 0 14";
+			fens[24] = "r1bq1rk1/pp4pp/3b4/1Bppn1N1/4pB2/2P1P3/PPQ2PPP/R4RK1 b - - 1 13";
+			fens[23] = "r1bq1rk1/pp4pp/3b4/1Bppn1N1/4pB2/2P1P3/PPQ2PPP/R3K2R w KQ - 0 13";
+			fens[22] = "r1bq1rk1/pp4pp/2nb4/1BppP1N1/4pB2/2P1P3/PPQ2PPP/R3K2R b KQ - 0 12";
+			fens[21] = "r1bq1rk1/pp4pp/2nb4/1Bppp1N1/3PpB2/2P1P3/PPQ2PPP/R3K2R w KQ - 0 12";
+			fens[20] = "r1bq1rk1/pp4pp/2nbp3/1Bpp2N1/3PpB2/2P1P3/PPQ2PPP/R3K2R b KQ - 3 11";
+			fens[19] = "r1bq1rk1/pp4pp/2nbp3/1Bpp4/3PpB2/2P1PN2/PPQ2PPP/R3K2R w KQ - 2 11";
+			fens[18] = "r1bqk2r/pp4pp/2nbp3/1Bpp4/3PpB2/2P1PN2/PPQ2PPP/R3K2R b KQkq - 1 10";
+			fens[17] = "r1bqk2r/pp4pp/2nbp3/2pp4/3PpB2/2PBPN2/PPQ2PPP/R3K2R w KQkq - 0 10";
+			fens[16] = "r1bqk2r/pp4pp/2nbp3/2pp1p2/3PNB2/2PBPN2/PPQ2PPP/R3K2R b KQkq - 0 9";
+			fens[15] = "r1bqk2r/pp4pp/2nbp3/2pp1p2/3PnB2/2PBPN2/PPQN1PPP/R3K2R w KQkq - 2 9";
+			fens[14] = "r1bqkb1r/pp4pp/2n1p3/2pp1p2/3PnB2/2PBPN2/PPQN1PPP/R3K2R b KQkq - 1 8";
+			fens[13] = "r1bqkb1r/pp4pp/2n1p3/2pp1p2/3PnB2/2PBPN2/PPQ2PPP/RN2K2R w KQkq f6 0 8";
+			fens[12] = "r1bqkb1r/pp3ppp/2n1p3/2pp4/3PnB2/2PBPN2/PPQ2PPP/RN2K2R b KQkq - 1 7";
+			fens[11] = "r1bqkb1r/pp3ppp/2n1p3/2pp4/3PnB2/2P1PN2/PPQ2PPP/RN2KB1R w KQkq - 0 7";
+			fens[10] = "r1bqkb1r/pp2pppp/2n5/2pp4/3PnB2/2P1PN2/PPQ2PPP/RN2KB1R b KQkq - 4 6";
+			fens[9] = "r1bqkb1r/pp2pppp/2n5/2pp4/3PnB2/2P1PN2/PP3PPP/RN1QKB1R w KQkq - 3 6";
+			fens[8] = "r1bqkb1r/pp2pppp/2n2n2/2pp4/3P1B2/2P1PN2/PP3PPP/RN1QKB1R b KQkq - 2 5";
+			fens[7] = "r1bqkb1r/pp2pppp/2n2n2/2pp4/3P1B2/2P1P3/PP3PPP/RN1QKBNR w KQkq - 1 5";
+			fens[6] = "r1bqkbnr/pp2pppp/2n5/2pp4/3P1B2/2P1P3/PP3PPP/RN1QKBNR b KQkq - 0 4";
+			fens[5] = "r1bqkbnr/pp2pppp/2n5/2pp4/3P1B2/2P5/PP2PPPP/RN1QKBNR w KQkq - 2 4";
+			fens[4] = "rnbqkbnr/pp2pppp/8/2pp4/3P1B2/2P5/PP2PPPP/RN1QKBNR b KQkq - 1 3";
+			fens[3] = "rnbqkbnr/pp2pppp/8/2pp4/3P4/2P5/PP2PPPP/RNBQKBNR w KQkq d6 0 3";
+			fens[2] = "rnbqkbnr/pp1ppppp/8/2p5/3P4/2P5/PP2PPPP/RNBQKBNR b KQkq - 0 2";
+			fens[1] = "rnbqkbnr/pp1ppppp/8/2p5/3P4/8/PPP1PPPP/RNBQKBNR w KQkq c6 0 2";
+			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
+			
+			result = ::test_do_move(name: "test2", initial_fen: initial_fen, move_text: move_text, fens: fens);
+			
+			t1 = TIM::current_clock();
+			LOG::LogInfo(message: "test2: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1347,7 +857,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test20: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 b1c3 g8f6 e2e4 e7e6 e4e5 f8b4 f1b5 b8c6 a2a3 e8g8 a3b4 c6b4 e5f6 d8f6 g1f3 f8e8 c1g5 f6f5 e1g1 e8d8 d1d2 f5c2 d2c2 b4c2 g5d8 e6e5 f3e5 c2a1 b5d3 c8d7 f1a1 a8d8 e5d7 d8d7 a1a7 h7h6 a7a8 d7d8 a8d8";
 			fens[40] = "3R2k1/1pp2pp1/7p/3p4/3P4/2NB4/1P3PPP/6K1 b - - 0 21";
@@ -1391,12 +901,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/2N5/PPP1PPPP/R1BQKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test20", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test20: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1406,7 +916,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test21: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 b8c6 g1f3 g8f6 c1f4 e7e6 e2e3 f8d6 c2c3 d6f4 e3f4 e8g8 f3e5 c6e5 f4e5 f6d5 f1d3 d8g5 e1g1 d7d6 f1e1 d6e5 d4e5 f7f6 d1f3 f6e5 f3h3 h7h6 d3e4 a7a6 b1d2 g5d2 a1b1 d2f2 g1h1 d5e3 e1e3 f2f1 b1f1 f8f1";
 			fens[39] = "r1b3k1/1pp3p1/p3p2p/4p3/4B3/2P1R2Q/PP4PP/5r1K w - - 0 21";
@@ -1449,12 +959,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "r1bqkbnr/pppppppp/2n5/8/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 2 2";
 			fens[1] = "r1bqkbnr/pppppppp/2n5/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test21", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test21: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1464,7 +974,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test22: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 f1c4 b8c6 d1f3 g8f6 c4b3 f8c5 f3c3 d7d6 c3c4 c8e6 c4e2 d6d5 e4d5 f6d5 e2b5 b7b6 b5c6 e6d7 c6d5 d8e7 d5a8 e7d8 a8f3 e8g8 f3e4 d7c6 e4d3 d8h4 c2c3 h4f2 e1d1 f2f1 d3f1 e5e4 d2d3 e4d3 f1d3 f8e8 b3c2 c5f2 d3h7 g8f8 h7h8 f8e7 c1g5 f7f6 h8g7 e7d8 g7f6 e8e7 f6f2 d8c8 g5e7 c8b8 c2d3 b6b5 f2f8 b8b7 h2h4 a7a6 h4h5 a6a5 h5h6 b5b4 c3b4 a5b4 h6h7 c6a4 b2b3 a4c6 h7h8q b7b6 h8d4 b6a5 f8a8 c6a8 h1h5 c7c5 d4c5";
 			fens[80] = "b7/4B3/8/k1Q4R/1p6/1P1B4/P5P1/RN1K2N1 b - - 0 41";
@@ -1548,12 +1058,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test22", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test22: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1563,7 +1073,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test23: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 b8c6 e2e3 c8f5 b1d2 c6b4 c2c3 b4c2 e1e2 f5g4 g1f3 c2a1 d1a1 e7e6 h2h3 g4h5 e2e1 f8d6 f3e5 d8e7 f1e2 g8f6 a1d1 e8g8 d2f3 h7h6 g2g4 h5g6 e2d3 g6d3 d1d3 f6e4 h3h4 a7a5 g4g5 a8a6 f3d2 a6b6 b2b3 d6a3 d2e4 d5e4 d3e4 c7c6 h1g1 c6c5 g5h6 e7h4 g1g7 g8h8 e4h7";
 			fens[52] = "5r1k/1p3pRQ/1r2p2P/p1p1N3/3P1B1q/bPP1P3/P4P2/4K3 b - - 2 27";
@@ -1619,12 +1129,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test23", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test23: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1634,7 +1144,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test24: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 g7g6 c1f4 f8g7 g1f3 g8f6 b1d2 e8g8 e2e3 f6d5 f4g3 a7a6 e3e4 d5b4 c2c3 b4d3 f1d3 c7c6 d1b3 d8a5 e1g1 g7h6 a1d1 d7d5 e4e5 f7f6 e5f6 f8f6 d2c4 c8g4 c4a5";
 			fens[30] = "rn4k1/1p2p2p/p1p2rpb/N2p4/3P2b1/1QPB1NB1/PP3PPP/3R1RK1 b - - 0 16";
@@ -1668,12 +1178,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppppp1p/6p1/8/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppppp1p/6p1/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test24", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test24: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1683,7 +1193,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test25: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1g5 b8c6 e2e3 g8f6 h2h3 e7e5 c2c3 h7h6 g5h4 c8e6 d4e5 c6e5 f1b5 c7c6 b5a4 f8c5 g1f3 e8g8 f3e5 b7b5 e5c6 d8d6 a4b5 a8b8 a2a4 b8b7 b1d2 a7a6 b2b4 a6b5 b4c5 d6c6 d2b3 b5a4 b3d4 c6c5 a1c1 e6d7 d1f3 f6e4 e1g1 e4d2 f3g4 d2f1 g4f4 d7b5 d4b5 b7b5 g1f1 a4a3 c3c4 b5b4 f4g3 f8c8 h4f6 g8f8 g3g7 f8e8 g7f7 e8f7 f6d4 c5c6 c4c5 c6a4 f2f3 c8b8 e3e4 b4d4 c5c6 d4d1 f1e2 d1c1 e4d5 a4c4 e2e3 c4d5 c6c7 b8c8 g2g4";
 			fens[80] = "2r5/2P2k2/7p/3q4/6P1/p3KP1P/8/2r5 b - g3 0 41";
@@ -1767,12 +1277,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p2B1/3P4/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test25", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test25: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1782,7 +1292,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test26: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 g8f6 b1c3 e7e6 g1f3 c8d7 e2e3 f8d6 f1d3 b8c6 c3b5 c6b4 d3e2 f6e4 c2c3 b4a6 d1d3 e8g8 e1g1 d6f4 e3f4 d8f6 g2g3 g7g5 d3e3 g5f4 g3f4 f6g6 f3g5 e4g5 f4g5 f7f6 e3d3 g6g5 g1h1 f8f7 f1g1 f7g7 g1g5 f6g5 a1g1 d7e8 e2g4 e8g6 d3e2 g6e4 g4f3 e4f5 b2b3 a8f8 c3c4 a6b4 b5a7 b4d3 f3g4 d3f4 g4f5 f4e2 f5e6 g8h8 g1g2 e2f4 g2g3 f4e6 c4d5 e6d4 b3b4 f8f3 g3g4 f3f2 g4d4 f2a2 a7b5 g7f7 d4g4 h7h6 d5d6 c7d6 b5d6 f7f4 g4g3 f4f2 h1g1 f2d2 g3f3 d2d6 f3f8 h8g7 f8f2 d6d2 f2d2 a2d2 b4b5 d2b2 b5b6 b2b6 g1g2 b6c6 g2g3 c6c4 g3f3 b7b5 f3e3 c4c8 e3e4 b5b4 e4d4 b4b3";
 			fens[109] = "2r5/6k1/7p/6p1/3K4/1p6/7P/8 w - - 0 56";
@@ -1895,12 +1405,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test26", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test26: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1910,7 +1420,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test27: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e3 e7e5 d1h5 b8c6 f1c4 g7g6 h5f3 d8e7 c4d5 g8f6 d5c6 d7c6 b1c3 c8f5 b2b3 e8c8 a2a4 e7d6 f3e2 d6c5 b3b4 c5b4 c1a3 b4b6 a3f8 h8f8 g1f3 f5g4 a1b1 b6a5 h2h3 a5c3 d2c3 g4f5 b1b2 d8d5 c3c4 d5c5 g2g4 f5e4 g4g5 e4f3 e2f3 f6d7 b2b4 f8d8 f3f7 d7b6 f7h7 b6c4 h7g6 c5b5 b4b5 c6b5 a4b5 c4b2 g6f5 c8b8 e1g1 a7a6 f5f6 d8d6 f6e5 a6a5 e5b2 a5a4 b2b4 c7c6 b4d6";
 			fens[68] = "1k6/1p6/2pQ4/1P4P1/p7/4P2P/2P2P2/5RK1 b - - 0 35";
@@ -1982,12 +1492,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p2Q/8/4P3/PPPP1PPP/RNB1KBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/8/4P3/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR b KQkq - 0 1";
-
+			
 			result = ::test_do_move(name: "test27", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test27: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -1997,7 +1507,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test28: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 e7e5 d4e5 f8b4 c2c3 b4c5 g1f3 c5e7 c1f4 d7d6 e2e3 d6e5 d1d8 e8d8 f3e5 e7d6 e5f7 d8e8 f7h8 e8f8 f1c4 d6f4 e3f4 g7g6 c4g8 f8g8 h8g6 h7g6 b1d2 g6g5 f4g5 g8g7 e1c1 g7g6 d2e4 g6f5 e4g3 f5g5 h1e1 c8g4 e1e5 g5f4 e5b5 g4d1 c1d1 c7c6 b5b7 b8a6 g3h5 f4g4 h5f6 g4f5 f6h5 a8d8 d1c2 f5e4 b7a7 d8d3 a7a6 d3d6 b2b4 d6g6 b4b5 g6g2 h5f6 e4e5 f6d7 e5f4 a6c6 g2f2 c2b3 f2h2 b5b6 h2h8 b6b7 f4f3 c6c8 h8c8 b7c8q f3f2 c8e8 f2f3 e8e5 f3g4 e5f6 g4h5 f6g7 h5h4 g7g6 h4h3 g6g5 h3h2 g5g4 h2h1 b3c2 h1h2 c2d2 h2h1 d2e2 h1h2 e2f2 h2h1 g4g2";
 			fens[102] = "8/3N4/8/8/8/2P5/P4KQ1/7k b - - 24 52";
@@ -2103,12 +1613,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4P3/8/8/PPP1PPPP/RNBQKBNR b KQkq - 0 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/3P4/8/PPP1PPPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test28", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test28: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -2118,7 +1628,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test29: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1e2 g8f6 d2d3 b8c6 g2g3 f8c5 f1g2 d7d5 e1g1 c8e6 g1h1 e8g8 f2f4 g7g6 e2g1 c6d4 g1h3 h7h6 g3g4 e6g4 g2f3 g4f3 f1f3 d4f3 d1f3 c7c6 f4f5 d5e4 d3e4 d8d4 c1h6 d4d1 f3d1 f8d8 d1e1 f6g4 e1h4 d8d1 h1g2 g4e3 g2f3 d1f1 f3e2 a8d8 h4d8";
 			fens[46] = "3Q2k1/pp3p2/2p3pB/2b1pP2/4P3/4n2N/PPP1K2P/RN3r2 b - - 0 24";
@@ -2168,12 +1678,68 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPNPPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test29", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test29: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
+			return result;
+			@endnoparse
+		end function;
 
+		@dialect("oal");
+		function test3() return boolean is
+			@noparse
+			LOG::LogInfo(message: "test3: start");
+			t0 = TIM::current_clock();
+			
+			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+			move_text = "d2d4 d7d5 c1f4 b8c6 g1f3 c8f5 b1d2 g8f6 e2e3 e7e6 c2c3 f8d6 f1d3 e8g8 d1c2 f8e8 e1g1 e6e5 d4e5 c6e5 d3f5 e5f3 d2f3 d6f4 e3f4 f6e4 f1e1 c7c6 b2b3 d8e7 c3c4 e7b4 f3g5 e4g5 f4g5 e8e1 a1e1 b4e1";
+			fens[37] = "r5k1/pp3ppp/2p5/3p1BP1/2P5/1P6/P1Q2PPP/4q1K1 w - - 0 20";
+			fens[36] = "r5k1/pp3ppp/2p5/3p1BP1/1qP5/1P6/P1Q2PPP/4R1K1 b - - 0 19";
+			fens[35] = "r5k1/pp3ppp/2p5/3p1BP1/1qP5/1P6/P1Q2PPP/R3r1K1 w - - 0 19";
+			fens[34] = "r3r1k1/pp3ppp/2p5/3p1BP1/1qP5/1P6/P1Q2PPP/R3R1K1 b - - 0 18";
+			fens[33] = "r3r1k1/pp3ppp/2p5/3p1Bn1/1qP2P2/1P6/P1Q2PPP/R3R1K1 w - - 0 18";
+			fens[32] = "r3r1k1/pp3ppp/2p5/3p1BN1/1qP1nP2/1P6/P1Q2PPP/R3R1K1 b - - 2 17";
+			fens[31] = "r3r1k1/pp3ppp/2p5/3p1B2/1qP1nP2/1P3N2/P1Q2PPP/R3R1K1 w - - 1 17";
+			fens[30] = "r3r1k1/pp2qppp/2p5/3p1B2/2P1nP2/1P3N2/P1Q2PPP/R3R1K1 b - - 0 16";
+			fens[29] = "r3r1k1/pp2qppp/2p5/3p1B2/4nP2/1PP2N2/P1Q2PPP/R3R1K1 w - - 1 16";
+			fens[28] = "r2qr1k1/pp3ppp/2p5/3p1B2/4nP2/1PP2N2/P1Q2PPP/R3R1K1 b - - 0 15";
+			fens[27] = "r2qr1k1/pp3ppp/2p5/3p1B2/4nP2/2P2N2/PPQ2PPP/R3R1K1 w - - 0 15";
+			fens[26] = "r2qr1k1/ppp2ppp/8/3p1B2/4nP2/2P2N2/PPQ2PPP/R3R1K1 b - - 2 14";
+			fens[25] = "r2qr1k1/ppp2ppp/8/3p1B2/4nP2/2P2N2/PPQ2PPP/R4RK1 w - - 1 14";
+			fens[24] = "r2qr1k1/ppp2ppp/5n2/3p1B2/5P2/2P2N2/PPQ2PPP/R4RK1 b - - 0 13";
+			fens[23] = "r2qr1k1/ppp2ppp/5n2/3p1B2/5b2/2P1PN2/PPQ2PPP/R4RK1 w - - 0 13";
+			fens[22] = "r2qr1k1/ppp2ppp/3b1n2/3p1B2/5B2/2P1PN2/PPQ2PPP/R4RK1 b - - 0 12";
+			fens[21] = "r2qr1k1/ppp2ppp/3b1n2/3p1B2/5B2/2P1Pn2/PPQN1PPP/R4RK1 w - - 0 12";
+			fens[20] = "r2qr1k1/ppp2ppp/3b1n2/3pnB2/5B2/2P1PN2/PPQN1PPP/R4RK1 b - - 0 11";
+			fens[19] = "r2qr1k1/ppp2ppp/3b1n2/3pnb2/5B2/2PBPN2/PPQN1PPP/R4RK1 w - - 0 11";
+			fens[18] = "r2qr1k1/ppp2ppp/2nb1n2/3pPb2/5B2/2PBPN2/PPQN1PPP/R4RK1 b - - 0 10";
+			fens[17] = "r2qr1k1/ppp2ppp/2nb1n2/3ppb2/3P1B2/2PBPN2/PPQN1PPP/R4RK1 w - - 0 10";
+			fens[16] = "r2qr1k1/ppp2ppp/2nbpn2/3p1b2/3P1B2/2PBPN2/PPQN1PPP/R4RK1 b - - 6 9";
+			fens[15] = "r2qr1k1/ppp2ppp/2nbpn2/3p1b2/3P1B2/2PBPN2/PPQN1PPP/R3K2R w KQ - 5 9";
+			fens[14] = "r2q1rk1/ppp2ppp/2nbpn2/3p1b2/3P1B2/2PBPN2/PPQN1PPP/R3K2R b KQ - 4 8";
+			fens[13] = "r2q1rk1/ppp2ppp/2nbpn2/3p1b2/3P1B2/2PBPN2/PP1N1PPP/R2QK2R w KQ - 3 8";
+			fens[12] = "r2qk2r/ppp2ppp/2nbpn2/3p1b2/3P1B2/2PBPN2/PP1N1PPP/R2QK2R b KQkq - 2 7";
+			fens[11] = "r2qk2r/ppp2ppp/2nbpn2/3p1b2/3P1B2/2P1PN2/PP1N1PPP/R2QKB1R w KQkq - 1 7";
+			fens[10] = "r2qkb1r/ppp2ppp/2n1pn2/3p1b2/3P1B2/2P1PN2/PP1N1PPP/R2QKB1R b KQkq - 0 6";
+			fens[9] = "r2qkb1r/ppp2ppp/2n1pn2/3p1b2/3P1B2/4PN2/PPPN1PPP/R2QKB1R w KQkq - 0 6";
+			fens[8] = "r2qkb1r/ppp1pppp/2n2n2/3p1b2/3P1B2/4PN2/PPPN1PPP/R2QKB1R b KQkq - 0 5";
+			fens[7] = "r2qkb1r/ppp1pppp/2n2n2/3p1b2/3P1B2/5N2/PPPNPPPP/R2QKB1R w KQkq - 6 5";
+			fens[6] = "r2qkbnr/ppp1pppp/2n5/3p1b2/3P1B2/5N2/PPPNPPPP/R2QKB1R b KQkq - 5 4";
+			fens[5] = "r2qkbnr/ppp1pppp/2n5/3p1b2/3P1B2/5N2/PPP1PPPP/RN1QKB1R w KQkq - 4 4";
+			fens[4] = "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R b KQkq - 3 3";
+			fens[3] = "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 2 3";
+			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
+			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
+			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
+			
+			result = ::test_do_move(name: "test3", initial_fen: initial_fen, move_text: move_text, fens: fens);
+			
+			t1 = TIM::current_clock();
+			LOG::LogInfo(message: "test3: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
 			return result;
 			@endnoparse
 		end function;
@@ -2183,7 +1749,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test30: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 d1h5 g7g6 h5e5 f8e7 f1b5 b8c6 e5d5 g8f6 d5g5 c6d4 c2c3 d4c2 e1d1 c2a1 b1a3 f6e4 d2d3 e4g5 c1g5 e7g5 g1f3 e8g8 d1e1 a1c2 e1d1 c2a3 f3g5 d8g5 h1e1 a3b1 e1e5 g5d2";
 			fens[33] = "r1b2rk1/pppp1p1p/6p1/1B2R3/8/2PP4/PP1q1PPP/1n1K4 w - - 4 18";
@@ -2220,12 +1786,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test30", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test30: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -2235,7 +1801,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test31: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 e7e6 g1f3 d7d5 c1f4 g8f6 e2e3 f6e4 f1d3 f8b4 c2c3 b4a5 e1g1 e4f6 b1d2 h7h6 f3e5 g7g5 f4g3 a7a6 d2f3 g5g4 e5f7 e8f7 f3e5 f7e7 e5g6 e7f7 g6h8 d8h8 g3e5 h6h5 f2f3 g4g3 e5g3 h5h4 g3c7 a5c7 f3f4 h4h3 f1f2 h8g8 d1f3 f6g4 d3g6 g8g6 f3g3 g4f2 g3g6 f7g6 a1f1 h3g2 g1g2 f2g4 h2h3 g4e3 g2g3 e3f1 g3g4 f1h2 g4g3 h2f1 g3g4 f1e3 g4g3 g6f5 h3h4 c7f4 g3f3 e3g4 f3g2 f4c1 g2g3 c1b2 h4h5 c8d7 g3h4 b8c6 h5h6";
 			fens[78] = "r7/1p1b4/p1n1p2P/3p1k2/3P2nK/2P5/Pb6/8 b - - 0 40";
@@ -2317,12 +1883,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/4p3/8/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/4p3/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test31", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test31: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -2332,7 +1898,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test32: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 e1g1 f8c5 d2d3 e8g8 c1g5 f8e8 b1c3 c6d4 g5f6 d8f6 f3d4 c5d4 c3d5 f6f4 d5f4 e5f4 d1f3 d7d6 f3f4 e8e7 c2c3 d4e5 f4f3 d6d5 c4d5 c7c6 d5b3 c8e6 b3e6 e7e6 d3d4 e5d6 e4e5 d6c7 a1e1 a8e8 e1e2 c6c5 d4c5 c7e5 f1e1 h7h6 f3e3 e5h2 g1h2 e6e3 e2e3 e8c8 e3e8 c8e8 e1e8 g8h7 b2b4 h6h5 b4b5 g7g6 c5c6";
 			fens[62] = "4R3/pp3p1k/2P3p1/1P5p/8/2P5/P4PPK/8 b - - 0 32";
@@ -2398,12 +1964,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test32", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test32: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -2413,7 +1979,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test33: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 d1f3 f8c5 b1c3 d7d6 f1c4 c8e6 c4b3 b8c6 c3b5 g8e7 d2d4 c6d4 b5d4 c5d4 c1g5 f7f6 g5h4 e7c6 c2c3 d4c5 b3e6 c6d4 f3g4 d4c2 e1d1 c2a1 g4g7 d8e7 g7h8 e7f8 h8h7 a8c8 e6c8 c5f2 h7d7";
 			fens[36] = "2B1kq2/pppQ4/3p1p2/4p3/4P2B/2P5/PP3bPP/n2K2NR b - - 1 19";
@@ -2453,12 +2019,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5Q2/PPPP1PPP/RNB1KBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test33", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test33: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -2468,7 +2034,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test34: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 g8f6 g1f3 g7g6 c1f4 d7d6 e2e3 c8g4 b1d2 g4f3 d2f3 b8d7 f1d3 f8g7 c2c3 f6d5 d1b3 d5f4 e3f4 e8g8 e1c1 g7h6 g2g3 e7e6 b3b7 a8c8 b7a7 d8f6 c1b1 c8d8 d1e1 d8c8 a7a3 f6d8 h1g1 c8b8 g3g4 h6f4 g4g5 b8b6 g1g4 d8b8 b2b3 b6c6 g4f4 c6c3 e1d1 b8b7 a3a5 b7c6 b1b2 e6e5 d4e5 d6e5 f3e5 d7e5 a5e5 f8e8 e5c3 c6b7 d3c4 e8e2 d1d2 e2e1 c4f7 g8f8 d2d8 f8e7 c3c5 e7d8 f7d5 e1e2 b2c3 b7a6 d5c4 a6a2 c4e2 a2e2 c5f8 d8d7 f4d4 d7e6 f8e8 e6f5 e8e2 c7c5 d4d5 f5f4 d5c5 h7h5 e2e6 f4f3 e6g6 h5h4 g6h6 f3f2 h6h4 f2g2 h4e4 g2h2 e4e3 h2h1 e3e2 h1g1 c3d3 g1h1 d3e3 h1g1 e3f3 g1h1 f3g3 h1g1 e2g2";
 			fens[112] = "8/8/8/2R3P1/8/1P4K1/6Q1/6k1 b - - 13 57";
@@ -2584,12 +2150,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkb1r/pppppppp/5n2/8/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 2 2";
 			fens[1] = "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test34", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test34: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -2599,7 +2165,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test35: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 g1f3 c8f5 e2e3 g8f6 f3e5 b8c6 f1b5 f5e6 e5c6 d8d7 c6a7 e6g4 f2f3 c7c6 b5d3 g4h5 g2g4 h5g6 d3g6 h7g6 e1g1 a8a7 h2h3 h8h3 c2c3 f6g4 f3g4 d7g4 d1g4 h3h5 g4c8";
 			fens[32] = "2Q1kb2/rp2ppp1/2p3p1/3p3r/3P4/2P1P3/PP6/RNB2RK1 b - - 2 17";
@@ -2635,12 +2201,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test35", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test35: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -2650,7 +2216,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test36: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "c2c4 e7e5 e2e4 g8f6 d2d3 f8c5 g1h3 d7d6 d1f3 e8g8 c1g5 b8d7 b1c3 h7h6 g5h4 d7b6 h4f6 g7f6 f3g4 c8g4";
 			fens[19] = "r2q1rk1/ppp2p2/1n1p1p1p/2b1p3/2P1P1b1/2NP3N/PP3PPP/R3KB1R w KQ - 0 11";
@@ -2673,12 +2239,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/2P1P3/8/PP1P1PPP/RNBQKBNR b KQkq e3 0 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/2P5/8/PP1PPPPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq c3 0 1";
-
+			
 			result = ::test_do_move(name: "test36", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test36: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -2688,7 +2254,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test37: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 h7h6 e2e3 g7g5 f4g3 h6h5 g1f3 f7f6 f1d3 g5g4 d3g6 e8d7 f3e5 f6e5 g3e5 h8h6 g6f5 d7e8 e5f4 h6f6 f5c8 d8c8 e1g1 f8h6 f4e5 f6e6 c2c3 b8c6 d1a4 b7b5 a4b5 e8f7 b5d5 c8d7 d5d7 c6e5 d4e5 e6e5 d7c7 h6g5 f1e1 e5e6 c7c4 f7e8 c4e6 a7a5 f2f4 g5h4 e6g8 e8d7 g8a8 h4e1 g1h1 g4g3 h2g3 e1g3 a8a5 g3f2 a5h5 f2e3 b1a3 e3f4 a1d1 d7c6 h5a5 e7e5 a3c4 e5e4 d1e1 f4g3 e1e4 g3f2 e4e6 c6d7 a5d5 d7c7 d5f5 f2g3 f5f7 c7d8 f7e7 d8c8 e6c6 c8b8 e7c7 g3c7 g2g4 c7g3 g4g5 b8b7 c6b6 b7c7 b6d6 g3d6 g5g6 d6f8 c4e5 f8g7 e5g4 c7d6 g4e3 d6e7 e3d5 e7d6 d5f4 d6e5 f4h5 g7h6 h5g7 h6g7 h1g1 e5f5 g1f2 f5g6 f2e3 g6f5 e3d3 f5e5 d3c2 e5d6 c2b3 d6c5 c3c4 c5b6 a2a3 g7f8 c4c5 b6c5 a3a4 f8g7 b3a3 c5b6 a3b4 g7b2 a4a5 b6a6 b4a4 b2c3 a4b3 c3a5";
 			fens[141] = "8/8/k7/b7/8/1K6/8/8 w - - 0 72";
@@ -2833,12 +2399,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test37", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test37: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -2848,7 +2414,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test38: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 b8c6 e2e3 g8f6 g1f3 e7e6 b1d2 f8d6 f4g3 e8g8 f1d3 f8e8 c2c4 d8e7 a2a3 e6e5 b2b4 e5e4 c4c5 e4d3 f3e5 c6e5 d4e5 d6e5 a3a4 c7c6 e1g1 e5a1 d1a1 f6h5 a1e5 c8e6 e5h5 g7g6 d2f3";
 			fens[36] = "r3r1k1/pp2qp1p/2p1b1p1/2Pp3Q/PP6/3pPNB1/5PPP/5RK1 b - - 1 19";
@@ -2888,12 +2454,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test38", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test38: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -2903,7 +2469,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test39: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 b7b6 d2d4 c8b7 b1c3 e7e6 f1c4 f8b4 a2a3 b4c3 b2c3 d8h4 g1f3 h4e4 c1e3 e4c6 d1d3 d7d5 f3e5 d5c4 e5c6 c4d3 c2d3 b7c6 e1g1 g8f6 c3c4 e8g8 e3g5 f6d7 f1e1 h7h6 g5e7 f8e8 e7b4 b6b5 c4c5 b8a6 b4d2 d7f6 e1e5 a8d8 d2c3 f6g4 e5h5 d8d5 h5h4 g4f6 a1e1 d5h5 h4f4 h5f5 d4d5 f5f4 d5c6 a6c5 e1e5 c5d3 g2g3 d3e5 c3e5 f4f3 g1g2 f3a3 e5c7 e8c8";
 			fens[65] = "2r3k1/p1B2pp1/2P1pn1p/1p6/8/r5P1/5PKP/8 w - - 1 34";
@@ -2972,12 +2538,87 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/p1pppppp/1p6/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 2";
 			fens[1] = "rnbqkbnr/p1pppppp/1p6/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test39", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test39: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
+			return result;
+			@endnoparse
+		end function;
 
+		@dialect("oal");
+		function test4() return boolean is
+			@noparse
+			LOG::LogInfo(message: "test4: start");
+			t0 = TIM::current_clock();
+			
+			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+			move_text = "e2e4 d7d6 b1c3 g8f6 d1f3 g7g6 f1c4 c8e6 c3d5 f8g7 d5f6 g7f6 d2d3 e8g8 e4e5 f6e5 c4e6 f7e6 f3b7 b8d7 c1h6 d7c5 b7b4 f8f6 d3d4 c5a6 b4a4 e5f4 h6f4 f6f4 a4a6 d8b8 e1c1 f4f2 a6c4 b8b2 c1b2 f2g2 c4e6 g8g7 e6d5 a8b8 b2c3 g2g3 g1f3 g3h3 d1e1 b8f8 e1e7 g7h8 e7f7 h3f3 d5f3 f8f7 f3f7 g6g5 f7f8";
+			fens[56] = "5Q1k/p1p4p/3p4/6p1/3P4/2K5/P1P4P/7R b - - 1 29";
+			fens[55] = "7k/p1p2Q1p/3p4/6p1/3P4/2K5/P1P4P/7R w - - 0 29";
+			fens[54] = "7k/p1p2Q1p/3p2p1/8/3P4/2K5/P1P4P/7R b - - 0 28";
+			fens[53] = "7k/p1p2r1p/3p2p1/8/3P4/2K2Q2/P1P4P/7R w - - 0 28";
+			fens[52] = "5r1k/p1p2R1p/3p2p1/8/3P4/2K2Q2/P1P4P/7R b - - 0 27";
+			fens[51] = "5r1k/p1p2R1p/3p2p1/3Q4/3P4/2K2r2/P1P4P/7R w - - 0 27";
+			fens[50] = "5r1k/p1p2R1p/3p2p1/3Q4/3P4/2K2N1r/P1P4P/7R b - - 2 26";
+			fens[49] = "5r1k/p1p1R2p/3p2p1/3Q4/3P4/2K2N1r/P1P4P/7R w - - 1 26";
+			fens[48] = "5r2/p1p1R1kp/3p2p1/3Q4/3P4/2K2N1r/P1P4P/7R b - - 0 25";
+			fens[47] = "5r2/p1p1p1kp/3p2p1/3Q4/3P4/2K2N1r/P1P4P/4R2R w - - 9 25";
+			fens[46] = "1r6/p1p1p1kp/3p2p1/3Q4/3P4/2K2N1r/P1P4P/4R2R b - - 8 24";
+			fens[45] = "1r6/p1p1p1kp/3p2p1/3Q4/3P4/2K2N1r/P1P4P/3R3R w - - 7 24";
+			fens[44] = "1r6/p1p1p1kp/3p2p1/3Q4/3P4/2K2Nr1/P1P4P/3R3R b - - 6 23";
+			fens[43] = "1r6/p1p1p1kp/3p2p1/3Q4/3P4/2K3r1/P1P4P/3R2NR w - - 5 23";
+			fens[42] = "1r6/p1p1p1kp/3p2p1/3Q4/3P4/2K5/P1P3rP/3R2NR b - - 4 22";
+			fens[41] = "1r6/p1p1p1kp/3p2p1/3Q4/3P4/8/PKP3rP/3R2NR w - - 3 22";
+			fens[40] = "r7/p1p1p1kp/3p2p1/3Q4/3P4/8/PKP3rP/3R2NR b - - 2 21";
+			fens[39] = "r7/p1p1p1kp/3pQ1p1/8/3P4/8/PKP3rP/3R2NR w - - 1 21";
+			fens[38] = "r5k1/p1p1p2p/3pQ1p1/8/3P4/8/PKP3rP/3R2NR b - - 0 20";
+			fens[37] = "r5k1/p1p1p2p/3pp1p1/8/2QP4/8/PKP3rP/3R2NR w - - 0 20";
+			fens[36] = "r5k1/p1p1p2p/3pp1p1/8/2QP4/8/PKP2rPP/3R2NR b - - 0 19";
+			fens[35] = "r5k1/p1p1p2p/3pp1p1/8/2QP4/8/PqP2rPP/2KR2NR w - - 0 19";
+			fens[34] = "rq4k1/p1p1p2p/3pp1p1/8/2QP4/8/PPP2rPP/2KR2NR b - - 1 18";
+			fens[33] = "rq4k1/p1p1p2p/Q2pp1p1/8/3P4/8/PPP2rPP/2KR2NR w - - 0 18";
+			fens[32] = "rq4k1/p1p1p2p/Q2pp1p1/8/3P1r2/8/PPP2PPP/2KR2NR b - - 2 17";
+			fens[31] = "rq4k1/p1p1p2p/Q2pp1p1/8/3P1r2/8/PPP2PPP/R3K1NR w KQ - 1 17";
+			fens[30] = "r2q2k1/p1p1p2p/Q2pp1p1/8/3P1r2/8/PPP2PPP/R3K1NR b KQ - 0 16";
+			fens[29] = "r2q2k1/p1p1p2p/n2pp1p1/8/Q2P1r2/8/PPP2PPP/R3K1NR w KQ - 0 16";
+			fens[28] = "r2q2k1/p1p1p2p/n2pprp1/8/Q2P1B2/8/PPP2PPP/R3K1NR b KQ - 0 15";
+			fens[27] = "r2q2k1/p1p1p2p/n2pprpB/8/Q2P1b2/8/PPP2PPP/R3K1NR w KQ - 3 15";
+			fens[26] = "r2q2k1/p1p1p2p/n2pprpB/4b3/Q2P4/8/PPP2PPP/R3K1NR b KQ - 2 14";
+			fens[25] = "r2q2k1/p1p1p2p/n2pprpB/4b3/1Q1P4/8/PPP2PPP/R3K1NR w KQ - 1 14";
+			fens[24] = "r2q2k1/p1p1p2p/3pprpB/2n1b3/1Q1P4/8/PPP2PPP/R3K1NR b KQ - 0 13";
+			fens[23] = "r2q2k1/p1p1p2p/3pprpB/2n1b3/1Q6/3P4/PPP2PPP/R3K1NR w KQ - 5 13";
+			fens[22] = "r2q1rk1/p1p1p2p/3pp1pB/2n1b3/1Q6/3P4/PPP2PPP/R3K1NR b KQ - 4 12";
+			fens[21] = "r2q1rk1/pQp1p2p/3pp1pB/2n1b3/8/3P4/PPP2PPP/R3K1NR w KQ - 3 12";
+			fens[20] = "r2q1rk1/pQpnp2p/3pp1pB/4b3/8/3P4/PPP2PPP/R3K1NR b KQ - 2 11";
+			fens[19] = "r2q1rk1/pQpnp2p/3pp1p1/4b3/8/3P4/PPP2PPP/R1B1K1NR w KQ - 1 11";
+			fens[18] = "rn1q1rk1/pQp1p2p/3pp1p1/4b3/8/3P4/PPP2PPP/R1B1K1NR b KQ - 0 10";
+			fens[17] = "rn1q1rk1/ppp1p2p/3pp1p1/4b3/8/3P1Q2/PPP2PPP/R1B1K1NR w KQ - 0 10";
+			fens[16] = "rn1q1rk1/ppp1pp1p/3pB1p1/4b3/8/3P1Q2/PPP2PPP/R1B1K1NR b KQ - 0 9";
+			fens[15] = "rn1q1rk1/ppp1pp1p/3pb1p1/4b3/2B5/3P1Q2/PPP2PPP/R1B1K1NR w KQ - 0 9";
+			fens[14] = "rn1q1rk1/ppp1pp1p/3pbbp1/4P3/2B5/3P1Q2/PPP2PPP/R1B1K1NR b KQ - 0 8";
+			fens[13] = "rn1q1rk1/ppp1pp1p/3pbbp1/8/2B1P3/3P1Q2/PPP2PPP/R1B1K1NR w KQ - 1 8";
+			fens[12] = "rn1qk2r/ppp1pp1p/3pbbp1/8/2B1P3/3P1Q2/PPP2PPP/R1B1K1NR b KQkq - 0 7";
+			fens[11] = "rn1qk2r/ppp1pp1p/3pbbp1/8/2B1P3/5Q2/PPPP1PPP/R1B1K1NR w KQkq - 0 7";
+			fens[10] = "rn1qk2r/ppp1ppbp/3pbNp1/8/2B1P3/5Q2/PPPP1PPP/R1B1K1NR b KQkq - 0 6";
+			fens[9] = "rn1qk2r/ppp1ppbp/3pbnp1/3N4/2B1P3/5Q2/PPPP1PPP/R1B1K1NR w KQkq - 4 6";
+			fens[8] = "rn1qkb1r/ppp1pp1p/3pbnp1/3N4/2B1P3/5Q2/PPPP1PPP/R1B1K1NR b KQkq - 3 5";
+			fens[7] = "rn1qkb1r/ppp1pp1p/3pbnp1/8/2B1P3/2N2Q2/PPPP1PPP/R1B1K1NR w KQkq - 2 5";
+			fens[6] = "rnbqkb1r/ppp1pp1p/3p1np1/8/2B1P3/2N2Q2/PPPP1PPP/R1B1K1NR b KQkq - 1 4";
+			fens[5] = "rnbqkb1r/ppp1pp1p/3p1np1/8/4P3/2N2Q2/PPPP1PPP/R1B1KBNR w KQkq - 0 4";
+			fens[4] = "rnbqkb1r/ppp1pppp/3p1n2/8/4P3/2N2Q2/PPPP1PPP/R1B1KBNR b KQkq - 3 3";
+			fens[3] = "rnbqkb1r/ppp1pppp/3p1n2/8/4P3/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 3";
+			fens[2] = "rnbqkbnr/ppp1pppp/3p4/8/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 1 2";
+			fens[1] = "rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
+			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
+			
+			result = ::test_do_move(name: "test4", initial_fen: initial_fen, move_text: move_text, fens: fens);
+			
+			t1 = TIM::current_clock();
+			LOG::LogInfo(message: "test4: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
 			return result;
 			@endnoparse
 		end function;
@@ -2987,7 +2628,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test40: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1f3 b8c6 b1c3 g7g6 d2d3 f8g7 c1g5 g8e7 f1e2 c6d4 f3d4 e5d4 c3d5 f7f6 g5h4 e8g8 c2c4 d7d6 h4g3 e7d5 e4d5 c7c5 h2h4 a7a6 d1d2 f6f5 e1c1 c8d7 g3d6 f8f6 d2f4 f6e6 d5e6 d7e6 d6c7 d8d7 h4h5 b7b5 h5g6 h7g6 f4h4 g8f7 g2g4 d7c7 g4f5 e6d7 f5g6 f7e6 e2g4 e6d6 g4f3 a8f8 f3d5 f8f2 h4f2 c7a5 f2f4 g7e5 f4f8 d6c7 h1h8 a5a2 f8b8";
 			fens[64] = "1Q5R/2kb4/p5P1/1ppBb3/2Pp4/3P4/qP6/2KR4 b - - 1 33";
@@ -3055,12 +2696,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test40", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test40: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3070,7 +2711,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test41: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 g8f6 b1c3 b8c6 f1c4 e7e5 g1f3 d7d5 e4d5 c6b4 f3e5 b4c2 d1c2 f8d6 e5f3 e8g8 e1g1 f8e8 f3g5 d8e7 c2h7 f6h7 g5h7 g8h7 c4d3 c8f5 d3f5 g7g6 f5d3 e7e5 f2f3 e5h2 g1f2 h2g3 f2g1 d6c5 f1f2 g3f2 g1h2 h7g7 b2b3 e8h8";
 			fens[41] = "r6r/ppp2pk1/6p1/2bP4/8/1PNB1P2/P2P1qPK/R1B5 w - - 1 22";
@@ -3115,12 +2756,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkb1r/pppppppp/5n2/8/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 2 2";
 			fens[1] = "rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test41", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test41: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3130,7 +2771,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test42: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 c7c6 g1f3 d7d5 b1c3 g8f6 e4e5 f6e4 c3e4 d5e4 f3d4 d8d4 c2c3 d4e5 d2d4 e4d3 c1e3";
 			fens[16] = "rnb1kb1r/pp2pppp/2p5/4q3/8/2PpB3/PP3PPP/R2QKB1R b KQkq - 1 9";
@@ -3150,12 +2791,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pp1ppppp/2p5/8/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test42", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test42: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3165,7 +2806,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test43: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 g1f3 b8c6 c1f4 g8f6 e2e3 e7e5 f4g3 f8d6 d4e5 c6e5 g3e5 e8g8 d1d4 f8e8 e5f6 g7f6 b1c3 d6e5 d4d5 c7c6 d5b3 b7b6 f1d3 c8e6 d3c4 d8d6 e1g1 e5h2 f3h2 e8d8 a1d1 e6d5 c4d5 c6d5 d1d5 d6e5 d5e5 f6e5 h2f3 e5e4 c3e4 d8d7 e4f6 g8g7 f6d7 a8d8 b3b5";
 			fens[48] = "3r4/p2N1pkp/1p6/1Q6/8/4PN2/PPP2PP1/5RK1 b - - 2 25";
@@ -3217,12 +2858,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test43", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test43: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3232,7 +2873,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test44: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 d7d5 b1c3 d5d4 c3e2 g8f6 e2d4 d8d4 g1f3 f6e4 f3d4 e4f6 d2d3 e7e6 c1e3 e6e5 d4f3 b8c6 c2c3 c8g4 d3d4 e8c8 h2h3 g4f3 d1f3 e5d4 c3d4 f6d5 e3g5 f8e7 g5d2 g7g5 f1c4 c6d4 f3g4 f7f5 g4d4 d5b4 c4d5 d8d5 d4c3 h8d8 e1g1 d5d2 f1d1 d2d1 a1d1 d8d1 g1h2 d1d3 c3h8 d3d8 h8h7 b4a2 h7f5 d8d7";
 			fens[55] = "2k5/ppprb3/8/5Qp1/8/7P/nP3PPK/8 w - - 1 29";
@@ -3291,12 +2932,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test44", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test44: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3306,7 +2947,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test45: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 c7c6 d2d4 d7d5 b1c3 g8f6 c1e3 d5e4 d1d2 c8g4 f1e2 g4e2 d2e2 e7e6 e1c1 f8b4 f2f3 e4f3 g1f3 e8g8 d1d3 b4c3 d3c3 d8a5 e3d2 a5a2 c1d1 a2a1 d2c1 f8d8 c3d3 b8a6 f3g5 a6b4 d3b3 d8d4 d1e1 a1c1";
 			fens[37] = "r5k1/pp3ppp/2p1pn2/6N1/1n1r4/1R6/1PP1Q1PP/2q1K2R w - - 0 20";
@@ -3347,12 +2988,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pp1ppppp/2p5/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 2";
 			fens[1] = "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test45", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test45: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3362,7 +3003,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test46: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 e2e3 b8c6 g1f3 e7e5 f3e5 c6e5 d4e5 f7f6 e5e6 c8e6 c1d2 d8d6 f1b5 c7c6 b5d3 e8c8 e1g1 g8h6 d1f3 e6g4 f3g3 d8e8 e3e4 d5e4 d2f4 d6b4 c2c3 b4a5 b2b4 a5a4 f1e1 h6f5 g3g4 g7g6 d3e4 f8b4 c3b4 a4b4 e1e2 e8e4 g4h4 e4f4 h4f6 b4c4 e2e5 c4c1 e5e1 c1e1";
 			fens[49] = "2k4r/pp5p/2p2Qp1/5n2/5r2/8/P4PPP/RN2q1K1 w - - 0 26";
@@ -3415,12 +3056,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/4P3/PPP2PPP/RNBQKBNR b KQkq - 0 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test46", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test46: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3430,7 +3071,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test47: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 e7e6 e2e3 f8c5 d4c5 b8c6 g1f3 g8f6 f1d3 e8g8 e1g1 d8d6 c5d6 c7d6 f4d6 f8d8 d6g3 e6e5 d3e2 c8g4 f3e5 c6e5 g3e5 d8e8 e5f6 g7f6 e2g4 e8e7 f2f3 a8e8 g4f5 e7e3 d1d5 e3e1 b1c3 e1f1 a1f1 e8e5 d5d3 e5f5 d3f5 h7h6 f1d1 h6h5 f5f6 h5h4 c3e4 b7b5 d1d8 g8h7 d8h8";
 			fens[52] = "7R/p4p1k/5Q2/1p6/4N2p/5P2/PPP3PP/6K1 b - - 3 27";
@@ -3486,12 +3127,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test47", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test47: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3501,7 +3142,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test48: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 b8a6 d2d4 c7c5 c2c3 c5d4 c3d4 d7d6 b1c3 c8d7 g1f3 b7b5 f1d3 b5b4 c3b5 d7b5 d3b5";
 			fens[16] = "r2qkbnr/p3pppp/n2p4/1B6/1p1PP3/5N2/PP3PPP/R1BQK2R b KQkq - 0 9";
@@ -3521,12 +3162,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "r1bqkbnr/pppppppp/n7/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 2";
 			fens[1] = "r1bqkbnr/pppppppp/n7/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test48", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test48: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3536,7 +3177,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test49: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 f1c4 b8c6 g1f3 d7d6 d2d3 c8e6 c4e6 f7e6 b1c3 d8f6 c1e3 e8c8 a2a4 d6d5 e4d5 e6d5 a4a5 a7a6 e1g1 g7g6 c3e2 g8e7 e3c5 d5d4 c2c4 c6a5 a1a5 e7c6 d1a4 b7b6 a5a6 c8d7 c5f8 d8f8 a4b5 f8a8 b5d5 d7e7 a6a8 h8a8 f3e5 c6e5 d5a8 e5d3 a8e4 e7f7 e4d3 f6e5 e2d4";
 			fens[50] = "8/2p2k1p/1p4p1/4q3/2PN4/3Q4/1P3PPP/5RK1 b - - 0 26";
@@ -3590,12 +3231,101 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test49", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test49: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
+			return result;
+			@endnoparse
+		end function;
 
+		@dialect("oal");
+		function test5() return boolean is
+			@noparse
+			LOG::LogInfo(message: "test5: start");
+			t0 = TIM::current_clock();
+			
+			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+			move_text = "e2e4 d7d6 d2d4 g8f6 e4e5 f6g4 d4d5 g7g6 d1e2 d6e5 f2f3 g4f6 e2e5 f8g7 f1b5 c8d7 b5c4 e8g8 c1g5 c7c6 d5d6 e7d6 e5d6 f8e8 g1e2 d8a5 d6d2 e8e2 e1e2 a5e5 d2e3 e5b2 b1d2 b2c2 a1c1 c2f5 h2h4 h7h6 e3e7 h6g5 g2g4 f5e6 c4e6 d7e6 e7d8 g7f8 d8f6 b8d7 f6c3 a8e8 h4g5 f7f6 g5f6 d7f6 c3f6 f8g7 f6g6 e6d5 e2f2 g8f8 h1h7 g7d4 f2g2 e8e2 g2f1 e2d2 g6g7 f8e8 h7h8 d5g8 h8g8";
+			fens[70] = "4k1R1/pp4Q1/2p5/8/3b2P1/5P2/P2r4/2R2K2 b - - 0 36";
+			fens[69] = "4k1bR/pp4Q1/2p5/8/3b2P1/5P2/P2r4/2R2K2 w - - 4 36";
+			fens[68] = "4k2R/pp4Q1/2p5/3b4/3b2P1/5P2/P2r4/2R2K2 b - - 3 35";
+			fens[67] = "4k3/pp4QR/2p5/3b4/3b2P1/5P2/P2r4/2R2K2 w - - 2 35";
+			fens[66] = "5k2/pp4QR/2p5/3b4/3b2P1/5P2/P2r4/2R2K2 b - - 1 34";
+			fens[65] = "5k2/pp5R/2p3Q1/3b4/3b2P1/5P2/P2r4/2R2K2 w - - 0 34";
+			fens[64] = "5k2/pp5R/2p3Q1/3b4/3b2P1/5P2/P2Nr3/2R2K2 b - - 8 33";
+			fens[63] = "5k2/pp5R/2p3Q1/3b4/3b2P1/5P2/P2Nr1K1/2R5 w - - 7 33";
+			fens[62] = "4rk2/pp5R/2p3Q1/3b4/3b2P1/5P2/P2N2K1/2R5 b - - 6 32";
+			fens[61] = "4rk2/pp5R/2p3Q1/3b4/3b2P1/5P2/P2N1K2/2R5 w - - 5 32";
+			fens[60] = "4rk2/pp4bR/2p3Q1/3b4/6P1/5P2/P2N1K2/2R5 b - - 4 31";
+			fens[59] = "4rk2/pp4b1/2p3Q1/3b4/6P1/5P2/P2N1K2/2R4R w - - 3 31";
+			fens[58] = "4r1k1/pp4b1/2p3Q1/3b4/6P1/5P2/P2N1K2/2R4R b - - 2 30";
+			fens[57] = "4r1k1/pp4b1/2p3Q1/3b4/6P1/5P2/P2NK3/2R4R w - - 1 30";
+			fens[56] = "4r1k1/pp4b1/2p1b1Q1/8/6P1/5P2/P2NK3/2R4R b - - 0 29";
+			fens[55] = "4r1k1/pp4b1/2p1bQp1/8/6P1/5P2/P2NK3/2R4R w - - 1 29";
+			fens[54] = "4rbk1/pp6/2p1bQp1/8/6P1/5P2/P2NK3/2R4R b - - 0 28";
+			fens[53] = "4rbk1/pp6/2p1bnp1/8/6P1/2Q2P2/P2NK3/2R4R w - - 0 28";
+			fens[52] = "4rbk1/pp1n4/2p1bPp1/8/6P1/2Q2P2/P2NK3/2R4R b - - 0 27";
+			fens[51] = "4rbk1/pp1n4/2p1bpp1/6P1/6P1/2Q2P2/P2NK3/2R4R w - - 0 27";
+			fens[50] = "4rbk1/pp1n1p2/2p1b1p1/6P1/6P1/2Q2P2/P2NK3/2R4R b - - 0 26";
+			fens[49] = "4rbk1/pp1n1p2/2p1b1p1/6p1/6PP/2Q2P2/P2NK3/2R4R w - - 3 26";
+			fens[48] = "r4bk1/pp1n1p2/2p1b1p1/6p1/6PP/2Q2P2/P2NK3/2R4R b - - 2 25";
+			fens[47] = "r4bk1/pp1n1p2/2p1bQp1/6p1/6PP/5P2/P2NK3/2R4R w - - 1 25";
+			fens[46] = "rn3bk1/pp3p2/2p1bQp1/6p1/6PP/5P2/P2NK3/2R4R b - - 0 24";
+			fens[45] = "rn1Q1bk1/pp3p2/2p1bnp1/6p1/6PP/5P2/P2NK3/2R4R w - - 2 24";
+			fens[44] = "rn1Q2k1/pp3pb1/2p1bnp1/6p1/6PP/5P2/P2NK3/2R4R b - - 1 23";
+			fens[43] = "rn4k1/pp2Qpb1/2p1bnp1/6p1/6PP/5P2/P2NK3/2R4R w - - 0 23";
+			fens[42] = "rn4k1/pp1bQpb1/2p1Bnp1/6p1/6PP/5P2/P2NK3/2R4R b - - 0 22";
+			fens[41] = "rn4k1/pp1bQpb1/2p1qnp1/6p1/2B3PP/5P2/P2NK3/2R4R w - - 1 22";
+			fens[40] = "rn4k1/pp1bQpb1/2p2np1/5qp1/2B3PP/5P2/P2NK3/2R4R b - g3 0 21";
+			fens[39] = "rn4k1/pp1bQpb1/2p2np1/5qp1/2B4P/5P2/P2NK1P1/2R4R w - - 0 21";
+			fens[38] = "rn4k1/pp1bQpb1/2p2npp/5qB1/2B4P/5P2/P2NK1P1/2R4R b - - 1 20";
+			fens[37] = "rn4k1/pp1b1pb1/2p2npp/5qB1/2B4P/4QP2/P2NK1P1/2R4R w - - 0 20";
+			fens[36] = "rn4k1/pp1b1pbp/2p2np1/5qB1/2B4P/4QP2/P2NK1P1/2R4R b - h3 0 19";
+			fens[35] = "rn4k1/pp1b1pbp/2p2np1/5qB1/2B5/4QP2/P2NK1PP/2R4R w - - 2 19";
+			fens[34] = "rn4k1/pp1b1pbp/2p2np1/6B1/2B5/4QP2/P1qNK1PP/2R4R b - - 1 18";
+			fens[33] = "rn4k1/pp1b1pbp/2p2np1/6B1/2B5/4QP2/P1qNK1PP/R6R w - - 0 18";
+			fens[32] = "rn4k1/pp1b1pbp/2p2np1/6B1/2B5/4QP2/PqPNK1PP/R6R b - - 1 17";
+			fens[31] = "rn4k1/pp1b1pbp/2p2np1/6B1/2B5/4QP2/PqP1K1PP/RN5R w - - 0 17";
+			fens[30] = "rn4k1/pp1b1pbp/2p2np1/4q1B1/2B5/4QP2/PPP1K1PP/RN5R b - - 2 16";
+			fens[29] = "rn4k1/pp1b1pbp/2p2np1/4q1B1/2B5/5P2/PPPQK1PP/RN5R w - - 1 16";
+			fens[28] = "rn4k1/pp1b1pbp/2p2np1/q5B1/2B5/5P2/PPPQK1PP/RN5R b - - 0 15";
+			fens[27] = "rn4k1/pp1b1pbp/2p2np1/q5B1/2B5/5P2/PPPQr1PP/RN2K2R w KQ - 0 15";
+			fens[26] = "rn2r1k1/pp1b1pbp/2p2np1/q5B1/2B5/5P2/PPPQN1PP/RN2K2R b KQ - 4 14";
+			fens[25] = "rn2r1k1/pp1b1pbp/2pQ1np1/q5B1/2B5/5P2/PPP1N1PP/RN2K2R w KQ - 3 14";
+			fens[24] = "rn1qr1k1/pp1b1pbp/2pQ1np1/6B1/2B5/5P2/PPP1N1PP/RN2K2R b KQ - 2 13";
+			fens[23] = "rn1qr1k1/pp1b1pbp/2pQ1np1/6B1/2B5/5P2/PPP3PP/RN2K1NR w KQ - 1 13";
+			fens[22] = "rn1q1rk1/pp1b1pbp/2pQ1np1/6B1/2B5/5P2/PPP3PP/RN2K1NR b KQ - 0 12";
+			fens[21] = "rn1q1rk1/pp1b1pbp/2pp1np1/4Q1B1/2B5/5P2/PPP3PP/RN2K1NR w KQ - 0 12";
+			fens[20] = "rn1q1rk1/pp1bppbp/2pP1np1/4Q1B1/2B5/5P2/PPP3PP/RN2K1NR b KQ - 0 11";
+			fens[19] = "rn1q1rk1/pp1bppbp/2p2np1/3PQ1B1/2B5/5P2/PPP3PP/RN2K1NR w KQ - 0 11";
+			fens[18] = "rn1q1rk1/pppbppbp/5np1/3PQ1B1/2B5/5P2/PPP3PP/RN2K1NR b KQ - 6 10";
+			fens[17] = "rn1q1rk1/pppbppbp/5np1/3PQ3/2B5/5P2/PPP3PP/RNB1K1NR w KQ - 5 10";
+			fens[16] = "rn1qk2r/pppbppbp/5np1/3PQ3/2B5/5P2/PPP3PP/RNB1K1NR b KQkq - 4 9";
+			fens[15] = "rn1qk2r/pppbppbp/5np1/1B1PQ3/8/5P2/PPP3PP/RNB1K1NR w KQkq - 3 9";
+			fens[14] = "rnbqk2r/ppp1ppbp/5np1/1B1PQ3/8/5P2/PPP3PP/RNB1K1NR b KQkq - 2 8";
+			fens[13] = "rnbqk2r/ppp1ppbp/5np1/3PQ3/8/5P2/PPP3PP/RNB1KBNR w KQkq - 1 8";
+			fens[12] = "rnbqkb1r/ppp1pp1p/5np1/3PQ3/8/5P2/PPP3PP/RNB1KBNR b KQkq - 0 7";
+			fens[11] = "rnbqkb1r/ppp1pp1p/5np1/3Pp3/8/5P2/PPP1Q1PP/RNB1KBNR w KQkq - 1 7";
+			fens[10] = "rnbqkb1r/ppp1pp1p/6p1/3Pp3/6n1/5P2/PPP1Q1PP/RNB1KBNR b KQkq - 0 6";
+			fens[9] = "rnbqkb1r/ppp1pp1p/6p1/3Pp3/6n1/8/PPP1QPPP/RNB1KBNR w KQkq - 0 6";
+			fens[8] = "rnbqkb1r/ppp1pp1p/3p2p1/3PP3/6n1/8/PPP1QPPP/RNB1KBNR b KQkq - 1 5";
+			fens[7] = "rnbqkb1r/ppp1pp1p/3p2p1/3PP3/6n1/8/PPP2PPP/RNBQKBNR w KQkq - 0 5";
+			fens[6] = "rnbqkb1r/ppp1pppp/3p4/3PP3/6n1/8/PPP2PPP/RNBQKBNR b KQkq - 0 4";
+			fens[5] = "rnbqkb1r/ppp1pppp/3p4/4P3/3P2n1/8/PPP2PPP/RNBQKBNR w KQkq - 1 4";
+			fens[4] = "rnbqkb1r/ppp1pppp/3p1n2/4P3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3";
+			fens[3] = "rnbqkb1r/ppp1pppp/3p1n2/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 1 3";
+			fens[2] = "rnbqkbnr/ppp1pppp/3p4/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 2";
+			fens[1] = "rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
+			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
+			
+			result = ::test_do_move(name: "test5", initial_fen: initial_fen, move_text: move_text, fens: fens);
+			
+			t1 = TIM::current_clock();
+			LOG::LogInfo(message: "test5: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3605,7 +3335,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test50: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 c7c6 c1f4 d7d5 c2c3 c8f5 e2e3 g7g6 g1f3 f8g7 f1d3 f5d3 d1d3 e7e6 e1g1 g8f6 f1e1 f6e4 f4g5 e4g5 f3g5 d8g5 b1d2 e8g8 f2f3 e6e5 e3e4 b8d7 d2f1 e5d4 c3d4 a7a6 f1e3 d5e4 f3e4 a8d8 e1f1 d7c5 d3c2 g5e3 f1f2 g7d4 a1e1 e3e1";
 			fens[43] = "3r1rk1/1p3p1p/p1p3p1/2n5/3bP3/8/PPQ2RPP/4q1K1 w - - 0 23";
@@ -3652,12 +3382,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pp1ppppp/2p5/8/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pp1ppppp/2p5/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test50", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test50: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3667,7 +3397,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test51: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c2c4 e7e6 b1c3 g8f6 g1f3 b8c6 c1g5 f8e7 f3e5 e8g8 d1b3 h7h6 g5h4 b7b6 e5c6 d8d6 c6e7 d6e7 c4d5 e6d5 c3d5 f6d5 h4e7 d5e7 a1c1 c8e6 b3f3 c7c5 e2e3 e6a2 f1d3 e7g6 h2h4 a8e8 h4h5 g6h8 f3f5 g7g6 h5g6 f7g6 f5h3 g6g5 h3h6 f8f7 h6h8";
 			fens[46] = "4r1kQ/p4r2/1p6/2p3p1/3P4/3BP3/bP3PP1/2R1K2R b K - 0 24";
@@ -3717,12 +3447,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq c3 0 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test51", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test51: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3732,7 +3462,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test52: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 d1h5 b8c6 b1c3 g7g6 h5f3 f7f5 e4f5 g6f5 b2b3 d7d6 f1b5 g8e7 b5c6 b7c6 c3b5 c6b5 f3a8 e7c6 a8c6 d8d7 c6d7 e8d7 g1f3 f8h6 d2d3 h8f8 c1h6 f8e8 e1g1 c8b7 f3g5 e8g8 a1e1 f5f4 g2g3 c7c5 g3f4 g8g6 f4e5 g6h6 e5d6 d7d6 g5f3 h6g6 g1h1 b7f3";
 			fens[47] = "8/p6p/3k2r1/1pp5/8/1P1P1b2/P1P2P1P/4RR1K w - - 0 25";
@@ -3783,12 +3513,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test52", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test52: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3798,7 +3528,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test53: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 b8c6 c2c3 c8g4 g1f3 h7h6 e2e3 g7g5 f1d3 f7f6 f4g3 d8d7 e1g1 e8c8 d1a4 a7a6 c3c4 d5c4 d3c4 g4f3 g2f3 e7e5 d4d5 c6b4 a4d7 d8d7 b2b3 b7b5 b1c3 b5c4 b3c4 b4c2 a1b1 a6a5 f1c1 c2b4 a2a3 b4d3 c1c2 f8a3 c3b5 a3b4 c2b2 d3b2 b1b2 g8e7 b5a7 c8b7 e3e4 h6h5 f3f4 b7a7 c4c5 h5h4 c5c6 d7d8 d5d6 c7d6 c6c7 d8c8 b2c2 h4g3 f2g3 g5f4 h2h4 f4g3 g1g2 h8h4 g2g3 e7g6 c2f2 h4e4 f2f6 e4e3";
 			fens[75] = "2r5/k1P5/3p1Rn1/p3p3/1b6/4r1K1/8/8 w - - 1 39";
@@ -3877,12 +3607,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test53", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test53: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3892,7 +3622,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test54: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 b8c6 c2c3 e7e6 e2e3 g8f6 g1f3 h7h6 f1d3 f8d6 e1g1 d6f4 e3f4 d8d6 d1d2 e8g8 b1a3 a7a6 d3c2 f6e4 d2d3 f7f5 f1e1 d6f4 g2g3 f4g4 a1d1 e6e5 d4e5 c8e6 d1d2 f5f4 c2d1 f4g3 f3d4 g3h2 g1h2 g4h4 h2g1 h4g5 d3g3 e4g3 f2g3 g5g3 d2g2 g3e1 g1h2 c6d4 a3c2 d4c2 d1c2 e1h4 h2g1 h4e1 g1h2 f8f2 g2f2 e1f2 h2h1 f2c2";
 			fens[61] = "r5k1/1pp3p1/p3b2p/3pP3/8/2P5/PPq5/7K w - - 0 32";
@@ -3957,12 +3687,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test54", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test54: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -3972,7 +3702,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test55: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1f3 f7f6 d2d4 b8c6 c2c3 d7d6 d4d5 g8e7 d5c6 b7c6 f1c4 d6d5 e4d5 c6d5 c4b5 c8d7 b5d3 e7f5 d3f5 d7f5 e1g1 f8c5 f3h4 f5e4 d1h5 g7g6 h4g6 h8g8 h5h7 g8g6 h7h8 c5f8 h8h3 d8d7 h3d7 e8d7 f2f3 e4d3 f1f2 f8c5 c1e3 c5e3 b1d2 e3f2 g1f2 a8b8 a1g1 b8b2 f2e3 d3c4 f3f4 b2a2 f4e5 f6e5 d2f3 a2e2";
 			fens[57] = "8/p1pk4/6r1/3pp3/2b5/2P1KN2/4r1PP/6R1 w - - 2 30";
@@ -4033,12 +3763,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test55", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test55: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4048,7 +3778,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test56: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 g1f3 c8f5 e2e3 e7e6 c2c4 f8d6 c4c5 d6c5 d4c5 b8c6 b1c3 g8f6 f1b5 d8d7 c1d2 e8g8 e1g1 a7a6 f1e1 a6b5 c3b5";
 			fens[22] = "r4rk1/1ppq1ppp/2n1pn2/1NPp1b2/8/4PN2/PP1B1PPP/R2QR1K1 b - - 0 12";
@@ -4074,12 +3804,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test56", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test56: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4089,7 +3819,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test57: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 g1f3 c8f5 c1f4 e7e6 e2e3 b8c6 f1b5 f8d6 e1g1 g8f6 c2c4 e8g8 b1c3 d5c4 a2a3 f8e8 b5c4 e6e5 c3b5 d6e7 f4e5 c6e5 f3e5 f5g4 d1b3 a7a6 e5f7 d8d7 f7e5 d7e6 c4e6 g4e6 b5c7 e6b3 c7e8 a8e8 a1c1 f6d5 e5d3 a6a5 c1c3 d5c3 b2c3 b3c4 f1d1";
 			fens[46] = "4r1k1/1p2b1pp/8/p7/2bP4/P1PNP3/5PPP/3R2K1 b - - 2 24";
@@ -4139,12 +3869,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test57", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test57: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4154,7 +3884,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test58: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 b8c6 c2c3 d7d5 c1f4 f7f6 e2e3 e7e5 d1h5 g7g6 h5h4 g6g5 h4h5 e8e7 h5d1 d8e8 f1e2 c8f5 b1d2 e7d7 e3e4 g8e7 e4f5 e7f5 e2g4 c6e7 g1f3 h7h6 e1g1 d7d8 d1c2 f5e3 f2e3 g5f4 e3f4 f6f5 g4h3 e7g6 g2g3 f8e7 f1e1 h8f8 d4e5 e8b5 h3f1 b5c5 f3d4 g6f4 g1h1 f4g6 d4e6 d8c8 e6c5 e7c5 d2e4 d5e4 f1h3 b7b6 e1f1 c8b7 f1d1 g6e5 c2d2 e4e3 d2e2 e5c4 h3g2 b7a6 e2c4 b6b5 c4c5 e3e2 c5c6 a6a5 b2b4 a5a4 c6a6";
 			fens[76] = "r4r2/p1p5/Q6p/1p3p2/kP6/2P3P1/P3p1BP/R2R3K b - - 2 39";
@@ -4234,12 +3964,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "r1bqkbnr/pppppppp/2n5/8/3P4/2P5/PP2PPPP/RNBQKBNR b KQkq - 0 2";
 			fens[1] = "r1bqkbnr/pppppppp/2n5/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test58", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test58: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4249,7 +3979,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test59: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1f3 f7f6 f1c4 d7d5 e4d5 f8d6 d2d3 g8e7 b1c3 e8g8 e1g1 c8d7 d3d4 c7c6 d5c6 g8h8 c6d7 d8d7 d4e5 f6e5 c3b5 d7c8 b5d6 c8c4 d6c4";
 			fens[26] = "rn3r1k/pp2n1pp/8/4p3/2N5/5N2/PPP2PPP/R1BQ1RK1 b - - 0 14";
@@ -4279,12 +4009,67 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test59", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test59: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
+			return result;
+			@endnoparse
+		end function;
 
+		@dialect("oal");
+		function test6() return boolean is
+			@noparse
+			LOG::LogInfo(message: "test6: start");
+			t0 = TIM::current_clock();
+			
+			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+			move_text = "d2d4 d7d5 c1f4 b8c6 g1f3 c8f5 b1d2 e7e6 e2e3 f8d6 f4d6 d8d6 f1d3 f5d3 c2d3 c6b4 f3e5 f7f6 d1h5 g7g6 e5g6 b4c2 e1e2 e8c8 g6h8 c2a1 h1a1 d6f8 h8f7 f8e8 a1c1 f6f5 f7d6 d8d6 h5e8 d6d8 e8e6";
+			fens[36] = "2kr2n1/ppp4p/4Q3/3p1p2/3P4/3PP3/PP1NKPPP/2R5 b - - 0 19";
+			fens[35] = "2krQ1n1/ppp4p/4p3/3p1p2/3P4/3PP3/PP1NKPPP/2R5 w - - 1 19";
+			fens[34] = "2k1Q1n1/ppp4p/3rp3/3p1p2/3P4/3PP3/PP1NKPPP/2R5 b - - 0 18";
+			fens[33] = "2k1q1n1/ppp4p/3rp3/3p1p1Q/3P4/3PP3/PP1NKPPP/2R5 w - - 0 18";
+			fens[32] = "2krq1n1/ppp4p/3Np3/3p1p1Q/3P4/3PP3/PP1NKPPP/2R5 b - - 1 17";
+			fens[31] = "2krq1n1/ppp2N1p/4p3/3p1p1Q/3P4/3PP3/PP1NKPPP/2R5 w - - 0 17";
+			fens[30] = "2krq1n1/ppp2N1p/4pp2/3p3Q/3P4/3PP3/PP1NKPPP/2R5 b - - 4 16";
+			fens[29] = "2krq1n1/ppp2N1p/4pp2/3p3Q/3P4/3PP3/PP1NKPPP/R7 w - - 3 16";
+			fens[28] = "2kr1qn1/ppp2N1p/4pp2/3p3Q/3P4/3PP3/PP1NKPPP/R7 b - - 2 15";
+			fens[27] = "2kr1qnN/ppp4p/4pp2/3p3Q/3P4/3PP3/PP1NKPPP/R7 w - - 1 15";
+			fens[26] = "2kr2nN/ppp4p/3qpp2/3p3Q/3P4/3PP3/PP1NKPPP/R7 b - - 0 14";
+			fens[25] = "2kr2nN/ppp4p/3qpp2/3p3Q/3P4/3PP3/PP1NKPPP/n6R w - - 0 14";
+			fens[24] = "2kr2nN/ppp4p/3qpp2/3p3Q/3P4/3PP3/PPnNKPPP/R6R b - - 0 13";
+			fens[23] = "2kr2nr/ppp4p/3qppN1/3p3Q/3P4/3PP3/PPnNKPPP/R6R w - - 3 13";
+			fens[22] = "r3k1nr/ppp4p/3qppN1/3p3Q/3P4/3PP3/PPnNKPPP/R6R b kq - 2 12";
+			fens[21] = "r3k1nr/ppp4p/3qppN1/3p3Q/3P4/3PP3/PPnN1PPP/R3K2R w KQkq - 1 12";
+			fens[20] = "r3k1nr/ppp4p/3qppN1/3p3Q/1n1P4/3PP3/PP1N1PPP/R3K2R b KQkq - 0 11";
+			fens[19] = "r3k1nr/ppp4p/3qppp1/3pN2Q/1n1P4/3PP3/PP1N1PPP/R3K2R w KQkq - 0 11";
+			fens[18] = "r3k1nr/ppp3pp/3qpp2/3pN2Q/1n1P4/3PP3/PP1N1PPP/R3K2R b KQkq - 1 10";
+			fens[17] = "r3k1nr/ppp3pp/3qpp2/3pN3/1n1P4/3PP3/PP1N1PPP/R2QK2R w KQkq - 0 10";
+			fens[16] = "r3k1nr/ppp2ppp/3qp3/3pN3/1n1P4/3PP3/PP1N1PPP/R2QK2R b KQkq - 2 9";
+			fens[15] = "r3k1nr/ppp2ppp/3qp3/3p4/1n1P4/3PPN2/PP1N1PPP/R2QK2R w KQkq - 1 9";
+			fens[14] = "r3k1nr/ppp2ppp/2nqp3/3p4/3P4/3PPN2/PP1N1PPP/R2QK2R b KQkq - 0 8";
+			fens[13] = "r3k1nr/ppp2ppp/2nqp3/3p4/3P4/3bPN2/PPPN1PPP/R2QK2R w KQkq - 0 8";
+			fens[12] = "r3k1nr/ppp2ppp/2nqp3/3p1b2/3P4/3BPN2/PPPN1PPP/R2QK2R b KQkq - 1 7";
+			fens[11] = "r3k1nr/ppp2ppp/2nqp3/3p1b2/3P4/4PN2/PPPN1PPP/R2QKB1R w KQkq - 0 7";
+			fens[10] = "r2qk1nr/ppp2ppp/2nBp3/3p1b2/3P4/4PN2/PPPN1PPP/R2QKB1R b KQkq - 0 6";
+			fens[9] = "r2qk1nr/ppp2ppp/2nbp3/3p1b2/3P1B2/4PN2/PPPN1PPP/R2QKB1R w KQkq - 1 6";
+			fens[8] = "r2qkbnr/ppp2ppp/2n1p3/3p1b2/3P1B2/4PN2/PPPN1PPP/R2QKB1R b KQkq - 0 5";
+			fens[7] = "r2qkbnr/ppp2ppp/2n1p3/3p1b2/3P1B2/5N2/PPPNPPPP/R2QKB1R w KQkq - 0 5";
+			fens[6] = "r2qkbnr/ppp1pppp/2n5/3p1b2/3P1B2/5N2/PPPNPPPP/R2QKB1R b KQkq - 5 4";
+			fens[5] = "r2qkbnr/ppp1pppp/2n5/3p1b2/3P1B2/5N2/PPP1PPPP/RN1QKB1R w KQkq - 4 4";
+			fens[4] = "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R b KQkq - 3 3";
+			fens[3] = "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 2 3";
+			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
+			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
+			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
+			
+			result = ::test_do_move(name: "test6", initial_fen: initial_fen, move_text: move_text, fens: fens);
+			
+			t1 = TIM::current_clock();
+			LOG::LogInfo(message: "test6: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4294,7 +4079,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test60: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 g8f6 e2e3 c8f5 f1e2 e7e6 b1d2 b8c6 c2c3 f6h5 e2h5 g7g6 h5f3 f8d6 g1e2 e8g8 g2g3 e6e5 d4e5 d6e5 f4e5 c6e5 e2d4 f5g4 e1g1 e5f3 d4f3 h7h5 g1g2 d8d7 h2h3 g4h3 g2g1 h3f1 g1f1 c7c5 d2b3 b7b6 d1d3 a8d8 f3e5 d7e6 d3g6 f7g6 e5g6 e6g6 a1d1 g6c2";
 			fens[49] = "3r1rk1/p7/1p6/2pp3p/8/1NP1P1P1/PPq2P2/3R1K2 w - - 2 26";
@@ -4347,12 +4132,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test60", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test60: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4362,7 +4147,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test61: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1f3 b8c6 c2c3 c6a5 d2d4 g8f6 f1d3 a7a6 d1a4 a5c6 d3c2 d7d6 d4d5 c8d7 e1g1 c6b8 a4a5 b7b6 a5b4 f6g4 h2h3 g4f6 c1g5 h7h6 g5f6 g7f6 c3c4 h8g8 b1d2 d7h3 f3h4 h3g2 h4g2 d8d7 c2a4 e8d8 a4d7 b8d7 b4a4 d7c5 a4b4 a6a5 b4b5 c5d3 b2b3 d3f4 a1d1 g8g2 g1h1 g2g5 f1g1 g5h5";
 			fens[53] = "r2k1b2/2p2p2/1p1p1p1p/pQ1Pp2r/2P1Pn2/1P6/P2N1P2/3R2RK w - - 4 28";
@@ -4419,12 +4204,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test61", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test61: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4434,7 +4219,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test62: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1f3 g8f6 f1c4 d7d5 e4d5 c7c6 d5c6 b7c6 f3g5 f8b4 g5f7 d8d4 f7h8 b4c5 b2b3 d4f2";
 			fens[17] = "rnb1k2N/p5pp/2p2n2/2b1p3/2B5/1P6/P1PP1qPP/RNBQK2R w KQq - 0 10";
@@ -4455,12 +4240,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test62", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test62: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4470,7 +4255,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test63: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 g8f6 c1f4 g7g6 e2e3 f8g7 c2c3 d7d6 f1d3 b8c6 b1d2 e8g8 g1f3 b7b6 e1g1 f6d5 g2g3 d5f4 e3f4 c8g4 f1e1 e7e6 d1a4 c6e7 f3e5 d8e8 e5f7 e8a4 e1e6 f8f7 a1e1 a8e8 b2b3 a4d7 d3g6 e7g6 e6e8 f7f8 d2e4 f8e8";
 			fens[39] = "4r1k1/p1pq2bp/1p1p2n1/8/3PNPb1/1PP3P1/P4P1P/4R1K1 w - - 0 21";
@@ -4513,12 +4298,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkb1r/pppppppp/5n2/8/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 2 2";
 			fens[1] = "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test63", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test63: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4528,7 +4313,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test64: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 d1h5 g7g6 h5e5 g8e7 e5h8 b8c6 d2d3 d7d5 c1h6 e7f5 h8f8 e8d7 f8f7 c6e7 h6g5 d8e8 f7h7 d7d8 g5e7 f5e7 h7h4 e8b5 d3d4 b5b4 c2c3 b4b2 h4h8 d8d7 f1b5 b2b5 a2a4 b5b2 a1a3 b2b1 e1d2 b7b6 e4d5 b1b2 d2d3 b2a3 g1e2 g6g5 e2c1 a3a1 d3c2 g5g4 h2h3 b6b5 h3g4 b5a4 c1b3 a1a2 c2d3 a2b3 g4g5 b3d5 h1h7 a4a3 g5g6 d7c6 c3c4 d5g2 d4d5 c6d6 h8d8 d6c5 d8e7 c5b6 e7c7 b6a6 h7h6 c8f5 d3c3 a3a2 g6g7 f5g6 g7g8q a2a1q c3b4 a1b1 b4c5 g2f2 c5c6 a8g8 d5d6 f2f4 c7b7 a6a5 b7a7 a5b4 h6g6 g8g6 a7b7 b4c3 b7b1 f4f3 c6c7 g6g5 d6d7 g5d5 c4d5 f3d5 d7d8q d5d8 c7d8 c3c4 b1c1 c4b4 d8c7 b4a4 c7b6 a4b4 c1c5 b4b3 b6b5 b3a2 c5c2 a2a3 c2c3 a3a2 b5b4 a2b1 b4b3";
 			fens[124] = "8/8/8/8/8/1KQ5/8/1k6 b - - 18 63";
@@ -4656,12 +4441,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test64", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test64: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4671,7 +4456,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test65: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 f1c4 g8f6 d1f3 d7d6 g2g4 c8g4 f3g3 d8d7 h2h3 f6h5 h3g4 h5g3 f2g3 f8e7 d2d4 e8g8 d4e5 d6e5 c2c3 b8c6 g4g5 f8d8 e1e2 g7g6 c1e3 b7b5 c4b5 d7d1 e2f2 d8d6 g1h3 d1h1 h3f4 h1h2 f4g2 a8d8 b1a3 d6f6 g5f6 e7f6 b5c6 g6g5 e3a7 d8d2 f2e3 d2g2 b2b4 g2g3";
 			fens[49] = "6k1/B1p2p1p/2B2b2/4p1p1/1P2P3/N1P1K1r1/P6q/R7 w - - 0 26";
@@ -4724,12 +4509,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test65", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test65: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4739,7 +4524,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test66: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 b8c6 e2e3 f7f6 d1h5 g7g6 h5g4 c8g4 f1e2 g4f5 e2d3 f5d3 c2d3 c6b4 e1f1 b4d3 f4g3 c7c6 g1f3 d8a5 b1c3 d3b2 a1c1 e7e6 f1e2 f8b4 e2d2 e6e5 f3e5 f6e5 g3e5 a5a2 c1a1 a2b3 e5h8 b3c3 d2e2 c3d2 e2f1 b2d1";
 			fens[41] = "r3k1nB/pp5p/2p3p1/3p4/1b1P4/4P3/3q1PPP/R2n1K1R w q - 4 22";
@@ -4784,12 +4569,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test66", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test66: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4799,7 +4584,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test67: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 d1f3 f7f5 f1c4 d7d6 e4f5 g8e7 g2g4 g7g6 f5g6 h7g6 d2d3 c7c5 c1g5 d8a5 c2c3 b8c6 b1a3 f8g7 f3f7 e8d8 f7g7 h8h7 g7h7 d8c7 a3b5 c7b8 g5e7 c6e7 h7e7 a7a6 e7d6 a5c7 d6c7";
 			fens[34] = "rkb5/1pQ5/p5p1/1Np1p3/2B3P1/2PP4/PP3P1P/R3K1NR b KQ - 0 18";
@@ -4837,12 +4622,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5Q2/PPPP1PPP/RNB1KBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test67", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test67: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4852,7 +4637,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test68: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 e7e5 c1f4 e5f4 e2e3 f4e3 f2e3 g7g5 g1f3 f8g7 c2c3 g5g4 f3e5 d7d6 e5g4 f7f5 g4f2 b7b5 f1d3 c8b7 e1g1 d8g5 d1e2 g5g2";
 			fens[23] = "rn2k1nr/pbp3bp/3p4/1p3p2/3P4/2PBP3/PP2QNqP/RN3RK1 w kq - 0 13";
@@ -4879,12 +4664,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/3P4/8/PPP1PPPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test68", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test68: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4894,7 +4679,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test69: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 g8f6 g1f3 e7e6 e2e3 d7d5 f1d3 h7h6 b1d2 f8d6 c2c3 e8g8 e1g1 f8e8 b2b4 b8d7 c1a3 a7a5 f1e1 e6e5 d4e5 d7e5 d3b5 c8d7 f3d4 c7c6 b5d3 a5a4 e3e4 d5e4 d2e4 d6f8 e4f6 d8f6 e1e4 d7f5 e4f4 e5d3 d4f5 e8e1 d1e1 d3e1 a1e1 f6c3 e1e3 c3a1 a3c1 a1c1 e3e1 c1e1";
 			fens[49] = "r4bk1/1p3pp1/2p4p/5N2/pP3R2/8/P4PPP/4q1K1 w - - 0 26";
@@ -4947,12 +4732,55 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkb1r/pppppppp/5n2/8/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 2 2";
 			fens[1] = "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test69", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test69: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
+			return result;
+			@endnoparse
+		end function;
 
+		@dialect("oal");
+		function test7() return boolean is
+			@noparse
+			LOG::LogInfo(message: "test7: start");
+			t0 = TIM::current_clock();
+			
+			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+			move_text = "e2e4 d7d6 f2f4 g8f6 e4e5 f6g4 d1g4 g7g6 f4f5 g6f5 g4f4 e7e6 g1f3 f8g7 f1c4 e8g8 d2d4 d6e5 d4e5 b8c6 e1g1 d8d4 f3d4 c6d4 f4d4";
+			fens[24] = "r1b2rk1/ppp2pbp/4p3/4Pp2/2BQ4/8/PPP3PP/RNB2RK1 b - - 0 13";
+			fens[23] = "r1b2rk1/ppp2pbp/4p3/4Pp2/2Bn1Q2/8/PPP3PP/RNB2RK1 w - - 0 13";
+			fens[22] = "r1b2rk1/ppp2pbp/2n1p3/4Pp2/2BN1Q2/8/PPP3PP/RNB2RK1 b - - 0 12";
+			fens[21] = "r1b2rk1/ppp2pbp/2n1p3/4Pp2/2Bq1Q2/5N2/PPP3PP/RNB2RK1 w - - 3 12";
+			fens[20] = "r1bq1rk1/ppp2pbp/2n1p3/4Pp2/2B2Q2/5N2/PPP3PP/RNB2RK1 b - - 2 11";
+			fens[19] = "r1bq1rk1/ppp2pbp/2n1p3/4Pp2/2B2Q2/5N2/PPP3PP/RNB1K2R w KQ - 1 11";
+			fens[18] = "rnbq1rk1/ppp2pbp/4p3/4Pp2/2B2Q2/5N2/PPP3PP/RNB1K2R b KQ - 0 10";
+			fens[17] = "rnbq1rk1/ppp2pbp/4p3/4pp2/2BP1Q2/5N2/PPP3PP/RNB1K2R w KQ - 0 10";
+			fens[16] = "rnbq1rk1/ppp2pbp/3pp3/4Pp2/2BP1Q2/5N2/PPP3PP/RNB1K2R b KQ d3 0 9";
+			fens[15] = "rnbq1rk1/ppp2pbp/3pp3/4Pp2/2B2Q2/5N2/PPPP2PP/RNB1K2R w KQ - 4 9";
+			fens[14] = "rnbqk2r/ppp2pbp/3pp3/4Pp2/2B2Q2/5N2/PPPP2PP/RNB1K2R b KQkq - 3 8";
+			fens[13] = "rnbqk2r/ppp2pbp/3pp3/4Pp2/5Q2/5N2/PPPP2PP/RNB1KB1R w KQkq - 2 8";
+			fens[12] = "rnbqkb1r/ppp2p1p/3pp3/4Pp2/5Q2/5N2/PPPP2PP/RNB1KB1R b KQkq - 1 7";
+			fens[11] = "rnbqkb1r/ppp2p1p/3pp3/4Pp2/5Q2/8/PPPP2PP/RNB1KBNR w KQkq - 0 7";
+			fens[10] = "rnbqkb1r/ppp1pp1p/3p4/4Pp2/5Q2/8/PPPP2PP/RNB1KBNR b KQkq - 1 6";
+			fens[9] = "rnbqkb1r/ppp1pp1p/3p4/4Pp2/6Q1/8/PPPP2PP/RNB1KBNR w KQkq - 0 6";
+			fens[8] = "rnbqkb1r/ppp1pp1p/3p2p1/4PP2/6Q1/8/PPPP2PP/RNB1KBNR b KQkq - 0 5";
+			fens[7] = "rnbqkb1r/ppp1pp1p/3p2p1/4P3/5PQ1/8/PPPP2PP/RNB1KBNR w KQkq - 0 5";
+			fens[6] = "rnbqkb1r/ppp1pppp/3p4/4P3/5PQ1/8/PPPP2PP/RNB1KBNR b KQkq - 0 4";
+			fens[5] = "rnbqkb1r/ppp1pppp/3p4/4P3/5Pn1/8/PPPP2PP/RNBQKBNR w KQkq - 1 4";
+			fens[4] = "rnbqkb1r/ppp1pppp/3p1n2/4P3/5P2/8/PPPP2PP/RNBQKBNR b KQkq - 0 3";
+			fens[3] = "rnbqkb1r/ppp1pppp/3p1n2/8/4PP2/8/PPPP2PP/RNBQKBNR w KQkq - 1 3";
+			fens[2] = "rnbqkbnr/ppp1pppp/3p4/8/4PP2/8/PPPP2PP/RNBQKBNR b KQkq f3 0 2";
+			fens[1] = "rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
+			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
+			
+			result = ::test_do_move(name: "test7", initial_fen: initial_fen, move_text: move_text, fens: fens);
+			
+			t1 = TIM::current_clock();
+			LOG::LogInfo(message: "test7: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
 			return result;
 			@endnoparse
 		end function;
@@ -4962,7 +4790,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test70: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 f1c4 f8b4 c2c3 b4c5 d2d3 c5f8 g1f3 f8c5 d3d4 c5f8 e1g1 c7c6 d4e5 d7d5 c1f4 b8d7 f4g5 f7f6 e5f6 g7f6 g5h4 f8c5 c4b3 d7e5 f1e1 d8d7 c3c4 g8e7 c4d5 d7d6 f3e5 e8g8 b1c3 e7f5 e4f5 f8f7 e5f7 g8f7 a1c1 f7g7 e1e8 d6e7 e8e7 c5e7 d1e1 g7f7 d5d6 c8e6 d6e7 a8e8 f5e6 f7e7 c1d1 e7f8 h4f6 b7b6 e6e7 e8e7 e1e7";
 			fens[60] = "5k2/p3Q2p/1pp2B2/8/8/1BN5/PP3PPP/3R2K1 b - - 0 31";
@@ -5026,12 +4854,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test70", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test70: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -5041,7 +4869,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test71: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1f3 f7f5 b1c3 f8c5 e4f5 g8f6 f3e5 d7d6 d1e2 e8g8 e2b5 d8e8 b5c4 f8f7 f1e2 d6e5 c4c5 c8f5 c3b5 b8d7 c5c7 a8c8 c7b7 d7c5 b7f3 e8d7 d2d3 h7h6 b5d6 d7d6 f3f5 a7a5 f5c8 f7f8 c8f5 f6h5 f5h5 g7g6 h5h6 a5a4 d3d4 d6d4 h6g6 g8h8 g6h6 h8g8 c2c3 d4f4 c1f4 e5f4 h6f4 c5e6 f4a4 f8f7 e2c4 f7f6 a4e8 g8g7 c4e6 f6e6 e8e6 g7f8 a1d1 f8g7 d1d7 g7f8 e6d6 f8g8 d6b8";
 			fens[70] = "1Q4k1/3R4/8/8/8/2P5/PP3PPP/4K2R b K - 8 36";
@@ -5115,12 +4943,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test71", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test71: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -5130,7 +4958,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test72: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 e7e6 e2e3 g8f6 f1d3 f8b4 c2c3 b4a5 d1d2 f6g4 h2h3 g4f6 g1f3 f6h5 e1g1 h5f4 e3f4 h7h5 b1a3 f7f6 f1e1 b8c6 a1d1 a7a6 e1e6 c8e6 d2e2 e8d7 b2b3 a5c3 a3c4 d5c4 b3c4 c6d4 f3d4 c3d4 d3b1 f6f5 a2a3 d8h4 a3a4 h4f4 g2g3 f4d6 e2c2 d7e7 c4c5 d6d5 c2e2 a8d8 a4a5 d5c5 d1f1 d4e5 h3h4 e5g3 b1a2 d8d6 a2e6 d6e6 f1d1 g3f2 e2f2 c5f2 g1f2 e6d6 d1e1 d6e6 e1d1 h8d8 d1b1 b7b6 a5b6 e6b6 b1e1 b6e6";
 			fens[77] = "3r4/2p1k1p1/p3r3/5p1p/7P/8/5K2/4R3 w - - 2 40";
@@ -5211,12 +5039,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test72", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test72: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -5226,7 +5054,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test73: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c1f4 b8c6 b1c3 c8f5 g2g4 g7g5 f1h3 f8h6 g1f3 g8f6 e1g1 e8g8 d1d2 d8d7 f4g5 f5g4 h3g2 h6g7 f3e5 f6e4 g2e4 g7e5 c3d5 c6d4 d5e7 d7e7 g5e7 d4e2 g1h1";
 			fens[30] = "r4rk1/ppp1Bp1p/8/4b3/4B1b1/8/PPPQnP1P/R4R1K b - - 1 16";
@@ -5260,12 +5088,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test73", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test73: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -5275,7 +5103,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test74: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1f3 b8c6 b1c3 f8c5 f1c4 g8f6 f3g5 f6e4 g5f7 d8e7 c3e4 d7d5 c4d5 e8g8 f7e5 c8e6 e5c6 b7c6 d5e6 e7e6 d2d3 a8d8 e1g1 h7h5 e4c5 a7a5 c5e6 d8d6 e6f8 g8f8 d1f3 d6f6 f3h5 g7g6 c1h6 f8g8 h5c5 f6f5 c5c6 f5h5 c6g6 g8h8 g6g7";
 			fens[44] = "7k/2p3Q1/7B/p6r/8/3P4/PPP2PPP/R4RK1 b - - 2 23";
@@ -5323,12 +5151,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test74", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test74: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -5338,7 +5166,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test75: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 g1f3 b8c6 f1b5 a7a6 b5c6 b7c6 f3e5 f8d6 d1h5 g7g6 e5g6 f7g6 h5g4 g8f6 g4g5 e8g8 e4e5 d6e5 e1g1 d7d6 d2d4 e5d4 c2c4 f8e8 g5h6 f6g4 h6f4 h7h5 c1e3";
 			fens[30] = "r1bqr1k1/2p5/p1pp2p1/7p/2Pb1Qn1/4B3/PP3PPP/RN3RK1 b - - 1 16";
@@ -5372,12 +5200,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test75", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test75: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -5387,7 +5215,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test76: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 b8c6 f1c4 c6e5 d2d3 e5c4 d3c4 c7c5 c1f4 d7d6 g1f3 e7e5 f4g5 g8f6 b1c3 f8e7 e1g1 f6g4 d1d2 g4h2 g1h2 h7h6 h2g1 h6g5 f3g5 e7g5 d2d1 g5f4 a2a4 d8h4 d1d3 h4h2";
 			fens[31] = "r1b1k2r/pp3pp1/3p4/2p1p3/P1P1Pb2/2NQ4/1PP2PPq/R4RK1 w kq - 3 17";
@@ -5422,12 +5250,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "r1bqkbnr/pppppppp/2n5/8/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 2 2";
 			fens[1] = "r1bqkbnr/pppppppp/2n5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test76", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test76: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -5437,7 +5265,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test77: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 c2c4 d5c4 b1c3 c7c5 c1f4 f7f5 d4d5 e7e5 f4g3 g8h6 h2h3 g7g5 e2e4 f5e4 c3e4 f8g7 f1c4 b8a6 g1f3 d8d7 f3e5 g7e5 g3e5 e8g8 e4f6 g8h8 f6d7 h8g8 d5d6";
 			fens[30] = "r1b2rk1/pp1N3p/n2P3n/2p1B1p1/2B5/7P/PP3PP1/R2QK2R b KQ - 0 16";
@@ -5471,12 +5299,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq c3 0 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test77", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test77: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -5486,7 +5314,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test78: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "d2d4 d7d5 g1f3 e7e6 h2h3 c7c6 c1f4 g7g6 e2e3 h7h5 c2c3 f8g7 b1d2 g8h6 f1e2 e8g8 e1g1 b7b5 a1c1 a7a5 b2b3 f7f6 f4h6 g7h6 a2a4 e6e5 a4b5 c6b5 e2b5 f6f5 f3e5 f8e8 e5g6 e8e6 g6e5 a8a7 d1h5 b8c6 b5c6 c8b7 c6b5 b7a8 h5f5 d8e8 b5e8 e6e8 f5g6 g8h8 g6h6 h8g8 h6g6 g8h8 g6e8 h8h7 e8h5 h7g8 c3c4 d5c4 c1c4 a8g2 g1g2 a5a4 c4a4 g8f8 a4a7 f8g8 h5e8";
 			fens[66] = "4Q1k1/R7/8/4N3/3P4/1P2P2P/3N1PK1/5R2 b - - 2 34";
@@ -5556,12 +5384,12 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
-
+			
 			result = ::test_do_move(name: "test78", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test78: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-
+			
 			return result;
 			@endnoparse
 		end function;
@@ -5571,7 +5399,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test79: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 f1c4 d8f6 c2c3 f8c5 d2d4 e5d4 c3d4 c5d4 c1e3 d4b2 b1c3 b2c3 d1d2 c3d2 e1d2 f6a1 g1f3 a1h1 f3e1 h1g2 e1g2 g8f6 a2a4 f6e4 d2e1 e8g8 e1f1 b8c6 f1g1 d7d6 a4a5 c6a5 g1h1 a5c4 e3d2 c4d2 h2h3 e4f2 h1h2 c8h3 h2g1 f2g4 g1h1 h3g2 h1g2 d2f3 g2f3 a7a5 f3g4 a5a4 g4g5 a4a3 g5h5 f8e8 h5h4 e8e5 h4h3 a3a2 h3h2 a2a1q h2g2 a8a2 g2g3 a1b2 g3f3 a2a3 f3f4 a3e3 f4g4 b2c2 g4f4 c2e4";
 			fens[73] = "6k1/1pp2ppp/3p4/4r3/4qK2/4r3/8/8 w - - 12 38";
@@ -5648,12 +5476,112 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test79", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test79: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
+			return result;
+			@endnoparse
+		end function;
 
+		@dialect("oal");
+		function test8() return boolean is
+			@noparse
+			LOG::LogInfo(message: "test8: start");
+			t0 = TIM::current_clock();
+			
+			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+			move_text = "d2d4 g8f6 c1f4 g7g6 b1c3 f8g7 e2e4 d7d6 e4e5 d6e5 f4e5 e8g8 g1f3 b8c6 c3b5 f6e8 c2c3 c8g4 f1e2 c6e5 f3e5 g7e5 d4e5 d8d1 a1d1 g4e2 e1e2 f7f6 e5e6 c7c6 b5d4 a8d8 f2f3 e8c7 g2g4 d8d5 c3c4 d5c5 d1c1 c5e5 e2f2 c7e6 d4e6 e5e6 c1e1 e6d6 c4c5 d6d7 b2b4 f8d8 f2e2 d7d2 e2e3 d2a2 e1d1 d8d1 h1d1 g8f7 d1d2 a2d2 e3d2 f7e6 d2c3 e6d5 f3f4 f6f5 g4f5 g6f5 c3d3 e7e5 f4e5 d5e5 d3e3 f5f4 e3f3 e5d4 f3f4 d4c4 f4e3 c4b4 e3d4 a7a5";
+			fens[81] = "8/1p5p/2p5/p1P5/1k1K4/8/7P/8 w - a6 0 42";
+			fens[80] = "8/pp5p/2p5/2P5/1k1K4/8/7P/8 b - - 1 41";
+			fens[79] = "8/pp5p/2p5/2P5/1k6/4K3/7P/8 w - - 0 41";
+			fens[78] = "8/pp5p/2p5/2P5/1Pk5/4K3/7P/8 b - - 2 40";
+			fens[77] = "8/pp5p/2p5/2P5/1Pk2K2/8/7P/8 w - - 1 40";
+			fens[76] = "8/pp5p/2p5/2P5/1P1k1K2/8/7P/8 b - - 0 39";
+			fens[75] = "8/pp5p/2p5/2P5/1P1k1p2/5K2/7P/8 w - - 2 39";
+			fens[74] = "8/pp5p/2p5/2P1k3/1P3p2/5K2/7P/8 b - - 1 38";
+			fens[73] = "8/pp5p/2p5/2P1k3/1P3p2/4K3/7P/8 w - - 0 38";
+			fens[72] = "8/pp5p/2p5/2P1kp2/1P6/4K3/7P/8 b - - 1 37";
+			fens[71] = "8/pp5p/2p5/2P1kp2/1P6/3K4/7P/8 w - - 0 37";
+			fens[70] = "8/pp5p/2p5/2PkPp2/1P6/3K4/7P/8 b - - 0 36";
+			fens[69] = "8/pp5p/2p5/2Pkpp2/1P3P2/3K4/7P/8 w - e6 0 36";
+			fens[68] = "8/pp2p2p/2p5/2Pk1p2/1P3P2/3K4/7P/8 b - - 1 35";
+			fens[67] = "8/pp2p2p/2p5/2Pk1p2/1P3P2/2K5/7P/8 w - - 0 35";
+			fens[66] = "8/pp2p2p/2p3p1/2Pk1P2/1P3P2/2K5/7P/8 b - - 0 34";
+			fens[65] = "8/pp2p2p/2p3p1/2Pk1p2/1P3PP1/2K5/7P/8 w - - 0 34";
+			fens[64] = "8/pp2p2p/2p2pp1/2Pk4/1P3PP1/2K5/7P/8 b - - 0 33";
+			fens[63] = "8/pp2p2p/2p2pp1/2Pk4/1P4P1/2K2P2/7P/8 w - - 3 33";
+			fens[62] = "8/pp2p2p/2p1kpp1/2P5/1P4P1/2K2P2/7P/8 b - - 2 32";
+			fens[61] = "8/pp2p2p/2p1kpp1/2P5/1P4P1/5P2/3K3P/8 w - - 1 32";
+			fens[60] = "8/pp2pk1p/2p2pp1/2P5/1P4P1/5P2/3K3P/8 b - - 0 31";
+			fens[59] = "8/pp2pk1p/2p2pp1/2P5/1P4P1/4KP2/3r3P/8 w - - 0 31";
+			fens[58] = "8/pp2pk1p/2p2pp1/2P5/1P4P1/4KP2/r2R3P/8 b - - 2 30";
+			fens[57] = "8/pp2pk1p/2p2pp1/2P5/1P4P1/4KP2/r6P/3R4 w - - 1 30";
+			fens[56] = "6k1/pp2p2p/2p2pp1/2P5/1P4P1/4KP2/r6P/3R4 b - - 0 29";
+			fens[55] = "6k1/pp2p2p/2p2pp1/2P5/1P4P1/4KP2/r6P/3r3R w - - 0 29";
+			fens[54] = "3r2k1/pp2p2p/2p2pp1/2P5/1P4P1/4KP2/r6P/3R3R b - - 1 28";
+			fens[53] = "3r2k1/pp2p2p/2p2pp1/2P5/1P4P1/4KP2/r6P/4R2R w - - 0 28";
+			fens[52] = "3r2k1/pp2p2p/2p2pp1/2P5/1P4P1/4KP2/P2r3P/4R2R b - - 4 27";
+			fens[51] = "3r2k1/pp2p2p/2p2pp1/2P5/1P4P1/5P2/P2rK2P/4R2R w - - 3 27";
+			fens[50] = "3r2k1/pp1rp2p/2p2pp1/2P5/1P4P1/5P2/P3K2P/4R2R b - - 2 26";
+			fens[49] = "3r2k1/pp1rp2p/2p2pp1/2P5/1P4P1/5P2/P4K1P/4R2R w - - 1 26";
+			fens[48] = "5rk1/pp1rp2p/2p2pp1/2P5/1P4P1/5P2/P4K1P/4R2R b - b3 0 25";
+			fens[47] = "5rk1/pp1rp2p/2p2pp1/2P5/6P1/5P2/PP3K1P/4R2R w - - 1 25";
+			fens[46] = "5rk1/pp2p2p/2pr1pp1/2P5/6P1/5P2/PP3K1P/4R2R b - - 0 24";
+			fens[45] = "5rk1/pp2p2p/2pr1pp1/8/2P3P1/5P2/PP3K1P/4R2R w - - 2 24";
+			fens[44] = "5rk1/pp2p2p/2p1rpp1/8/2P3P1/5P2/PP3K1P/4R2R b - - 1 23";
+			fens[43] = "5rk1/pp2p2p/2p1rpp1/8/2P3P1/5P2/PP3K1P/2R4R w - - 0 23";
+			fens[42] = "5rk1/pp2p2p/2p1Npp1/4r3/2P3P1/5P2/PP3K1P/2R4R b - - 0 22";
+			fens[41] = "5rk1/pp2p2p/2p1npp1/4r3/2PN2P1/5P2/PP3K1P/2R4R w - - 0 22";
+			fens[40] = "5rk1/ppn1p2p/2p1Ppp1/4r3/2PN2P1/5P2/PP3K1P/2R4R b - - 4 21";
+			fens[39] = "5rk1/ppn1p2p/2p1Ppp1/4r3/2PN2P1/5P2/PP2K2P/2R4R w - - 3 21";
+			fens[38] = "5rk1/ppn1p2p/2p1Ppp1/2r5/2PN2P1/5P2/PP2K2P/2R4R b - - 2 20";
+			fens[37] = "5rk1/ppn1p2p/2p1Ppp1/2r5/2PN2P1/5P2/PP2K2P/3R3R w - - 1 20";
+			fens[36] = "5rk1/ppn1p2p/2p1Ppp1/3r4/2PN2P1/5P2/PP2K2P/3R3R b - - 0 19";
+			fens[35] = "5rk1/ppn1p2p/2p1Ppp1/3r4/3N2P1/2P2P2/PP2K2P/3R3R w - - 1 19";
+			fens[34] = "3r1rk1/ppn1p2p/2p1Ppp1/8/3N2P1/2P2P2/PP2K2P/3R3R b - g3 0 18";
+			fens[33] = "3r1rk1/ppn1p2p/2p1Ppp1/8/3N4/2P2P2/PP2K1PP/3R3R w - - 1 18";
+			fens[32] = "3rnrk1/pp2p2p/2p1Ppp1/8/3N4/2P2P2/PP2K1PP/3R3R b - - 0 17";
+			fens[31] = "3rnrk1/pp2p2p/2p1Ppp1/8/3N4/2P5/PP2KPPP/3R3R w - - 2 17";
+			fens[30] = "r3nrk1/pp2p2p/2p1Ppp1/8/3N4/2P5/PP2KPPP/3R3R b - - 1 16";
+			fens[29] = "r3nrk1/pp2p2p/2p1Ppp1/1N6/8/2P5/PP2KPPP/3R3R w - - 0 16";
+			fens[28] = "r3nrk1/ppp1p2p/4Ppp1/1N6/8/2P5/PP2KPPP/3R3R b - - 0 15";
+			fens[27] = "r3nrk1/ppp1p2p/5pp1/1N2P3/8/2P5/PP2KPPP/3R3R w - - 0 15";
+			fens[26] = "r3nrk1/ppp1pp1p/6p1/1N2P3/8/2P5/PP2KPPP/3R3R b - - 0 14";
+			fens[25] = "r3nrk1/ppp1pp1p/6p1/1N2P3/8/2P5/PP2bPPP/3RK2R w K - 0 14";
+			fens[24] = "r3nrk1/ppp1pp1p/6p1/1N2P3/6b1/2P5/PP2BPPP/3RK2R b K - 0 13";
+			fens[23] = "r3nrk1/ppp1pp1p/6p1/1N2P3/6b1/2P5/PP2BPPP/R2qK2R w KQ - 0 13";
+			fens[22] = "r2qnrk1/ppp1pp1p/6p1/1N2P3/6b1/2P5/PP2BPPP/R2QK2R b KQ - 0 12";
+			fens[21] = "r2qnrk1/ppp1pp1p/6p1/1N2b3/3P2b1/2P5/PP2BPPP/R2QK2R w KQ - 0 12";
+			fens[20] = "r2qnrk1/ppp1ppbp/6p1/1N2N3/3P2b1/2P5/PP2BPPP/R2QK2R b KQ - 0 11";
+			fens[19] = "r2qnrk1/ppp1ppbp/6p1/1N2n3/3P2b1/2P2N2/PP2BPPP/R2QK2R w KQ - 0 11";
+			fens[18] = "r2qnrk1/ppp1ppbp/2n3p1/1N2B3/3P2b1/2P2N2/PP2BPPP/R2QK2R b KQ - 2 10";
+			fens[17] = "r2qnrk1/ppp1ppbp/2n3p1/1N2B3/3P2b1/2P2N2/PP3PPP/R2QKB1R w KQ - 1 10";
+			fens[16] = "r1bqnrk1/ppp1ppbp/2n3p1/1N2B3/3P4/2P2N2/PP3PPP/R2QKB1R b KQ - 0 9";
+			fens[15] = "r1bqnrk1/ppp1ppbp/2n3p1/1N2B3/3P4/5N2/PPP2PPP/R2QKB1R w KQ - 5 9";
+			fens[14] = "r1bq1rk1/ppp1ppbp/2n2np1/1N2B3/3P4/5N2/PPP2PPP/R2QKB1R b KQ - 4 8";
+			fens[13] = "r1bq1rk1/ppp1ppbp/2n2np1/4B3/3P4/2N2N2/PPP2PPP/R2QKB1R w KQ - 3 8";
+			fens[12] = "rnbq1rk1/ppp1ppbp/5np1/4B3/3P4/2N2N2/PPP2PPP/R2QKB1R b KQ - 2 7";
+			fens[11] = "rnbq1rk1/ppp1ppbp/5np1/4B3/3P4/2N5/PPP2PPP/R2QKBNR w KQ - 1 7";
+			fens[10] = "rnbqk2r/ppp1ppbp/5np1/4B3/3P4/2N5/PPP2PPP/R2QKBNR b KQkq - 0 6";
+			fens[9] = "rnbqk2r/ppp1ppbp/5np1/4p3/3P1B2/2N5/PPP2PPP/R2QKBNR w KQkq - 0 6";
+			fens[8] = "rnbqk2r/ppp1ppbp/3p1np1/4P3/3P1B2/2N5/PPP2PPP/R2QKBNR b KQkq - 0 5";
+			fens[7] = "rnbqk2r/ppp1ppbp/3p1np1/8/3PPB2/2N5/PPP2PPP/R2QKBNR w KQkq - 0 5";
+			fens[6] = "rnbqk2r/ppppppbp/5np1/8/3PPB2/2N5/PPP2PPP/R2QKBNR b KQkq e3 0 4";
+			fens[5] = "rnbqk2r/ppppppbp/5np1/8/3P1B2/2N5/PPP1PPPP/R2QKBNR w KQkq - 2 4";
+			fens[4] = "rnbqkb1r/pppppp1p/5np1/8/3P1B2/2N5/PPP1PPPP/R2QKBNR b KQkq - 1 3";
+			fens[3] = "rnbqkb1r/pppppp1p/5np1/8/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 0 3";
+			fens[2] = "rnbqkb1r/pppppppp/5n2/8/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 2 2";
+			fens[1] = "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2";
+			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
+			
+			result = ::test_do_move(name: "test8", initial_fen: initial_fen, move_text: move_text, fens: fens);
+			
+			t1 = TIM::current_clock();
+			LOG::LogInfo(message: "test8: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
 			return result;
 			@endnoparse
 		end function;
@@ -5663,7 +5591,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			LOG::LogInfo(message: "test80: start");
 			t0 = TIM::current_clock();
-
+			
 			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 			move_text = "e2e4 e7e5 c2c4 f8c5 a2a3 g8f6 b2b4 c5e7 f1e2 f6e4 d2d3 e4f6 g2g4 d7d6 f2f3 e8g8 h2h4 h7h5 g4h5 f6h5 c1e3 e7h4 h1h4 d8h4 e1f1 c8h3 g1h3 h4h3 f1e1 b8c6 f3f4 e5f4 e3f2 c6d4 e2h5 f8e8 d1e2 e8e2 e1d1 e2f2 a1a2 h3h1";
 			fens[41] = "r5k1/ppp2pp1/3p4/7B/1PPn1p2/P2P4/R4r2/1N1K3q w - - 2 22";
@@ -5708,12 +5636,83 @@ within lichess_bot::components::Engine::test is
 			fens[2] = "rnbqkbnr/pppp1ppp/8/4p3/2P1P3/8/PP1P1PPP/RNBQKBNR b KQkq c3 0 2";
 			fens[1] = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2";
 			fens[0] = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
-
+			
 			result = ::test_do_move(name: "test80", initial_fen: initial_fen, move_text: move_text, fens: fens);
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "test80: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
+			return result;
+			@endnoparse
+		end function;
 
+		@dialect("oal");
+		function test9() return boolean is
+			@noparse
+			LOG::LogInfo(message: "test9: start");
+			t0 = TIM::current_clock();
+			
+			initial_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+			move_text = "d2d4 d7d5 c1f4 c7c6 g1f3 d8a5 c2c3 b7b5 a2a3 e7e6 e2e3 b5b4 c3b4 a5b6 f1d3 f8b4 a3b4 b6b4 b1c3 b4b2 d1c1 b2b4 e1g1 c8a6 f3e5 f7f6 d3a6 f6e5 f4e5 b8a6 a1a6 b4c4 a6a4 c4d3 e5g7 d3g6 g7h8 g8f6 h8f6 g6f6 c1a1 c6c5 a4a7 a8a7 a1a7 c5d4 e3d4 h7h5 f1b1 f6e7 b1b8 e8f7 b8b7";
+			fens[52] = "8/QR2qk2/4p3/3p3p/3P4/2N5/5PPP/6K1 b - - 5 27";
+			fens[51] = "1R6/Q3qk2/4p3/3p3p/3P4/2N5/5PPP/6K1 w - - 4 27";
+			fens[50] = "1R2k3/Q3q3/4p3/3p3p/3P4/2N5/5PPP/6K1 b - - 3 26";
+			fens[49] = "4k3/Q3q3/4p3/3p3p/3P4/2N5/5PPP/1R4K1 w - - 2 26";
+			fens[48] = "4k3/Q7/4pq2/3p3p/3P4/2N5/5PPP/1R4K1 b - - 1 25";
+			fens[47] = "4k3/Q7/4pq2/3p3p/3P4/2N5/5PPP/5RK1 w - h6 0 25";
+			fens[46] = "4k3/Q6p/4pq2/3p4/3P4/2N5/5PPP/5RK1 b - - 0 24";
+			fens[45] = "4k3/Q6p/4pq2/3p4/3p4/2N1P3/5PPP/5RK1 w - - 0 24";
+			fens[44] = "4k3/Q6p/4pq2/2pp4/3P4/2N1P3/5PPP/5RK1 b - - 0 23";
+			fens[43] = "4k3/r6p/4pq2/2pp4/3P4/2N1P3/5PPP/Q4RK1 w - - 0 23";
+			fens[42] = "r3k3/R6p/4pq2/2pp4/3P4/2N1P3/5PPP/Q4RK1 b q - 0 22";
+			fens[41] = "r3k3/p6p/4pq2/2pp4/R2P4/2N1P3/5PPP/Q4RK1 w q - 0 22";
+			fens[40] = "r3k3/p6p/2p1pq2/3p4/R2P4/2N1P3/5PPP/Q4RK1 b q - 1 21";
+			fens[39] = "r3k3/p6p/2p1pq2/3p4/R2P4/2N1P3/5PPP/2Q2RK1 w q - 0 21";
+			fens[38] = "r3k3/p6p/2p1pBq1/3p4/R2P4/2N1P3/5PPP/2Q2RK1 b q - 0 20";
+			fens[37] = "r3k2B/p6p/2p1pnq1/3p4/R2P4/2N1P3/5PPP/2Q2RK1 w q - 1 20";
+			fens[36] = "r3k1nB/p6p/2p1p1q1/3p4/R2P4/2N1P3/5PPP/2Q2RK1 b q - 0 19";
+			fens[35] = "r3k1nr/p5Bp/2p1p1q1/3p4/R2P4/2N1P3/5PPP/2Q2RK1 w kq - 1 19";
+			fens[34] = "r3k1nr/p5Bp/2p1p3/3p4/R2P4/2NqP3/5PPP/2Q2RK1 b kq - 0 18";
+			fens[33] = "r3k1nr/p5pp/2p1p3/3pB3/R2P4/2NqP3/5PPP/2Q2RK1 w kq - 3 18";
+			fens[32] = "r3k1nr/p5pp/2p1p3/3pB3/R1qP4/2N1P3/5PPP/2Q2RK1 b kq - 2 17";
+			fens[31] = "r3k1nr/p5pp/R1p1p3/3pB3/2qP4/2N1P3/5PPP/2Q2RK1 w kq - 1 17";
+			fens[30] = "r3k1nr/p5pp/R1p1p3/3pB3/1q1P4/2N1P3/5PPP/2Q2RK1 b kq - 0 16";
+			fens[29] = "r3k1nr/p5pp/n1p1p3/3pB3/1q1P4/2N1P3/5PPP/R1Q2RK1 w kq - 0 16";
+			fens[28] = "rn2k1nr/p5pp/B1p1p3/3pB3/1q1P4/2N1P3/5PPP/R1Q2RK1 b kq - 0 15";
+			fens[27] = "rn2k1nr/p5pp/B1p1p3/3pp3/1q1P1B2/2N1P3/5PPP/R1Q2RK1 w kq - 0 15";
+			fens[26] = "rn2k1nr/p5pp/B1p1pp2/3pN3/1q1P1B2/2N1P3/5PPP/R1Q2RK1 b kq - 0 14";
+			fens[25] = "rn2k1nr/p5pp/b1p1pp2/3pN3/1q1P1B2/2NBP3/5PPP/R1Q2RK1 w kq - 0 14";
+			fens[24] = "rn2k1nr/p4ppp/b1p1p3/3pN3/1q1P1B2/2NBP3/5PPP/R1Q2RK1 b kq - 5 13";
+			fens[23] = "rn2k1nr/p4ppp/b1p1p3/3p4/1q1P1B2/2NBPN2/5PPP/R1Q2RK1 w kq - 4 13";
+			fens[22] = "rnb1k1nr/p4ppp/2p1p3/3p4/1q1P1B2/2NBPN2/5PPP/R1Q2RK1 b kq - 3 12";
+			fens[21] = "rnb1k1nr/p4ppp/2p1p3/3p4/1q1P1B2/2NBPN2/5PPP/R1Q1K2R w KQkq - 2 12";
+			fens[20] = "rnb1k1nr/p4ppp/2p1p3/3p4/3P1B2/2NBPN2/1q3PPP/R1Q1K2R b KQkq - 1 11";
+			fens[19] = "rnb1k1nr/p4ppp/2p1p3/3p4/3P1B2/2NBPN2/1q3PPP/R2QK2R w KQkq - 0 11";
+			fens[18] = "rnb1k1nr/p4ppp/2p1p3/3p4/1q1P1B2/2NBPN2/1P3PPP/R2QK2R b KQkq - 1 10";
+			fens[17] = "rnb1k1nr/p4ppp/2p1p3/3p4/1q1P1B2/3BPN2/1P3PPP/RN1QK2R w KQkq - 0 10";
+			fens[16] = "rnb1k1nr/p4ppp/1qp1p3/3p4/1P1P1B2/3BPN2/1P3PPP/RN1QK2R b KQkq - 0 9";
+			fens[15] = "rnb1k1nr/p4ppp/1qp1p3/3p4/1b1P1B2/P2BPN2/1P3PPP/RN1QK2R w KQkq - 0 9";
+			fens[14] = "rnb1kbnr/p4ppp/1qp1p3/3p4/1P1P1B2/P2BPN2/1P3PPP/RN1QK2R b KQkq - 2 8";
+			fens[13] = "rnb1kbnr/p4ppp/1qp1p3/3p4/1P1P1B2/P3PN2/1P3PPP/RN1QKB1R w KQkq - 1 8";
+			fens[12] = "rnb1kbnr/p4ppp/2p1p3/q2p4/1P1P1B2/P3PN2/1P3PPP/RN1QKB1R b KQkq - 0 7";
+			fens[11] = "rnb1kbnr/p4ppp/2p1p3/q2p4/1p1P1B2/P1P1PN2/1P3PPP/RN1QKB1R w KQkq - 0 7";
+			fens[10] = "rnb1kbnr/p4ppp/2p1p3/qp1p4/3P1B2/P1P1PN2/1P3PPP/RN1QKB1R b KQkq - 0 6";
+			fens[9] = "rnb1kbnr/p4ppp/2p1p3/qp1p4/3P1B2/P1P2N2/1P2PPPP/RN1QKB1R w KQkq - 0 6";
+			fens[8] = "rnb1kbnr/p3pppp/2p5/qp1p4/3P1B2/P1P2N2/1P2PPPP/RN1QKB1R b KQkq - 0 5";
+			fens[7] = "rnb1kbnr/p3pppp/2p5/qp1p4/3P1B2/2P2N2/PP2PPPP/RN1QKB1R w KQkq b6 0 5";
+			fens[6] = "rnb1kbnr/pp2pppp/2p5/q2p4/3P1B2/2P2N2/PP2PPPP/RN1QKB1R b KQkq - 0 4";
+			fens[5] = "rnb1kbnr/pp2pppp/2p5/q2p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R w KQkq - 2 4";
+			fens[4] = "rnbqkbnr/pp2pppp/2p5/3p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R b KQkq - 1 3";
+			fens[3] = "rnbqkbnr/pp2pppp/2p5/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 0 3";
+			fens[2] = "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2";
+			fens[1] = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2";
+			fens[0] = "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1";
+			
+			result = ::test_do_move(name: "test9", initial_fen: initial_fen, move_text: move_text, fens: fens);
+			
+			t1 = TIM::current_clock();
+			LOG::LogInfo(message: "test9: done " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
 			return result;
 			@endnoparse
 		end function;
@@ -5723,7 +5722,7 @@ within lichess_bot::components::Engine::test is
 			@noparse
 			failures = 0;
 			t0 = TIM::current_clock();
-
+			
 			if not ::test1() then failures = failures + 1; end if;
 			if not ::test2() then failures = failures + 1; end if;
 			if not ::test3() then failures = failures + 1; end if;
@@ -5804,7 +5803,7 @@ within lichess_bot::components::Engine::test is
 			if not ::test78() then failures = failures + 1; end if;
 			if not ::test79() then failures = failures + 1; end if;
 			if not ::test80() then failures = failures + 1; end if;
-
+			
 			t1 = TIM::current_clock();
 			LOG::LogInfo(message: "80 tests run in " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
 			LOG::LogInfo(message: "Tests ran with " + STRING::itoa(i: failures) + " failures");

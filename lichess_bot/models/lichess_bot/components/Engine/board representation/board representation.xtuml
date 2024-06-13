@@ -3,6 +3,7 @@
 within lichess_bot::components::Engine is
 
 	package 'board representation' is
+		class Bitboards;
 		class Board;
 	end package;
 

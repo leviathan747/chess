@@ -4,5 +4,8 @@ shapes :
   shape : Board
     render : class "lichess_bot::components::Engine::board representation::Board"
     bounds : x : 6242.0 y : 2711.0 width : 253.0 height : 205.0
+  shape : Bitboards
+    render : class "lichess_bot::components::Engine::board representation::Bitboards"
+    bounds : x : 0.0 y : 0.0 width : 200.0 height : 150.0
 
 connectors :

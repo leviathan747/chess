@@ -1,0 +1,137 @@
+// BP 7.1.6 content: ModelClass syschar: 3 persistence-version: 7.1.6
+
+within lichess_bot::components::Engine::'board representation' is
+
+	@key_letters("Bitboards");
+	@class_num(2);
+	class Bitboards is
+
+		FILES: sequence (8) of timestamp;
+
+		RANKS: sequence (8) of timestamp;
+
+		@dialect("oal");
+		@operation_num(1);
+		operation initialize() is
+			@noparse
+			// create file bitboards
+			i = 7;
+			while i >= 0 loop
+				j = 0;
+				self.FILES[i] = Bits::zero();
+				while j < 8 loop
+					self.FILES[i] = Bits::bitwise_or(a: self.FILES[i], b: Bits::left_shift(a: 1, n: j * 8 + i));
+					j = j + 1;
+				end while;
+				i = i - 1;
+			end while;
+			
+			// create rank bitboards
+			i = 7;
+			while i >= 0 loop
+				self.RANKS[i] = Bits::left_shift(a: 255, n: i * 8);
+				i = i - 1;
+			end while;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(2);
+		class operation get_instance() return instance of Bitboards is
+			@noparse
+			select any bb from instances of Bitboards;
+			if empty bb then
+				create object instance bb of Bitboards;
+				bb.initialize();
+			end if;
+			return bb;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(1);
+		class operation coordinate_to_bitboard(coordinate: in string) return timestamp is
+			@noparse
+			file_num = STRING::indexof( haystack: "abcdefgh", needle: STRING::substr(s: param.coordinate, begin:0, end:1));
+			rank_num = STRING::atoi(s: STRING::substr(s: param.coordinate, begin:1, end:2)) - 1;
+			return Bits::left_shift(a: 1, n: rank_num * 8 + file_num);
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(6);
+		class operation bitboard_to_coordinate(bitboard: in timestamp) return string is
+			@noparse
+			file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: param.bitboard);
+			return STRING::substr(s: "abcdefgh", begin: file_rank[0], end: file_rank[0] + 1) + STRING::itoa(i: file_rank[1] + 1);
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(8);
+		class operation bitboard_population(bitboard: in timestamp) return integer is
+			@noparse
+			// Brian Kernighan's algorithm for counting the number of set bits
+			bitboard = param.bitboard;
+			count = 0;
+			while bitboard != 0 loop
+				count = count + 1;
+				bitboard = Bits::bitwise_and(a: bitboard, b: bitboard - 1);  // reset LS1B
+			end while;
+			return count;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(9);
+		class operation bitboard_to_file_and_rank(bitboard: in timestamp) return sequence (2) of integer is
+			@noparse
+			bitboard = param.bitboard;
+			
+			full_rank = Bits::zero();
+			full_rank = 255;  // 0b11111111
+			
+			rank_num = 0;
+			while Bits::bitwise_and(a: bitboard, b: full_rank) == 0  and rank_num <= 7 loop
+				bitboard = Bits::unsigned_right_shift(a: bitboard, n: 8);
+				rank_num = rank_num + 1;
+			end while;
+			
+			file_num = 0;
+			while bitboard != 1 and file_num <= 7 loop
+				bitboard = Bits::unsigned_right_shift(a: bitboard, n: 1);
+				file_num = file_num + 1;
+			end while;
+			
+			file_rank[1] = rank_num;
+			file_rank[0] = file_num;
+			return file_rank;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(11);
+		class operation bitboard_print(bitboard: in timestamp) is
+			@noparse
+			// start at the 63rd bit and descend
+			bb = Bitboards::get_instance();
+			bitboard_string = "";
+			mask = Bits::left_shift(a: 1, n: 63);
+			while mask != 0 loop
+				if Bits::bitwise_and(a: param.bitboard, b: mask) != 0 then
+					bitboard_string = "*" + bitboard_string;
+				else
+					bitboard_string = "." + bitboard_string;
+				end if;
+				if Bits::bitwise_and(a: bb.FILES[0], b: mask) != 0 then
+					LOG::LogInfo(message: bitboard_string);
+					bitboard_string = "";
+				end if;
+				mask = Bits::unsigned_right_shift(a: mask, n: 1);
+			end while;
+			@endnoparse
+		end operation;
+
+	end class;
+
+end;
