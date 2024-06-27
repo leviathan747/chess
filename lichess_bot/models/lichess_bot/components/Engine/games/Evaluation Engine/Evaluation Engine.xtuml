@@ -53,6 +53,12 @@ within lichess_bot::components::Engine::games is
 			
 				select one board related by position->Board[R6];
 				
+				// unlink the existing best move
+				select one existing_best_move related by position->Move[R5];
+				if not empty existing_best_move then
+					unrelate existing_best_move from position across R5;
+				end if;
+				
 				// process moves in 4 passes
 				//   pass 0 = checks
 				//   pass 1 = captures
@@ -121,12 +127,11 @@ within lichess_bot::components::Engine::games is
 					end if;
 				end if;
 				
-				/* TODO
+				// TODO
 				if not empty next_moves then
 					select one best_next_move related by position->Move[R5];
 					LOG::LogInfo(message: "Best line: " + param.line + " " + best_next_move.lan + " : " + STRING::itoa(i: position.evaluation));
 				end if;
-				*/
 				
 			end if;
 			@endnoparse

@@ -78,8 +78,6 @@ within lichess_bot::components::Engine::games is
 			// create and categorize future moves
 			if not self.next_moves_created then
 			
-				select one engine related by self->Engine[R4];
-				
 				// get the list of legal next moves
 				legal_moves = ChessLib::legalMoves(fen: self.fen);
 				
