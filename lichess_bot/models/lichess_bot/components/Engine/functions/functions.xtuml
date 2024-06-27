@@ -36,8 +36,10 @@ within lichess_bot::components::Engine is
 		@function_num(2);
 		function send_challenge() is
 			@noparse
+			user = "maia1";
+			LOG::LogInfo(message: "Challenging " + user + "...");
 			r = chess::createChallenge(
-				user: "maia1",
+				user: user,
 				rated: false,
 				clock_limit: 900,
 				clock_increment: 5,

@@ -52,32 +52,64 @@ within lichess_bot::components::Engine::games is
 				position.create_next_moves();
 			
 				select one board related by position->Board[R6];
-			
-				// TODO evaluate moves in priority order
-				select many next_moves related by position->Move[R2.'is follwed by'];
-				for each next_move in next_moves loop
-					
-					// analyze the next position
-					select one next_position related by next_move->Position[R2.'is follwed by'];
-					self.analyze_lines(position: next_position, depth: param.depth - 1, line: param.line + " " + next_move.lan);
-					
-					// compare to find the best next move
-					select one best_next_move related by position->Move[R5];
-					if empty best_next_move or ( board.active_color == Color::WHITE and next_position.evaluation > position.evaluation ) or
-							( board.active_color == Color::BLACK and next_position.evaluation < position.evaluation ) then
-						if not empty best_next_move then
-							unrelate best_next_move from position across R5;
-						end if;
-						relate next_move to position across R5;
-						// TODO
-						// LOG::LogInfo(message: "New best line: " + param.line + " " + next_move.lan + " : " + STRING::itoa(i: position.evaluation) + " -> " + STRING::itoa(i: next_position.evaluation));
-						position.evaluation = next_position.evaluation;
-						position.evaluation_depth = next_position.evaluation_depth + 1;
-					end if;
 				
-					// TODO prune the tree using alpha-beta pruning; for now, evaluate the whole tree
+				// process moves in 4 passes
+				//   pass 0 = checks
+				//   pass 1 = captures
+				//   pass 2 = attacks
+				//   pass 3 = all others
+				select many next_moves related by position->Move[R2.'is follwed by'];
+				pass = 0;
+				while pass < 4 loop
 			
-				end for;
+					for each next_move in next_moves loop
+						
+						if (pass == 0 and next_move.is_check) or
+						   (pass == 1 and next_move.is_capture and not next_move.is_check) or
+						   (pass == 2 and next_move.is_attack and not next_move.is_check and not next_move.is_capture) or
+						   (pass == 3 and not next_move.is_check and not next_move.is_capture and not next_move.is_attack) then
+						
+							// analyze the next position
+							select one next_position related by next_move->Position[R2.'is follwed by'];
+							self.analyze_lines(position: next_position, depth: param.depth - 1, line: param.line + " " + next_move.lan);
+							
+							// compare to find the best next move
+							select one best_next_move related by position->Move[R5];
+							if empty best_next_move or ( board.active_color == Color::WHITE and next_position.evaluation > position.evaluation ) or
+									( board.active_color == Color::BLACK and next_position.evaluation < position.evaluation ) then
+								if not empty best_next_move then
+									unrelate best_next_move from position across R5;
+								end if;
+								relate next_move to position across R5;
+								// TODO
+								// LOG::LogInfo(message: "New best line: " + param.line + " " + next_move.lan + " : " + STRING::itoa(i: position.evaluation) + " -> " + STRING::itoa(i: next_position.evaluation));
+								position.evaluation = next_position.evaluation;
+								position.evaluation_depth = next_position.evaluation_depth + 1;
+							end if;
+						
+							// prune the tree using alpha-beta pruning:
+							// if the opponent is the active player and the evaluation is
+							// better for the opponent the current best move, then we can
+							// stop evaluation early
+							select one game related by self->ActiveGame[R1];
+							if board.active_color != game.color then
+								select one current_best_move related by position->Position[R2.'follows']->Move[R5];
+								select one current_best_move_position related by current_best_move->Position[R2.'is follwed by'];
+								if not empty current_best_move_position and 
+									((board.active_color == Color::WHITE and position.evaluation > current_best_move_position.evaluation) or
+									 (board.active_color == Color::BLACK and position.evaluation < current_best_move_position.evaluation)) then
+									// TODO
+									//LOG::LogInfo(message: next_move.lan + " is better for opponent than " + current_best_move.lan + ". skipping sub trees");
+									pass = 4;  // skip all remaining passes
+									break;
+								end if;
+							end if;
+						
+						end if;
+			
+					end for;
+					pass = pass + 1;
+				end while;
 				
 				// check for checkmate
 				// TODO this also rewards stalemate

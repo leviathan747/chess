@@ -308,6 +308,7 @@ public class LichessAPIConnection implements LichessAPIProvider {
 			final var response = client.send(requestBuilder.build(), BodyHandlers.ofString());
 			switch (response.statusCode()) {
 			case 200:
+				out.printf("%s\n", response.body());
 				return true;
 			case 400:
 			case 401:

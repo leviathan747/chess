@@ -155,17 +155,34 @@ within lichess_bot::components::Engine::games is
 			create object instance move of Move;
 			move.lan = param.lan;
 			
+			// get source and destination bitboards
+			src_bitboard = Bitboards::coordinate_to_bitboard(coordinate: STRING::substr(s: move.lan, begin: 0, end: 2));
+			dst_bitboard = Bitboards::coordinate_to_bitboard(coordinate: STRING::substr(s: move.lan, begin: 2, end: 4));
+			
+			// get the promotion character
+			promotion = "";
+			if STRING::strlen(s: move.lan) > 4 then
+				promotion = STRING::substr(s: move.lan, begin: 4, end: 5);
+			end if;
+			
 			// create the new board
 			select one current_board related by self->Board[R6];
-			board = current_board.do_move(lan: move.lan);
+			board = current_board.do_move(src_bitboard: src_bitboard, dst_bitboard: dst_bitboard, promotion: promotion);
 			
-			// TODO populate properties of the move
+			// populate properties of the move
+			pre_move_attacks = current_board.get_attacks(our_pov: true);
+			post_move_attacks = board.get_attacks(our_pov: false);
+			move.is_check = Bits::bitwise_and(a: post_move_attacks, b: board.our_king) != 0;
+			move.is_pawn_move = Bits::bitwise_and(a: src_bitboard, b: current_board.our_pawns) != 0;
+			move.is_capture = Bits::bitwise_and(a: current_board.their_pieces_bitboard(), b: dst_bitboard) != 0 or
+				(move.is_pawn_move and Bits::bitwise_and(a: current_board.en_passant_target, b: dst_bitboard) != 0);
+			move.is_attack = Bits::bitwise_and(a: post_move_attacks, b: board.our_pieces_bitboard()) != 0;
+			
 			// TODO Consider possible optimization: is this necessary if the move is being created after the fact
 			
 			// TODO in the future, we will want to detect if a position already exists
 			// create the new position
 			create object instance new_position of Position;
-			moves[0] = param.lan;
 			new_position.fen = board.to_fen();
 			relate board to new_position across R6;
 			select one engine related by self->Engine[R4];
