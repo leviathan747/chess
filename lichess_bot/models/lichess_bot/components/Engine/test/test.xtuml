@@ -26,7 +26,6 @@ within lichess_bot::components::Engine is
 					promotion = STRING::substr(s: token, begin: 4, end: 5);
 				end if;
 				new_board = board.do_move(src_bitboard: src_bitboard, dst_bitboard: dst_bitboard, promotion: promotion);
-				delete object instance board;
 				board = new_board;
 			
 				// print the board
@@ -50,11 +49,73 @@ within lichess_bot::components::Engine is
 				move_num = move_num + 1;
 			end while;
 			
+			select many boards from instances of Board;
+			for each board in boards loop
+				delete object instance board;
+			end for;
+			
 			return true;
 			@endnoparse
 		end function;
 
+		@dialect("oal");
+		@function_num(2);
+		function test_evaluate_position(fen: in string, depth: in integer) is
+			@noparse
+			LOG::LogInfo(message: "Evaluating position: " + param.fen);
+			
+			// create the bot
+			create object instance bot of Bot;
+			bot.config = PROP::loadProperties(file_name:"lichess_bot.properties");
+			
+			// create the board
+			board = Board::from_fen(fen: param.fen);
+			
+			// create the initial position
+			create object instance initial_position of Position;
+			initial_position.fen = board.to_fen();
+			relate board to initial_position across R6;
+			
+			// create the game
+			create object instance game of ActiveGame;
+			game.id = "test_game";
+			game.initial_fen = initial_position.fen;
+			game.start_color = board.active_color;
+			game.color = game.start_color;
+			relate initial_position to game across R3;
+			
+			// create the evaluation engine
+			create object instance engine of Engine;
+			relate engine to game across R1;
+			relate initial_position to engine across R4;
+			
+			// analyze the position
+			t0 = TIM::current_clock();
+			engine.analyze_lines(position: initial_position, depth: param.depth, line: "");
+			t1 = TIM::current_clock();
+			
+			// report results
+			select many pos related by engine->Position[R4];
+			select one best_move related by initial_position->Move[R5];
+			if not empty best_move then
+				LOG::LogInfo(message: "Best move: " + best_move.lan);
+			else
+				LOG::LogFailure(message: "Did not find best move.");
+			end if;
+			LOG::LogInfo(message: "Current position count:    " + STRING::itoa(i: cardinality  pos));
+			LOG::LogInfo(message: "New evaluated positions:   " + STRING::itoa(i: engine.positions_evaluated));
+			LOG::LogInfo(message: "Time to analyze:           " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
+			
+			// clean up
+			delete object instance bot;
+			game.dispose();
+			
+			ARCH::shutdown();
+			@endnoparse
+		end function;
+
 		package do_move_test_cases;
+		package evaluate_position_test_cases;
 	end package;
 
 end;

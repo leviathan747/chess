@@ -4,6 +4,7 @@ import sys
 
 parent_package_name = 'lichess_bot::components::Engine::test'
 package_name = 'do_move_test_cases'
+test_prefix = 'dm_'
 
 # parse all the games
 test_games = []
@@ -31,7 +32,7 @@ print()
 # output test functions
 for test_num, test_game in enumerate(test_games):
     print('\t\t@dialect("oal");')
-    print(f'\t\tfunction test{test_num + 1}() return boolean is')
+    print(f'\t\tfunction {test_prefix}test{test_num + 1}() return boolean is')
     print('\t\t\t@noparse')
     print(f'\t\t\tLOG::LogInfo(message: "test{test_num + 1}: start");')
     print('\t\t\tt0 = TIM::current_clock();')
@@ -53,13 +54,13 @@ for test_num, test_game in enumerate(test_games):
 
 # output test_all function
 print('\t\t@dialect("oal");')
-print('\t\tfunction test_all() is')
+print(f'\t\tfunction {test_prefix}test_all() is')
 print('\t\t\t@noparse')
 print('\t\t\tfailures = 0;')
 print('\t\t\tt0 = TIM::current_clock();')
 print()
 for test_num, test_game in enumerate(test_games):
-    print(f'\t\t\tif not ::test{test_num + 1}() then failures = failures + 1; end if;')
+    print(f'\t\t\tif not ::{test_prefix}test{test_num + 1}() then failures = failures + 1; end if;')
 print()
 print('\t\t\tt1 = TIM::current_clock();')
 print(f'\t\t\tLOG::LogInfo(message: "{len(test_games)} tests run in " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");')
