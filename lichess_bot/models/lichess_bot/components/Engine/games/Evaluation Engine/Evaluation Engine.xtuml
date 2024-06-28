@@ -74,9 +74,23 @@ within lichess_bot::components::Engine::games is
 						   (pass == 2 and next_move.is_attack) or
 						   (pass == 3) then
 						   
+							new_depth = param.depth  - 1;
+							
+							// assure all capture chains on the same destination square are
+							// fully explored this does not consider edge cases like en
+							// passant capture it also does not consider sequences of
+							// captures that include multiple destination squares, but for
+							// now it's "good enough"
+							if new_depth == 0 and next_move.is_capture then
+								select one prev_move related by position->Move[R2.'follows'];
+								if not empty prev_move and STRING::substr(s: prev_move.lan, begin: 2, end: 4) == STRING::substr(s: next_move.lan, begin: 2, end: 4) then
+									new_depth = 1;  // go one extra step
+								end if;
+							end if;
+						   
 							// analyze the next position
 							select one next_position related by next_move->Position[R2.'is follwed by'];
-							self.analyze_lines(position: next_position, depth: param.depth - 1, line: param.line + " " + next_move.lan);
+							self.analyze_lines(position: next_position, depth: new_depth, line: param.line + " " + next_move.lan);
 							
 							// compare to find the best next move
 							select one best_next_move related by position->Move[R5];
