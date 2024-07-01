@@ -7,5 +7,8 @@ shapes :
   shape : evaluate_position_test_cases
     render : package "lichess_bot::components::Engine::test::evaluate_position_test_cases"
     bounds : x : 220.0 y : 0.0 width : 200.0 height : 150.0
+  shape : GameManager
+    render : class "lichess_bot::components::Engine::test::Game Manager"
+    bounds : x : 0.0 y : 0.0 width : 200.0 height : 150.0
 
 connectors :

@@ -1,0 +1,32 @@
+// BP 7.1.6 content: InstanceStateMachine syschar: 3 persistence-version: 7.1.6
+
+within lichess_bot::components::Engine::test::'Game Manager' is
+
+	@state_num(1);
+	@dialect("oal");
+	state challenging;
+
+	@event_num(1);
+	event check;
+
+	state model is
+
+		|             | check       |
+		| ----------- | ----------- |
+		| challenging | challenging |
+
+	end state model;
+
+	state challenging is
+		@noparse
+		max_games = Bot::getInteger(name: "max_games", default_value: 1);
+		select many games from instances of ActiveGame where (selected.game_state.status == GameStatus::CREATED or selected.game_state.status == GameStatus::STARTED);
+		if cardinality games < max_games then
+			::send_challenge(user: "maia1");
+		end if;
+		create event instance evt of GameManager1:'check' to self;
+		self.challenge_timer = TIM::timer_start(event_inst: evt, microseconds: self.check_interval * 1000000);
+		@endnoparse
+	end state;
+
+end;

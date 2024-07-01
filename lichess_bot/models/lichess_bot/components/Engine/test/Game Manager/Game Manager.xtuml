@@ -1,0 +1,53 @@
+// BP 7.1.6 content: ModelClass syschar: 3 persistence-version: 7.1.6
+
+within lichess_bot::components::Engine::test is
+
+	@key_letters("GameManager");
+	@class_num(1);
+	class 'Game Manager' is
+
+		challenge_timer: timer;
+
+		check_interval: integer = 15;
+
+		@dialect("oal");
+		@operation_num(1);
+		class operation get_instance() return instance of 'Game Manager' is
+			@noparse
+			select any mgr from instances of GameManager;
+			if empty mgr then
+				create object instance mgr of GameManager;
+			end if;
+			return mgr;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(2);
+		operation dispose() is
+			@noparse
+			self.stop();
+			delete object instance self;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(3);
+		operation start() is
+			@noparse
+			create event instance evt of GameManager1:'check' to self;
+			self.challenge_timer = TIM::timer_start(event_inst: evt, microseconds: self.check_interval * 1000000);
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(4);
+		operation stop() is
+			@noparse
+			r = TIM::timer_cancel(timer_inst_ref: self.challenge_timer);
+			@endnoparse
+		end operation;
+
+	end class;
+
+end;

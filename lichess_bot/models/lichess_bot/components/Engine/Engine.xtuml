@@ -126,6 +126,23 @@ within lichess_bot::components is
 						(game.color == Color::BLACK and param.text == "White offers draw")) then
 						game.handle_draw_offer();
 					end if;
+					
+					// handle resign command
+					if param.username == "leviathan747" then
+						if param.text == ".resign" then
+							r = chess::chat(game_id: game.id, text: "My dad says I have to go home now...", room: Room::PLAYER);
+							r = chess::chat(game_id: game.id, text: "My dad says I have to go home now...", room: Room::SPECTATOR);
+							game.resign();
+						elif param.text == ".start" then
+							mgr = GameManager::get_instance();
+							mgr.start();
+						elif param.text == ".stop" then
+							mgr = GameManager::get_instance();
+							mgr.stop();
+						elif param.text == ".challenge" then
+							::send_challenge(user: "maia1");
+						end if;
+					end if;
 				
 				end if;
 				@endnoparse

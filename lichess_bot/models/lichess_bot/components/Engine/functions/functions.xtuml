@@ -17,6 +17,9 @@ within lichess_bot::components::Engine is
 			// connect to the Lichess API and start listening for events
 			send chess::connect(properties: bot.config);
 			
+			// TODO create a game manager for testing
+			mgr = GameManager::get_instance();
+			
 			LOG::LogInfo(message: "Initialization complete");
 			@endnoparse
 		end function;
@@ -34,19 +37,24 @@ within lichess_bot::components::Engine is
 
 		@dialect("oal");
 		@function_num(2);
-		function send_challenge() is
+		function send_challenge(user: in string) is
 			@noparse
-			user = "maia1";
-			LOG::LogInfo(message: "Challenging " + user + "...");
-			r = chess::createChallenge(
-				user: user,
-				rated: false,
-				clock_limit: 900,
-				clock_increment: 5,
-				color: Color::RANDOM,
-				variant: Variant::STANDARD,
-				fen: ""
-			);
+			max_games = Bot::getInteger(name: "max_games", default_value: 1);
+			select many games from instances of ActiveGame where (selected.game_state.status == GameStatus::CREATED or selected.game_state.status == GameStatus::STARTED);
+			if cardinality games < max_games then
+				LOG::LogInfo(message: "Challenging " + param.user + "...");
+				r = chess::createChallenge(
+					user: param.user,
+					rated: false,
+					clock_limit: 900,
+					clock_increment: 5,
+					color: Color::RANDOM,
+					variant: Variant::STANDARD,
+					fen: ""
+				);
+			else
+				LOG::LogInfo(message: "Could not challenge " + param.user + ": too many games already");
+			end if;
 			@endnoparse
 		end function;
 

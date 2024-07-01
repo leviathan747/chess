@@ -1,0 +1,33 @@
+render : "lichess_bot::components::Engine::test::Game Manager::Instance State Machine"
+
+shapes :
+  shape : challenging
+    render : state "lichess_bot::components::Engine::test::Game Manager::Instance State Machine::challenging"
+    bounds : x : 4752.0 y : 3288.0 width : 204.0 height : 144.0
+
+connectors :
+  connector : challenging____GameManager1__check
+    render : transition "lichess_bot::components::Engine::test::Game Manager::Instance State Machine::challenging::GameManager1: check"
+    polyline :
+      segment :
+        start : x : 4956.0 y : 3360.0
+        end :   x : 5006.0 y : 3360.0
+      segment :
+        start : x : 5006.0 y : 3360.0
+        end :   x : 5006.0 y : 3239.0
+      segment :
+        start : x : 5006.0 y : 3239.0
+        end :   x : 4884.0 y : 3239.0
+      segment :
+        start : x : 4884.0 y : 3239.0
+        end :   x : 4884.0 y : 3288.0
+    anchors :
+      start :
+        point : x : 4956.0 y : 3360.0
+        shape : challenging
+      end :
+        point : x : 4884.0 y : 3288.0
+        shape : challenging
+    texts :
+      text :
+        bounds : x : 4955.0 y : 3200.0 width : 0.0 height : 0.0 where : middle
