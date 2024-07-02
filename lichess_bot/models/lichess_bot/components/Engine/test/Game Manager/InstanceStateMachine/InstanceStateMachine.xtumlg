@@ -26,7 +26,7 @@ connectors :
         point : x : 4956.0 y : 3360.0
         shape : challenging
       end :
-        point : x : 4884.0 y : 3288.0
+        point : x : 5006.0 y : 3360.0
         shape : challenging
     texts :
       text :

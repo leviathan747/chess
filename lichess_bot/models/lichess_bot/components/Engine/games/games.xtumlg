@@ -12,10 +12,13 @@ shapes :
     bounds : x : 5640.0 y : 2928.0 width : 229.0 height : 145.0
   shape : Move
     render : class "lichess_bot::components::Engine::games::Move"
-    bounds : x : 5664.0 y : 3192.0 width : 277.0 height : 133.0
+    bounds : x : 5736.0 y : 3192.0 width : 216.0 height : 133.0
   shape : Board
     render : imported_class "lichess_bot::components::Engine::games::Board"
-    bounds : x : 5663.0 y : 2711.0 width : 240.0 height : 108.0
+    bounds : x : 5663.0 y : 2711.0 width : 205.0 height : 108.0
+  shape : EvaluationJob
+    render : class "lichess_bot::components::Engine::games::Evaluation Job"
+    bounds : x : 5292.0 y : 3384.0 width : 217.0 height : 144.0
 
 connectors :
   connector : R1
@@ -49,16 +52,16 @@ connectors :
         end :   x : 5976.0 y : 3120.0
       segment :
         start : x : 5976.0 y : 3120.0
-        end :   x : 5818.0 y : 3120.0
+        end :   x : 5843.0 y : 3120.0
       segment :
-        start : x : 5818.0 y : 3120.0
-        end :   x : 5820.0 y : 3073.0
+        start : x : 5843.0 y : 3120.0
+        end :   x : 5843.0 y : 3073.0
     anchors :
       start :
         point : x : 5869.0 y : 3024.0
         shape : Position
       end :
-        point : x : 5976.0 y : 3024.0
+        point : x : 5843.0 y : 3073.0
         shape : Position
     texts :
       text :
@@ -66,19 +69,19 @@ connectors :
       text :
         bounds : x : 5945.0 y : 3092.0 width : 0.0 height : 0.0 where : middle
       text :
-        bounds : x : 5826.0 y : 3092.0 width : 0.0 height : 0.0 where : end
+        bounds : x : 5849.0 y : 3092.0 width : 0.0 height : 0.0 where : end
   connector : R2____Move
     render : associative_link "lichess_bot::components::Engine::games::R2::Move"
     polyline :
       segment :
-        start : x : 5879.0 y : 3192.0
-        end :   x : 5879.0 y : 3120.0
+        start : x : 5902.0 y : 3192.0
+        end :   x : 5902.0 y : 3120.0
     anchors :
       start :
-        point : x : 5879.0 y : 3192.0
+        point : x : 5902.0 y : 3192.0
         shape : Move
       end :
-        point : x : 5879.0 y : 3120.0
+        point : x : 5902.0 y : 3120.0
         connector : R2
     texts :
   connector : R3
@@ -131,22 +134,22 @@ connectors :
     render : association "lichess_bot::components::Engine::games::R5"
     polyline :
       segment :
-        start : x : 5688.0 y : 3073.0
-        end :   x : 5688.0 y : 3192.0
+        start : x : 5748.0 y : 3073.0
+        end :   x : 5748.0 y : 3192.0
     anchors :
       start :
-        point : x : 5688.0 y : 3073.0
+        point : x : 5748.0 y : 3073.0
         shape : Position
       end :
-        point : x : 5688.0 y : 3192.0
+        point : x : 5748.0 y : 3192.0
         shape : Move
     texts :
       text :
-        bounds : x : 5698.0 y : 3083.0 width : 0.0 height : 0.0 where : start
+        bounds : x : 5755.0 y : 3077.0 width : 45.0 height : 36.0 where : start
       text :
-        bounds : x : 5648.0 y : 3126.0 width : 0.0 height : 0.0 where : middle
+        bounds : x : 5714.0 y : 3122.0 width : 0.0 height : 0.0 where : middle
       text :
-        bounds : x : 5698.0 y : 3169.0 width : 0.0 height : 0.0 where : end
+        bounds : x : 5753.0 y : 3167.0 width : 0.0 height : 0.0 where : end
   connector : R6
     render : association "lichess_bot::components::Engine::games::R6"
     polyline :
@@ -167,3 +170,121 @@ connectors :
         bounds : x : 5741.0 y : 2867.0 width : 0.0 height : 0.0 where : middle
       text :
         bounds : x : 5791.0 y : 2905.0 width : 0.0 height : 0.0 where : end
+  connector : R8
+    render : association "lichess_bot::components::Engine::games::R8"
+    polyline :
+      segment :
+        start : x : 5352.0 y : 3528.0
+        end :   x : 5352.0 y : 3599.0
+      segment :
+        start : x : 5352.0 y : 3599.0
+        end :   x : 5243.0 y : 3599.0
+      segment :
+        start : x : 5243.0 y : 3599.0
+        end :   x : 5243.0 y : 3490.0
+      segment :
+        start : x : 5243.0 y : 3490.0
+        end :   x : 5292.0 y : 3490.0
+    anchors :
+      start :
+        point : x : 5352.0 y : 3528.0
+        shape : EvaluationJob
+      end :
+        point : x : 5292.0 y : 3490.0
+        shape : EvaluationJob
+    texts :
+      text :
+        bounds : x : 5359.0 y : 3530.0 width : 0.0 height : 0.0 where : start
+      text :
+        bounds : x : 5248.0 y : 3575.0 width : 0.0 height : 0.0 where : middle
+      text :
+        bounds : x : 5177.0 y : 3493.0 width : 0.0 height : 0.0 where : end
+  connector : R9
+    render : association "lichess_bot::components::Engine::games::R9"
+    polyline :
+      segment :
+        start : x : 5509.0 y : 3395.0
+        end :   x : 5675.0 y : 3395.0
+      segment :
+        start : x : 5675.0 y : 3395.0
+        end :   x : 5675.0 y : 3073.0
+    anchors :
+      start :
+        point : x : 5509.0 y : 3395.0
+        shape : EvaluationJob
+      end :
+        point : x : 5675.0 y : 3073.0
+        shape : Position
+    texts :
+      text :
+        bounds : x : 5511.0 y : 3401.0 width : 0.0 height : 0.0 where : start
+      text :
+        bounds : x : 5641.0 y : 3364.0 width : 0.0 height : 0.0 where : middle
+      text :
+        bounds : x : 5610.0 y : 3097.0 width : 0.0 height : 0.0 where : end
+  connector : R10
+    render : association "lichess_bot::components::Engine::games::R10"
+    polyline :
+      segment :
+        start : x : 5509.0 y : 3455.0
+        end :   x : 5783.0 y : 3455.0
+      segment :
+        start : x : 5783.0 y : 3455.0
+        end :   x : 5783.0 y : 3325.0
+    anchors :
+      start :
+        point : x : 5509.0 y : 3455.0
+        shape : EvaluationJob
+      end :
+        point : x : 5783.0 y : 3325.0
+        shape : Move
+    texts :
+      text :
+        bounds : x : 5515.0 y : 3461.0 width : 0.0 height : 0.0 where : start
+      text :
+        bounds : x : 5741.0 y : 3409.0 width : 0.0 height : 0.0 where : middle
+      text :
+        bounds : x : 5792.0 y : 3327.0 width : 64.0 height : 36.0 where : end
+  connector : R11
+    render : association "lichess_bot::components::Engine::games::R11"
+    polyline :
+      segment :
+        start : x : 5509.0 y : 3502.0
+        end :   x : 5922.0 y : 3502.0
+      segment :
+        start : x : 5922.0 y : 3502.0
+        end :   x : 5922.0 y : 3325.0
+    anchors :
+      start :
+        point : x : 5509.0 y : 3502.0
+        shape : EvaluationJob
+      end :
+        point : x : 5922.0 y : 3325.0
+        shape : Move
+    texts :
+      text :
+        bounds : x : 5519.0 y : 3512.0 width : 0.0 height : 0.0 where : start
+      text :
+        bounds : x : 5884.0 y : 3469.0 width : 0.0 height : 0.0 where : middle
+      text :
+        bounds : x : 5936.0 y : 3333.0 width : 0.0 height : 0.0 where : end
+  connector : R12
+    render : association "lichess_bot::components::Engine::games::R12"
+    polyline :
+      segment :
+        start : x : 5364.0 y : 3288.0
+        end :   x : 5364.0 y : 3384.0
+    anchors :
+      start :
+        point : x : 5364.0 y : 3288.0
+        shape : EvaluationEngine
+      end :
+        point : x : 5364.0 y : 3384.0
+        shape : EvaluationJob
+    texts :
+      text :
+        bounds : x : 5374.0 y : 3298.0 width : 0.0 height : 0.0 where : start
+      text :
+        bounds : x : 5319.0 y : 3330.0 width : 0.0 height : 0.0 where : middle
+      text :
+        bounds : x : 5374.0 y : 3361.0 width : 0.0 height : 0.0 where : end

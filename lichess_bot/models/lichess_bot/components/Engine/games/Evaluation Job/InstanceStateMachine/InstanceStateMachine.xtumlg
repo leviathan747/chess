@@ -1,0 +1,141 @@
+render : "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine"
+
+shapes :
+  shape : created
+    render : state "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::created"
+    bounds : x : 4188.0 y : 3264.0 width : 156.0 height : 96.0
+  shape : collectingmoves
+    render : state "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::collecting moves"
+    bounds : x : 4512.0 y : 3240.0 width : 216.0 height : 156.0
+  shape : finalizingevaluation
+    render : state "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::finalizing evaluation"
+    bounds : x : 5292.0 y : 3240.0 width : 216.0 height : 156.0
+  shape : done
+    render : state "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::done"
+    bounds : x : 4896.0 y : 3552.0 width : 228.0 height : 144.0
+  shape : evaluatingmove
+    render : state "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::evaluating move"
+    bounds : x : 4896.0 y : 3240.0 width : 229.0 height : 157.0
+  shape : updatingevaluation
+    render : state "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::updating evaluation"
+    bounds : x : 4896.0 y : 2928.0 width : 228.0 height : 150.0
+
+connectors :
+  connector : created____EvaluationJob1__evaluate
+    render : transition "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::created::EvaluationJob1: evaluate"
+    polyline :
+      segment :
+        start : x : 4344.0 y : 3312.0
+        end :   x : 4512.0 y : 3312.0
+    anchors :
+      start :
+        point : x : 4344.0 y : 3312.0
+        shape : created
+      end :
+        point : x : 4512.0 y : 3312.0
+        shape : collectingmoves
+    texts :
+      text :
+        bounds : x : 4357.0 y : 3282.0 width : 0.0 height : 0.0 where : middle
+  connector : collectingmoves____EvaluationJob2__done
+    render : transition "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::collecting moves::EvaluationJob2: done"
+    polyline :
+      segment :
+        start : x : 4654.0 y : 3396.0
+        end :   x : 4654.0 y : 3600.0
+      segment :
+        start : x : 4654.0 y : 3600.0
+        end :   x : 4896.0 y : 3600.0
+    anchors :
+      start :
+        point : x : 4654.0 y : 3396.0
+        shape : collectingmoves
+      end :
+        point : x : 4654.0 y : 3600.0
+        shape : done
+    texts :
+      text :
+        bounds : x : 4680.0 y : 3572.0 width : 0.0 height : 0.0 where : middle
+  connector : finalizingevaluation____EvaluationJob2__done
+    render : transition "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::finalizing evaluation::EvaluationJob2: done"
+    polyline :
+      segment :
+        start : x : 5328.0 y : 3396.0
+        end :   x : 5327.0 y : 3600.0
+      segment :
+        start : x : 5327.0 y : 3600.0
+        end :   x : 5124.0 y : 3600.0
+    anchors :
+      start :
+        point : x : 5328.0 y : 3396.0
+        shape : finalizingevaluation
+      end :
+        point : x : 5327.0 y : 3600.0
+        shape : done
+    texts :
+      text :
+        bounds : x : 5195.0 y : 3569.0 width : 0.0 height : 0.0 where : middle
+  connector : collectingmoves____EvaluationJob1__evaluate
+    render : transition "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::collecting moves::EvaluationJob1: evaluate"
+    polyline :
+      segment :
+        start : x : 4728.0 y : 3312.0
+        end :   x : 4896.0 y : 3311.0
+    anchors :
+      start :
+        point : x : 4728.0 y : 3312.0
+        shape : collectingmoves
+      end :
+        point : x : 4896.0 y : 3311.0
+        shape : evaluatingmove
+    texts :
+      text :
+        bounds : x : 4744.0 y : 3281.0 width : 0.0 height : 0.0 where : middle
+  connector : evaluatingmove____EvaluationJob2__done
+    render : transition "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::evaluating move::EvaluationJob2: done"
+    polyline :
+      segment :
+        start : x : 5125.0 y : 3312.0
+        end :   x : 5292.0 y : 3312.0
+    anchors :
+      start :
+        point : x : 5125.0 y : 3312.0
+        shape : evaluatingmove
+      end :
+        point : x : 5292.0 y : 3312.0
+        shape : finalizingevaluation
+    texts :
+      text :
+        bounds : x : 5159.0 y : 3274.0 width : 123.0 height : 23.0 where : middle
+  connector : evaluatingmove____EvaluationJob1__evaluate
+    render : transition "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::evaluating move::EvaluationJob1: evaluate"
+    polyline :
+      segment :
+        start : x : 5063.0 y : 3240.0
+        end :   x : 5063.0 y : 3078.0
+    anchors :
+      start :
+        point : x : 5063.0 y : 3240.0
+        shape : evaluatingmove
+      end :
+        point : x : 5063.0 y : 3078.0
+        shape : updatingevaluation
+    texts :
+      text :
+        bounds : x : 5073.0 y : 3137.0 width : 92.0 height : 36.0 where : middle
+  connector : updatingevaluation____EvaluationJob1__evaluate
+    render : transition "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::updating evaluation::EvaluationJob1: evaluate"
+    polyline :
+      segment :
+        start : x : 4955.0 y : 3078.0
+        end :   x : 4955.0 y : 3240.0
+    anchors :
+      start :
+        point : x : 4955.0 y : 3078.0
+        shape : updatingevaluation
+      end :
+        point : x : 4955.0 y : 3240.0
+        shape : evaluatingmove
+    texts :
+      text :
+        bounds : x : 4855.0 y : 3139.0 width : 92.0 height : 36.0 where : middle

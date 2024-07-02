@@ -1,0 +1,259 @@
+// BP 7.1.6 content: InstanceStateMachine syschar: 3 persistence-version: 7.1.6
+
+within lichess_bot::components::Engine::games::'Evaluation Job' is
+
+	@state_num(1);
+	@dialect("oal");
+	state created;
+
+	@state_num(2);
+	@dialect("oal");
+	state 'collecting moves';
+
+	@state_num(3);
+	@dialect("oal");
+	state 'finalizing evaluation';
+
+	@state_num(4);
+	@dialect("oal");
+	state done;
+
+	@state_num(5);
+	@dialect("oal");
+	state 'evaluating move';
+
+	@state_num(6);
+	@dialect("oal");
+	state 'updating evaluation';
+
+	@event_num(1);
+	event evaluate;
+
+	@event_num(2);
+	event done;
+
+	state model is
+
+		|                         | evaluate                | done                    |
+		| ----------------------- | ----------------------- | ----------------------- |
+		| created                 | 'collecting moves'      | cannot_happen           |
+		| 'collecting moves'      | 'evaluating move'       | done                    |
+		| 'finalizing evaluation' | cannot_happen           | done                    |
+		| done                    | cannot_happen           | cannot_happen           |
+		| 'evaluating move'       | 'updating evaluation'   | 'finalizing evaluation' |
+		| 'updating evaluation'   | 'evaluating move'       | cannot_happen           |
+
+	end state model;
+
+	state 'collecting moves' is
+		@noparse
+		select one position related by self->Position[R9];
+		if self.depth == 0 then
+		
+			// this is the final position in the line, so we evaluate it
+			position.evaluate();
+		
+			generate EvaluationJob2:'done' to self;
+		
+		// analyze deeper and update this evaluation based on future positions
+		else
+		
+			// create and prioritize the legal moves which follow this position
+			if not position.next_moves_created then
+		
+				// get the list of legal next moves
+				legal_moves = ChessLib::legalMoves(fen: position.fen);
+				
+				i = 0;
+				max_next_moves = Bot::getInteger(name:"debug_max_next_moves", default_value: -1);
+				while i < legal_moves.length and (max_next_moves == -1 or i < max_next_moves) loop
+					move_lan = legal_moves[i];
+					
+					select any move related by position->Move[R2.'is follwed by'] where selected.lan == move_lan;
+					if empty move then
+						move = position.new_move(lan: move_lan);
+					end if;
+		
+					i = i + 1;
+				end while;
+				
+				position.next_moves_created = true;
+			
+			end if;
+		
+			// unlink the existing best move if it exists before recalculating
+			select one existing_best_move related by position->Move[R5];
+			if not empty existing_best_move then
+				unrelate existing_best_move from position across R5;
+			end if;
+			
+			// queue all next moves for evaluation
+			select many next_moves related by position->Move[R2.'is follwed by'];
+			for each next_move in next_moves loop
+				relate next_move to self across R11;
+			end for;
+			
+			generate EvaluationJob1:'evaluate' to self;
+			
+		end if;
+		@endnoparse
+	end state;
+
+	state 'finalizing evaluation' is
+		@noparse
+		// check for checkmate and stalemate
+		select one position related by self->Position[R9];
+		select one board related by position->Board[R6];
+		select one prev_move related by position->Move[R2.'follows'];
+		select many next_moves related by position->Move[R2.'is follwed by'];
+		if empty next_moves then
+			// checkmate
+			if prev_move.is_check then
+				if board.active_color == Color::WHITE then
+					position.evaluation = MIN_EVAL;
+				else
+					position.evaluation = MAX_EVAL;
+				end if;
+			// stalemate
+			else
+				position.evaluation = 0;
+			end if;
+		end if;
+		
+		generate EvaluationJob2:'done' to self;
+		@endnoparse
+	end state;
+
+	state done is
+		@noparse
+		// pop job off the stack and trigger the job below to begin evaluating
+		
+		select one engine related by self->Engine[R12];
+		unrelate self from engine across R12;
+		
+		select one position related by self->Position[R9];
+		unrelate self from position across R9;
+		
+		select one below_job related by self->EvaluationJob[R8.'is above'];
+		if not empty below_job then
+			unrelate self from below_job across R8.'is above';
+			generate EvaluationJob1:'evaluate' to below_job;
+		else
+			generate Engine2:'done evaluating' to engine;
+		end if;
+		
+		self.dispose();
+		@endnoparse
+	end state;
+
+	state 'evaluating move' is
+		@noparse
+		// process the next move
+		// process moves in 4 passes
+		//   pass 0 = checks
+		//   pass 1 = captures
+		//   pass 2 = attacks
+		//   pass 3 = all others
+		
+		select any next_move related by self->Move[R11] where selected.is_check;
+		if empty next_move then
+			select any next_move related by self->Move[R11] where selected.is_capture;
+			if empty next_move then
+				select any next_move related by self->Move[R11] where selected.is_attack;
+				if empty next_move then
+					select any next_move related by self->Move[R11];
+				end if;
+			end if;
+		end if;
+		
+		if not empty next_move then
+		
+			select one position related by self->Position[R9];
+			
+			// move this move to be currently processing
+			unrelate next_move from self across R11;
+			relate next_move to self across R10;
+		
+			new_depth = self.depth - 1;
+			
+			// assure all capture chains on the same destination square are
+			// fully explored this does not consider edge cases like en
+			// passant capture it also does not consider sequences of
+			// captures that include multiple destination squares, but for
+			// now it's "good enough"
+			if new_depth == 0 and next_move.is_capture then
+				select one prev_move related by position->Move[R2.'follows'];
+				if not empty prev_move and STRING::substr(s: prev_move.lan, begin: 2, end: 4) == STRING::substr(s: next_move.lan, begin: 2, end: 4) then
+					new_depth = 1;  // go one extra step
+				end if;
+			end if;
+		   
+			// analyze the next position
+			create object instance new_job of EvaluationJob;
+			new_job.depth = new_depth;
+			select one engine related by self->Engine[R12];
+			relate new_job to engine across R12;
+			select one next_position related by next_move->Position[R2.'is follwed by'];
+			relate next_position to new_job across R9;
+			relate self to new_job across R8.'is below';
+			generate EvaluationJob1:'evaluate' to new_job;
+		
+		else
+			
+			// no more moves to process
+			generate EvaluationJob2:'done' to self;
+		
+		end if;
+		@endnoparse
+	end state;
+
+	state 'updating evaluation' is
+		@noparse
+		// handle the most recently processed move
+		select one currently_evaluating_move related by self->Move[R10];
+		if not empty currently_evaluating_move then
+			select one position related by self->Position[R9];
+			select one board related by position->Board[R6];
+			select one next_position related by currently_evaluating_move->Position[R2.'is follwed by'];
+		
+			// compare to find the best next move
+			select one best_next_move related by position->Move[R5];
+			if empty best_next_move or ( board.active_color == Color::WHITE and next_position.evaluation > position.evaluation ) or
+					( board.active_color == Color::BLACK and next_position.evaluation < position.evaluation ) then
+				if not empty best_next_move then
+					unrelate best_next_move from position across R5;
+				end if;
+				relate currently_evaluating_move to position across R5;
+				position.evaluation = next_position.evaluation;
+				position.evaluation_depth = next_position.evaluation_depth + 1;
+			end if;
+		
+			// prune the tree using alpha-beta pruning:
+			// if the opponent is the active player and the evaluation is
+			// better for the opponent the current best move, then we can
+			// stop evaluation early
+			select one game related by self->Engine[R12]->ActiveGame[R1];
+			if board.active_color != game.color then
+				select one current_best_move related by position->Position[R2.'follows']->Move[R5];
+				select one current_best_move_position related by current_best_move->Position[R2.'is follwed by'];
+				if not empty current_best_move_position and 
+					((board.active_color == Color::WHITE and position.evaluation > current_best_move_position.evaluation) or
+					 (board.active_color == Color::BLACK and position.evaluation < current_best_move_position.evaluation)) then
+					// skip all the rest of the moves and complete this evaluation
+					select many next_moves related by self->Move[R11];
+					for each next_move in next_moves loop
+						unrelate next_move from self across R11;
+					end for;
+				end if;
+			end if;
+			
+			// unlink the current move
+			unrelate currently_evaluating_move from self across R10;
+			
+		end if;
+		
+		generate EvaluationJob1:'evaluate' to self;
+		@endnoparse
+	end state;
+
+end;

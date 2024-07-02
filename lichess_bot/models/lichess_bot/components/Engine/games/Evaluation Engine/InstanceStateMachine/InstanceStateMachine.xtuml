@@ -1,0 +1,101 @@
+// BP 7.1.6 content: InstanceStateMachine syschar: 3 persistence-version: 7.1.6
+
+within lichess_bot::components::Engine::games::'Evaluation Engine' is
+
+	@state_num(1);
+	@dialect("oal");
+	state idle;
+
+	@state_num(2);
+	@dialect("oal");
+	state evaluating;
+
+	@state_num(3);
+	@dialect("oal");
+	state 'completing evaluation';
+
+	@state_num(4);
+	@dialect("oal");
+	state canceling;
+
+	@event_num(1);
+	event 'start evaluation'(depth: in integer);
+
+	@event_num(2);
+	event 'done evaluating';
+
+	@event_num(3);
+	event 'cancel evaluation';
+
+	state model is
+
+		|                         | 'start evaluation'      | 'done evaluating'       | 'cancel evaluation'     |
+		| ----------------------- | ----------------------- | ----------------------- | ----------------------- |
+		| idle                    | evaluating              | cannot_happen           | ignore                  |
+		| evaluating              | cannot_happen           | 'completing evaluation' | canceling               |
+		| 'completing evaluation' | cannot_happen           | idle                    | ignore                  |
+		| canceling               | cannot_happen           | 'completing evaluation' | ignore                  |
+
+	end state model;
+
+	state evaluating(depth: in integer) is
+		@noparse
+		// set up the attributes to collect stats
+		self.pre_evaluation_position_count = self.positions_evaluated;
+		self.pre_evaluation_time = TIM::current_clock();
+		
+		// create first job and put it on the stack
+		create object instance new_job of EvaluationJob;
+		new_job.depth = param.depth;
+		relate new_job to self across R12;
+		select one current_position related by self->ActiveGame[R1]->Position[R3];
+		relate current_position to new_job across R9;
+		generate EvaluationJob1:'evaluate' to new_job;
+		@endnoparse
+	end state;
+
+	state 'completing evaluation' is
+		@noparse
+		// output stats on the evaluation
+		select many pos related by self->Position[R4];
+		LOG::LogInfo(message: "Current position count:    " + STRING::itoa(i: cardinality  pos));
+		LOG::LogInfo(message: "New evaluated positions:   " + STRING::itoa(i: self.positions_evaluated - self.pre_evaluation_position_count));
+		LOG::LogInfo(message: "Total evaluated positions: " + STRING::itoa(i: self.positions_evaluated));
+		LOG::LogInfo(message: "Time to analyze:           " + STRING::itoa(i: (TIM::current_clock() - self.pre_evaluation_time) / 1000) + "ms");
+		
+		// select the best move from the evaluation engine
+		select one game related by self->ActiveGame[R1];
+		select one best_move related by game->Position[R3]->Move[R5];
+		if not empty best_move then
+			
+			move = best_move.lan;
+		
+			best_line = "";
+			while not empty best_move loop
+				best_line = best_line + " " + best_move.lan;
+				select one best_move related by best_move->Position[R2.'is follwed by']->Move[R5];;
+			end while;
+			
+			LOG::LogInfo(message: "Playing best line: " + best_line);
+			
+			generate ActiveGame3:'play move'(move: move) to game;
+			
+		end if;
+		
+		generate Engine2:'done evaluating' to self;
+		@endnoparse
+	end state;
+
+	state canceling is
+		@noparse
+		// dispose all current evaluation jobs
+		LOG::LogInfo(message: "Canceling evaluation early...");
+		select many jobs related by self->EvaluationJob[R12];
+		for each job in jobs loop
+			job.dispose();
+		end for;
+		generate Engine2:'done evaluating' to self;
+		@endnoparse
+	end state;
+
+end;

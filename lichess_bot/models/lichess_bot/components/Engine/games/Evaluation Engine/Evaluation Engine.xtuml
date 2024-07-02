@@ -6,10 +6,11 @@ within lichess_bot::components::Engine::games is
 	@class_num(3);
 	class 'Evaluation Engine' is
 
-		//! TODO Eventually this will be a constant time map between FEN and instances of position that have already been evaluated
-		evaluated_positions_map: integer;
-
 		positions_evaluated: integer;
+
+		pre_evaluation_position_count: integer;
+
+		pre_evaluation_time: timestamp;
 
 		@dialect("oal");
 		@operation_num(4);
@@ -28,127 +29,13 @@ within lichess_bot::components::Engine::games is
 				gameR1.dispose();
 			end if;
 			
+			select any jobR12 related by self->EvaluationJob[R12];
+			while not empty jobR12 loop
+				jobR12.dispose();
+				select any jobR12 related by self->EvaluationJob[R12];
+			end while;
+			
 			delete object instance self;
-			@endnoparse
-		end operation;
-
-		@dialect("oal");
-		@operation_num(2);
-		operation analyze_lines(position: in instance of Position, depth: in integer, line: in string) is
-			@noparse
-			position = param.position;
-			if param.depth == 0 then
-			
-				// this is the final position in the line, so we evaluate it
-				position.evaluate();
-			
-				// TODO
-				// LOG::LogInfo(message: "Analyzed line: " + param.line + " = " + STRING::itoa(i: position.evaluation));
-			
-			// analyze deeper and update this evaluation based on future positions
-			else
-			
-				// create and prioritize the legal moves which follow this position
-				position.create_next_moves();
-			
-				select one board related by position->Board[R6];
-				
-				// unlink the existing best move
-				select one existing_best_move related by position->Move[R5];
-				if not empty existing_best_move then
-					unrelate existing_best_move from position across R5;
-				end if;
-				
-				// process moves in 4 passes
-				//   pass 0 = checks
-				//   pass 1 = captures
-				//   pass 2 = attacks
-				//   pass 3 = all others
-				select many next_moves related by position->Move[R2.'is follwed by'];
-				select many processed_moves from instances of Move where false;
-				pass = 0;
-				while not empty next_moves loop
-					for each next_move in next_moves loop
-						if (pass == 0 and next_move.is_check) or
-						   (pass == 1 and next_move.is_capture) or
-						   (pass == 2 and next_move.is_attack) or
-						   (pass == 3) then
-						   
-							new_depth = param.depth  - 1;
-							
-							// assure all capture chains on the same destination square are
-							// fully explored this does not consider edge cases like en
-							// passant capture it also does not consider sequences of
-							// captures that include multiple destination squares, but for
-							// now it's "good enough"
-							if new_depth == 0 and next_move.is_capture then
-								select one prev_move related by position->Move[R2.'follows'];
-								if not empty prev_move and STRING::substr(s: prev_move.lan, begin: 2, end: 4) == STRING::substr(s: next_move.lan, begin: 2, end: 4) then
-									new_depth = 1;  // go one extra step
-								end if;
-							end if;
-						   
-							// analyze the next position
-							select one next_position related by next_move->Position[R2.'is follwed by'];
-							self.analyze_lines(position: next_position, depth: new_depth, line: param.line + " " + next_move.lan);
-							
-							// compare to find the best next move
-							select one best_next_move related by position->Move[R5];
-							if empty best_next_move or ( board.active_color == Color::WHITE and next_position.evaluation > position.evaluation ) or
-									( board.active_color == Color::BLACK and next_position.evaluation < position.evaluation ) then
-								if not empty best_next_move then
-									unrelate best_next_move from position across R5;
-								end if;
-								relate next_move to position across R5;
-								// TODO
-								// LOG::LogInfo(message: "New best line: " + param.line + " " + next_move.lan + " : " + STRING::itoa(i: position.evaluation) + " -> " + STRING::itoa(i: next_position.evaluation));
-								position.evaluation = next_position.evaluation;
-								position.evaluation_depth = next_position.evaluation_depth + 1;
-							end if;
-						
-							// prune the tree using alpha-beta pruning:
-							// if the opponent is the active player and the evaluation is
-							// better for the opponent the current best move, then we can
-							// stop evaluation early
-							select one game related by self->ActiveGame[R1];
-							if board.active_color != game.color then
-								select one current_best_move related by position->Position[R2.'follows']->Move[R5];
-								select one current_best_move_position related by current_best_move->Position[R2.'is follwed by'];
-								if not empty current_best_move_position and 
-									((board.active_color == Color::WHITE and position.evaluation > current_best_move_position.evaluation) or
-									 (board.active_color == Color::BLACK and position.evaluation < current_best_move_position.evaluation)) then
-									// TODO
-									//LOG::LogInfo(message: next_move.lan + " is better for opponent than " + current_best_move.lan + ". skipping sub trees");
-									select many next_moves from instances of Move where false;  // skip all remaining passes
-									break;
-								end if;
-							end if;
-							
-							processed_moves = processed_moves + next_move;
-						end if;
-					end for;
-					next_moves = next_moves - processed_moves;
-					pass = pass + 1;
-				end while;
-				
-				// check for checkmate
-				// TODO this also rewards stalemate
-				select many next_moves related by position->Move[R2.'is follwed by'];
-				if empty next_moves then
-					if board.active_color == Color::WHITE then
-						position.evaluation = MIN_EVAL;
-					else
-						position.evaluation = MAX_EVAL;
-					end if;
-				end if;
-				
-				// TODO
-				// if not empty next_moves then
-				// 	select one best_next_move related by position->Move[R5];
-				// 	LOG::LogInfo(message: "Best line: " + param.line + " " + best_next_move.lan + " : " + STRING::itoa(i: position.evaluation));
-				// end if;
-				
-			end if;
 			@endnoparse
 		end operation;
 

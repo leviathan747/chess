@@ -5,6 +5,7 @@ within lichess_bot::components::Engine is
 	package games is
 		class 'Active Game';
 		class 'Evaluation Engine';
+		class 'Evaluation Job';
 		class Move;
 		class Position;
 		class Board is lichess_bot::components::Engine::'board representation'::Board;
@@ -26,6 +27,21 @@ within lichess_bot::components::Engine is
 
 		relationship R6 is Board unconditionally represents one Position,
 		                   Position unconditionally 'is represented by' one Board;
+
+		relationship R8 is 'Evaluation Job' conditionally 'is above' one 'Evaluation Job',
+		                   'Evaluation Job' conditionally 'is below' one 'Evaluation Job';
+
+		relationship R9 is 'Evaluation Job' unconditionally evaluates one Position,
+		                   Position conditionally 'evaluated by' one 'Evaluation Job';
+
+		relationship R10 is 'Evaluation Job' conditionally 'currently evaluating' one Move,
+		                    Move conditionally 'being evaluated by' one 'Evaluation Job';
+
+		relationship R11 is 'Evaluation Job' conditionally 'is waiting to evaluate' many Move,
+		                    Move conditionally 'is queued for evaluation by' one 'Evaluation Job';
+
+		relationship R12 is 'Evaluation Engine' conditionally performs many 'Evaluation Job',
+		                    'Evaluation Job' unconditionally 'performed by' one 'Evaluation Engine';
 
 	end package;
 

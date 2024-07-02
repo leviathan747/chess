@@ -72,35 +72,6 @@ within lichess_bot::components::Engine::games is
 		end operation;
 
 		@dialect("oal");
-		@operation_num(3);
-		operation create_next_moves() is
-			@noparse
-			// create and categorize future moves
-			if not self.next_moves_created then
-			
-				// get the list of legal next moves
-				legal_moves = ChessLib::legalMoves(fen: self.fen);
-				
-				i = 0;
-				max_next_moves = Bot::getInteger(name:"debug_max_next_moves", default_value: -1);
-				while i < legal_moves.length and (max_next_moves == -1 or i < max_next_moves) loop
-					move_lan = legal_moves[i];
-					
-					select any move related by self->Move[R2.'is follwed by'] where selected.lan == move_lan;
-					if empty move then
-						move = self.new_move(lan: move_lan);
-					end if;
-			
-					i = i + 1;
-				end while;
-				
-				self.next_moves_created = true;
-			
-			end if;
-			@endnoparse
-		end operation;
-
-		@dialect("oal");
 		@operation_num(4);
 		operation dispose() is
 			@noparse
