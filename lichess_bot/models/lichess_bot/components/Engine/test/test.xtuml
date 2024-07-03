@@ -91,28 +91,7 @@ within lichess_bot::components::Engine is
 			relate initial_position to engine across R4;
 			
 			// analyze the position
-			t0 = TIM::current_clock();
-			// TODO fix this test
-			//engine.analyze_lines(position: initial_position, depth: param.depth, line: "");
-			t1 = TIM::current_clock();
-			
-			// report results
-			select many pos related by engine->Position[R4];
-			select one best_move related by initial_position->Move[R5];
-			if not empty best_move then
-				LOG::LogInfo(message: "Best move: " + best_move.lan);
-			else
-				LOG::LogFailure(message: "Did not find best move.");
-			end if;
-			LOG::LogInfo(message: "Current position count:    " + STRING::itoa(i: cardinality  pos));
-			LOG::LogInfo(message: "New evaluated positions:   " + STRING::itoa(i: engine.positions_evaluated));
-			LOG::LogInfo(message: "Time to analyze:           " + STRING::itoa(i: (t1 - t0) / 1000) + "ms");
-			
-			// clean up
-			delete object instance bot;
-			game.dispose();
-			
-			ARCH::shutdown();
+			generate Engine1:'start evaluation'(depth: param.depth) to engine;
 			@endnoparse
 		end function;
 
