@@ -39,6 +39,118 @@ within lichess_bot::components::Engine::games is
 			@endnoparse
 		end operation;
 
+		@dialect("oal");
+		@operation_num(5);
+		class operation compare_evaluation(pov: in Color, eval1: in Evaluation, eval2: in Evaluation) return integer is
+			@noparse
+			result = 0;
+			
+			// if mate is already on the board
+			if param.eval1.mate_on_board then
+			
+				// if the mate is in our favor
+				if (param.pov == Color::WHITE and param.eval1.mate_in > 0) or
+					(param.pov == Color::BLACK and param.eval1.mate_in < 0) then
+					
+					// the new position maintains the favorable mate
+					if param.eval2.mate_on_board and ((param.pov == Color::WHITE and param.eval2.mate_in >= 0) or
+						(param.pov == Color::BLACK and param.eval2.mate_in <= 0)) then
+					
+						// the quickest mate wins
+						if param.pov == Color::WHITE then
+							result = param.eval2.mate_in - param.eval1.mate_in;
+						else
+							result = param.eval1.mate_in - param.eval2.mate_in;
+						end if;
+			
+					else
+						
+						// current evaluation is better
+						result = 1;
+						
+					end if;
+				
+				// the mate is in their favor
+				else
+			
+					// the new position maintains the unfavorable mate
+					if param.eval2.mate_on_board and ((param.pov == Color::WHITE and param.eval2.mate_in <= 0) or
+						(param.pov == Color::BLACK and param.eval2.mate_in >= 0)) then
+						
+						// doesn't matter because we lose :(
+						result = 0;
+						
+					// the new position gets out of the unfavorable mate
+					else
+						
+						// getting out of mate is always better
+						result = -1;
+						
+					end if;
+			
+				end if;
+			
+			// no mate currently on the board
+			else
+				
+				// the new position results in mate
+				if param.eval2.mate_on_board then
+			
+					// it is a favorable mate
+					if (param.pov == Color::WHITE and param.eval2.mate_in >= 0) or
+						(param.pov == Color::BLACK and param.eval2.mate_in <= 0) then
+						
+						result = -1;
+						
+					// it is an unfavorable mate
+					else
+						
+						result = 1;
+						
+					end if;
+					
+				// simply compare evaluations
+				else
+					
+					// new evaluation is improved
+					if (param.pov == Color::WHITE and param.eval2.evaluation > param.eval1.evaluation) or
+						(param.pov == Color::BLACK and param.eval2.evaluation < param.eval1.evaluation) then
+						
+						result = -1;
+						
+					// new evaluation is equal
+					elif param.eval2.evaluation == param.eval1.evaluation then
+						
+						result = 0;
+			
+					// new evaluation is worse
+					else
+						
+						result = 1;
+						
+					end if;
+					
+				end if;
+			
+			end if;
+			
+			return result;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(6);
+		class operation eval_to_string(eval: in Evaluation) return string is
+			@noparse
+			if param.eval.mate_on_board then
+				return "#" + STRING::itoa(i: param.eval.mate_in);
+			else
+				string_eval = STRING::itoa(i: param.eval.evaluation);
+				return STRING::substr(s: string_eval, begin: 0, end: STRING::strlen(s: string_eval) - 2) + "." + STRING::substr(s: string_eval, begin: STRING::strlen(s: string_eval) - 2, end: -1);
+			end if;
+			@endnoparse
+		end operation;
+
 	end class;
 
 end;

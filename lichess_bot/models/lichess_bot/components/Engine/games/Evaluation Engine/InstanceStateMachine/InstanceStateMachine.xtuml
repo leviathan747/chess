@@ -65,7 +65,8 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
 		
 		// select the best move from the evaluation engine
 		select one game related by self->ActiveGame[R1];
-		select one best_move related by game->Position[R3]->Move[R5];
+		select one current_position related by game->Position[R3];
+		select one best_move related by current_position->Move[R5];
 		if not empty best_move then
 			
 			move = best_move.lan;
@@ -76,7 +77,7 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
 				select one best_move related by best_move->Position[R2.'is follwed by']->Move[R5];;
 			end while;
 			
-			LOG::LogInfo(message: "Playing best line: " + best_line);
+			LOG::LogInfo(message: "Playing best line: " + best_line + " " + Engine::eval_to_string(eval: current_position.evaluation));
 			
 			generate ActiveGame3:'play move'(move: move) to game;
 			

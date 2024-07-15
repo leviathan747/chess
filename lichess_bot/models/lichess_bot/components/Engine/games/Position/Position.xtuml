@@ -8,7 +8,7 @@ within lichess_bot::components::Engine::games is
 
 		fen: string;
 
-		evaluation: real;
+		evaluation: Evaluation;
 
 		//! This attribute represents the depth to which the position has been analyzed.
 		//! A non-negative value means the position has been evaluated.
@@ -61,7 +61,7 @@ within lichess_bot::components::Engine::games is
 					evaluation = evaluation * -1;
 				end if;
 			
-				self.evaluation = evaluation;
+				self.evaluation.evaluation = evaluation;
 				self.evaluation_depth = 0;
 				select one engine related by self->Engine[R4];
 			

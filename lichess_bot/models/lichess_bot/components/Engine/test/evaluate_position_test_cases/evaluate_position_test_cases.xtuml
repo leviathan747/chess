@@ -33,6 +33,16 @@ within lichess_bot::components::Engine::test is
 			@endnoparse
 		end function;
 
+		@dialect("oal");
+		@function_num(2);
+		function ep_test4() is
+			@noparse
+			fen = "8/8/3R4/4k3/q1P2p2/8/6K1/3R4 w - - 0 1";
+			depth = 4;
+			::test_evaluate_position(fen: fen, depth: depth);
+			@endnoparse
+		end function;
+
 	end package;
 
 end;

@@ -7,11 +7,11 @@ shapes :
   shape : lichess
     render : package "lichess_bot::types::lichess"
     bounds : x : 4400.0 y : 0.0 width : 200.0 height : 150.0
-  shape : Limits
-    render : constant_specification "lichess_bot::types::Limits"
-    bounds : x : 4620.0 y : 0.0 width : 200.0 height : 150.0
   shape : FEN
     render : constant_specification "lichess_bot::types::FEN"
     bounds : x : 0.0 y : 0.0 width : 200.0 height : 150.0
+  shape : Evaluation
+    render : structured_data_type "lichess_bot::types::Evaluation"
+    bounds : x : 4840.0 y : 0.0 width : 200.0 height : 150.0
 
 connectors :

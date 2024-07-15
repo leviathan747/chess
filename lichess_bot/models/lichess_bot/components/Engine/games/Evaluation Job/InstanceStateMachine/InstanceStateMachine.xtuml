@@ -106,17 +106,14 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
 		select one board related by position->Board[R6];
 		select one prev_move related by position->Move[R2.'follows'];
 		select many next_moves related by position->Move[R2.'is follwed by'];
-		if empty next_moves then
+		if position.next_moves_created and empty next_moves then
 			// checkmate
 			if prev_move.is_check then
-				if board.active_color == Color::WHITE then
-					position.evaluation = MIN_EVAL;
-				else
-					position.evaluation = MAX_EVAL;
-				end if;
+				position.evaluation.mate_on_board = true;
+				position.evaluation.mate_in = 0;
 			// stalemate
 			else
-				position.evaluation = 0;
+				position.evaluation.evaluation = 0;
 			end if;
 		end if;
 		
@@ -212,43 +209,73 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
 		// handle the most recently processed move
 		select one currently_evaluating_move related by self->Move[R10];
 		if not empty currently_evaluating_move then
+			select one game related by self->Engine[R12]->ActiveGame[R1];
 			select one position related by self->Position[R9];
 			select one board related by position->Board[R6];
 			select one next_position related by currently_evaluating_move->Position[R2.'is follwed by'];
+			
+			// TODO make ciera properly clone structure types
+			create object instance delete_me of Position;
+			next_evaluation = delete_me.evaluation;
+			delete object instance delete_me;
+		
+			if next_position.evaluation.mate_on_board then
+				next_evaluation.mate_on_board = true;
+				if next_position.evaluation.mate_in > 0 or next_position.evaluation.mate_in == 0 and board.active_color == Color::WHITE then
+					next_evaluation.mate_in = next_position.evaluation.mate_in + 1;
+				else
+					next_evaluation.mate_in = next_position.evaluation.mate_in - 1;
+				end if;
+			else
+				next_evaluation.evaluation = next_position.evaluation.evaluation;
+			end if;
 		
 			// compare to find the best next move
 			select one best_next_move related by position->Move[R5];
-			if empty best_next_move or ( board.active_color == Color::WHITE and next_position.evaluation > position.evaluation ) or
-					( board.active_color == Color::BLACK and next_position.evaluation < position.evaluation ) then
+			if empty best_next_move or Engine::compare_evaluation(pov: board.active_color, eval1: position.evaluation, eval2: next_evaluation) < 0 then
 				if not empty best_next_move then
 					unrelate best_next_move from position across R5;
 				end if;
 				relate currently_evaluating_move to position across R5;
-				position.evaluation = next_position.evaluation;
+				position.evaluation = next_evaluation;
 				position.evaluation_depth = next_position.evaluation_depth + 1;
 			end if;
+			
+			skip_remaining_moves = false;
 		
-			// prune the tree using alpha-beta pruning:
-			// if the opponent is the active player and the evaluation is
-			// better for the opponent the current best move, then we can
-			// stop evaluation early
-			select one game related by self->Engine[R12]->ActiveGame[R1];
+			// If the opponent is the active player and the evaluation at this position
+			// is better for the opponent than the position resulting from the previous
+			// best move for the bot, then we can conclude that any positions resulting
+			// from this branch will be worse for the bot, and we can stop evaluating
+			// early.
 			if board.active_color != game.color then
-				select one current_best_move related by position->Position[R2.'follows']->Move[R5];
-				select one current_best_move_position related by current_best_move->Position[R2.'is follwed by'];
-				if not empty current_best_move_position and 
-					((board.active_color == Color::WHITE and position.evaluation > current_best_move_position.evaluation) or
-					 (board.active_color == Color::BLACK and position.evaluation < current_best_move_position.evaluation)) then
-					// skip all the rest of the moves and complete this evaluation
-					select many next_moves related by self->Move[R11];
-					for each next_move in next_moves loop
-						unrelate next_move from self across R11;
-					end for;
+				select one prev_best_move_position related by position->Position[R2.'follows']->Move[R5]->Position[R2.'is follwed by'];
+				if not empty prev_best_move_position and Engine::compare_evaluation(pov: board.active_color, eval1: position.evaluation, eval2: prev_best_move_position.evaluation) > 0 then
+					skip_remaining_moves = true;
+				end if;
+			end if;
+			
+			// If the evaluation of this position is a favoarable forced checkmate,
+			// don't bother evaluating any more moves because checkmate will always be
+			// best. Technically if we keep evaluating we might find a quicker
+			// checkmate, but it's not worth the time.
+			if board.active_color == game.color then
+				if position.evaluation.mate_on_board and ((board.active_color == Color::WHITE and position.evaluation.mate_in > 0) or
+					(board.active_color == Color::BLACK and position.evaluation.mate_in < 0)) then
+					skip_remaining_moves = true;
 				end if;
 			end if;
 			
 			// unlink the current move
 			unrelate currently_evaluating_move from self across R10;
+			
+			// remove all the remaining moves from the evaluation queue
+			if skip_remaining_moves then
+				select many next_moves related by self->Move[R11];
+				for each next_move in next_moves loop
+					unrelate next_move from self across R11;
+				end for;
+			end if;
 			
 		end if;
 		

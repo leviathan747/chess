@@ -501,7 +501,7 @@ within lichess_bot::components::Engine::'board representation' is
 			
 			fen = param.fen;
 			if fen == "startpos" then
-				fen = startpos;
+				fen = STARTPOS;
 			end if;
 			
 			// add a space to the end of the FEN string for token parsing
