@@ -10,5 +10,8 @@ shapes :
   shape : Bits
     render : ee "lichess_bot::EEs::Bits"
     bounds : x : 440.0 y : 0.0 width : 200.0 height : 150.0
+  shape : LongTime
+    render : ee "lichess_bot::EEs::LongTime"
+    bounds : x : 660.0 y : 0.0 width : 200.0 height : 150.0
 
 connectors :

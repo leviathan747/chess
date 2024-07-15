@@ -6,7 +6,7 @@ shapes :
     bounds : x : 4129.0 y : 3180.0 width : 167.0 height : 96.0
   shape : gameover
     render : state "lichess_bot::components::Engine::games::Active Game::Instance State Machine::game over"
-    bounds : x : 5088.0 y : 3060.0 width : 204.0 height : 144.0
+    bounds : x : 5088.0 y : 3060.0 width : 288.0 height : 144.0
   shape : ourturn
     render : state "lichess_bot::components::Engine::games::Active Game::Instance State Machine::our turn"
     bounds : x : 4428.0 y : 3024.0 width : 312.0 height : 228.0
@@ -19,6 +19,9 @@ shapes :
   shape : claimingvictory
     render : state "lichess_bot::components::Engine::games::Active Game::Instance State Machine::claiming victory"
     bounds : x : 4788.0 y : 3576.0 width : 194.0 height : 120.0
+  shape : resigning
+    render : state "lichess_bot::components::Engine::games::Active Game::Instance State Machine::resigning"
+    bounds : x : 4416.0 y : 3756.0 width : 182.0 height : 111.0
 
 connectors :
   connector : ourturn____ActiveGame3__playmove
@@ -262,3 +265,38 @@ connectors :
     texts :
       text :
         bounds : x : 5115.0 y : 3604.0 width : 0.0 height : 0.0 where : middle
+  connector : resigning____ActiveGame2__gameover
+    render : transition "lichess_bot::components::Engine::games::Active Game::Instance State Machine::resigning::ActiveGame2: game over"
+    polyline :
+      segment :
+        start : x : 4598.0 y : 3803.0
+        end :   x : 5332.0 y : 3803.0
+      segment :
+        start : x : 5332.0 y : 3803.0
+        end :   x : 5332.0 y : 3204.0
+    anchors :
+      start :
+        point : x : 4598.0 y : 3803.0
+        shape : resigning
+      end :
+        point : x : 5332.0 y : 3803.0
+        shape : gameover
+    texts :
+      text :
+        bounds : x : 5134.0 y : 3769.0 width : 0.0 height : 0.0 where : middle
+  connector : theirturn____ActiveGame6__timeout
+    render : transition "lichess_bot::components::Engine::games::Active Game::Instance State Machine::their turn::ActiveGame6: timeout"
+    polyline :
+      segment :
+        start : x : 4500.0 y : 3541.0
+        end :   x : 4500.0 y : 3756.0
+    anchors :
+      start :
+        point : x : 4500.0 y : 3541.0
+        shape : theirturn
+      end :
+        point : x : 4500.0 y : 3756.0
+        shape : resigning
+    texts :
+      text :
+        bounds : x : 4376.0 y : 3642.0 width : 0.0 height : 0.0 where : middle

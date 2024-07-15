@@ -54,6 +54,19 @@ within lichess_bot is
 
 		end external;
 
+		//! The Time external entity provides date, timestamp, and timer related operations.
+		@key_letters("TIM2");
+		@realized;
+		external LongTime is
+			@dialect("oal");
+			bridge timer_start(event_inst: in 'inst<Event>', seconds: in integer) return timer is
+				@noparse
+				return TIM::timer_start(event_inst: param.event_inst, microseconds: param.seconds * 1000000);
+				@endnoparse
+			end bridge;
+
+		end external;
+
 		@key_letters("PROP");
 		@realized;
 		external Properties is

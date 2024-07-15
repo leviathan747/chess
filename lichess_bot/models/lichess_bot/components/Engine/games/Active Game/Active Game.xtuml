@@ -14,11 +14,14 @@ within lichess_bot::components::Engine::games is
 
 		claim_victory_timer: timer;
 
+		resign_timer: timer;
+
 		initial_fen: string;
 
 		start_color: Color;
 
 		move_timer: timer;
+
 
 		preferred identifier is (id);
 
