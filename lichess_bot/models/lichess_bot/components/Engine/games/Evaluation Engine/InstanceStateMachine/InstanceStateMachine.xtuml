@@ -71,13 +71,7 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
 			
 			move = best_move.lan;
 		
-			best_line = "";
-			while not empty best_move loop
-				best_line = best_line + " " + best_move.lan;
-				select one best_move related by best_move->Position[R2.'is follwed by']->Move[R5];;
-			end while;
-			
-			LOG::LogInfo(message: "Playing best line: " + best_line + " " + Engine::eval_to_string(eval: current_position.evaluation));
+			LOG::LogInfo(message: "Playing best line: " + self.get_best_line());
 			
 			generate ActiveGame3:'play move'(move: move) to game;
 			

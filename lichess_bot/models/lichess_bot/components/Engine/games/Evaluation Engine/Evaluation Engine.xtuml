@@ -151,6 +151,24 @@ within lichess_bot::components::Engine::games is
 			@endnoparse
 		end operation;
 
+		@dialect("oal");
+		@operation_num(7);
+		operation get_best_line() return string is
+			@noparse
+			sep = "";
+			best_line = "";
+			select one current_position related by self->ActiveGame[R1]->Position[R3];
+			select one best_move related by current_position->Move[R5];
+			while not empty best_move loop
+				best_line = best_line + sep + best_move.lan;
+				sep = " ";
+				select one best_move related by best_move->Position[R2.'is follwed by']->Move[R5];;
+			end while;
+			best_line = best_line + " - " + Engine::eval_to_string(eval: current_position.evaluation);
+			return best_line;
+			@endnoparse
+		end operation;
+
 	end class;
 
 end;

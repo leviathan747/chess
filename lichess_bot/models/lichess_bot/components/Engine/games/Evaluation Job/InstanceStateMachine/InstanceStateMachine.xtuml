@@ -219,6 +219,8 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
 			else
 				next_evaluation.evaluation = next_position.evaluation.evaluation;
 			end if;
+			
+			select one current_position related by self->Engine[R12]->ActiveGame[R1]->Position[R3];
 		
 			// compare to find the best next move
 			select one best_next_move related by position->Move[R5];
@@ -229,6 +231,12 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
 				relate currently_evaluating_move to position across R5;
 				position.evaluation = next_evaluation;
 				position.evaluation_depth = next_position.evaluation_depth + 1;
+				
+				// if this position is the game current position, print the updated best line
+				if position == current_position then
+					select one engine related by self->Engine[R12];
+					LOG::LogInfo(message: "New best line: " + engine.get_best_line());
+				end if;
 			end if;
 			
 			// If the opponent is the active player and the evaluation at this position
