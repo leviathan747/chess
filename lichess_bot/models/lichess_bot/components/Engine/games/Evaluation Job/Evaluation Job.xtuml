@@ -32,10 +32,17 @@ within lichess_bot::components::Engine::games is
 				unrelate self from moveR10 across R10;
 			end if;
 			
-			select any moveR11 related by self->Move[R11];
-			while not empty moveR11 loop
-				unrelate self from moveR11 across R11;
-				select any moveR11 related by self->Move[R11];
+			select one evalorderR14 related by self->EvaluationOrder[R14];
+			if not empty evalorderR14 then
+				unrelate self from evalorderR14 across R14;
+			end if;
+			
+			select any evalorderR11 related by self->EvaluationOrder[R11];
+			while not empty evalorderR11 loop
+				select one moveR11 related by evalorderR11->Move[R11];
+				unrelate self from moveR11 across R11 using evalorderR11;
+				delete object instance evalorderR11;
+				select any evalorderR11 related by self->EvaluationOrder[R11];
 			end while;
 			
 			select one engineR12 related by self->Engine[R12];
@@ -44,6 +51,98 @@ within lichess_bot::components::Engine::games is
 			end if;
 			
 			delete object instance self;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(2);
+		operation queue_move(move: in instance of Move) is
+			@noparse
+			// add to the list of moves to evaluate
+			// - already evaluated moves go first in order of best to worst evaluation
+			// - unevaluated moves are processed in the following order:
+			//   * checks
+			//   * captures
+			//   * attacks
+			//   * all others
+			
+			move = param.move;
+			
+			create object instance eval_order of EvaluationOrder;
+			relate move to self across R11 using eval_order;
+			
+			select one first_evaluation related by self->EvaluationOrder[R14];
+			if empty first_evaluation then
+			
+				// this is the first move to be added
+				relate eval_order to self across R14;
+				
+			else
+				
+				select one board related by self->Position[R9]->Board[R6];
+			
+				current_order = first_evaluation;
+				select any prev_order from instances of EvaluationOrder where false;
+				
+				// walk through the list to insert the new move
+				while not empty current_order loop
+					
+					// check to see if the new move should go before the current move in the order
+					select one current_move related by current_order->Move[R11];
+					select one current_position related by current_move->Position[R2.'is follwed by'];
+					select one new_position related by move->Position[R2.'is follwed by'];
+					
+					if new_position.evaluated and (not current_position.evaluated or 
+						Engine::compare_evaluation(pov: board.active_color, eval1: new_position.evaluation, eval2: current_position.evaluation) > 0) then
+						break;  // new evaluation is better
+					elif not current_position.evaluated then
+						if move.is_check and not current_move.is_check then
+							break;  // new move is a check
+						elif move.is_capture and not (current_move.is_check or current_move.is_capture) then
+							break;  // new move is a capture
+						elif move.is_attack and not (current_move.is_check or current_move.is_capture or current_move.is_attack) then
+							break;  // new move is an attack
+						end if;
+					end if;
+					
+					prev_order = current_order;
+					select one current_order related by current_order->EvaluationOrder[R13.'precedes'];
+				end while;
+				
+				// insert the new move between the previous and next move
+				if empty prev_order then
+					// this is the beginning of the list
+					unrelate current_order from self across R14;
+					relate eval_order to self across R14;
+					relate eval_order to current_order across R13.'precedes';
+				elif empty current_order then
+					// this is the end of the list
+					relate prev_order to eval_order across R13.'precedes';
+				else
+					// this is the middle of the list
+					unrelate prev_order from current_order across R13.'precedes';
+					relate prev_order to eval_order across R13.'precedes';
+					relate eval_order to current_order across R13.'precedes';
+				end if;
+				
+			end if;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(4);
+		operation get_next_move() return instance of Move is
+			@noparse
+			// try to select the next move from the current move
+			select one currently_evaluating_move related by self->Move[R10];
+			select one next_move related by currently_evaluating_move->EvaluationOrder[R11]->EvaluationOrder[R13.'precedes']->Move[R11];
+			
+			// if there is no current move, get the first move to evaluate
+			if empty currently_evaluating_move then
+				select one next_move related by self->EvaluationOrder[R14]->Move[R11];
+			end if;
+			
+			return next_move;
 			@endnoparse
 		end operation;
 

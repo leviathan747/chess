@@ -6,6 +6,7 @@ within lichess_bot::components::Engine is
 		class 'Active Game';
 		class 'Evaluation Engine';
 		class 'Evaluation Job';
+		class 'Evaluation Order';
 		class Move;
 		class Position;
 		class Board is lichess_bot::components::Engine::'board representation'::Board;
@@ -38,10 +39,17 @@ within lichess_bot::components::Engine is
 		                    Move conditionally 'being evaluated by' one 'Evaluation Job';
 
 		relationship R11 is 'Evaluation Job' conditionally 'is waiting to evaluate' many Move,
-		                    Move conditionally 'is queued for evaluation by' one 'Evaluation Job';
+		                    Move conditionally 'is queued for evaluation by' one 'Evaluation Job'
+		                    using one 'Evaluation Order';
 
 		relationship R12 is 'Evaluation Engine' conditionally performs many 'Evaluation Job',
 		                    'Evaluation Job' unconditionally 'performed by' one 'Evaluation Engine';
+
+		relationship R13 is 'Evaluation Order' conditionally follows one 'Evaluation Order',
+		                    'Evaluation Order' conditionally precedes one 'Evaluation Order';
+
+		relationship R14 is 'Evaluation Job' conditionally 'has first' one 'Evaluation Order',
+		                    'Evaluation Order' conditionally 'first for' one 'Evaluation Job';
 
 	end package;
 

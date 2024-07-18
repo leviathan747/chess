@@ -19,6 +19,9 @@ shapes :
   shape : EvaluationJob
     render : class "lichess_bot::components::Engine::games::Evaluation Job"
     bounds : x : 5292.0 y : 3384.0 width : 217.0 height : 144.0
+  shape : EvaluationOrder
+    render : class "lichess_bot::components::Engine::games::Evaluation Order"
+    bounds : x : 5926.0 y : 3550.0 width : 120.0 height : 96.0
 
 connectors :
   connector : R1
@@ -288,3 +291,66 @@ connectors :
         bounds : x : 5319.0 y : 3330.0 width : 0.0 height : 0.0 where : middle
       text :
         bounds : x : 5374.0 y : 3361.0 width : 0.0 height : 0.0 where : end
+  connector : R11____EvaluationOrder
+    render : associative_link "lichess_bot::components::Engine::games::R11::Evaluation Order"
+    polyline :
+      segment :
+        start : x : 5942.0 y : 3550.0
+        end :   x : 5914.0 y : 3502.0
+    anchors :
+      start :
+        point : x : 5942.0 y : 3550.0
+        shape : EvaluationOrder
+      end :
+        point : x : 5914.0 y : 3502.0
+        connector : R11
+    texts :
+  connector : R13
+    render : association "lichess_bot::components::Engine::games::R13"
+    polyline :
+      segment :
+        start : x : 5974.0 y : 3645.0
+        end :   x : 5974.0 y : 3695.0
+      segment :
+        start : x : 5974.0 y : 3695.0
+        end :   x : 6094.0 y : 3695.0
+      segment :
+        start : x : 6094.0 y : 3695.0
+        end :   x : 6094.0 y : 3600.0
+      segment :
+        start : x : 6094.0 y : 3600.0
+        end :   x : 6045.0 y : 3600.0
+    anchors :
+      start :
+        point : x : 5974.0 y : 3645.0
+        shape : EvaluationOrder
+      end :
+        point : x : 5974.0 y : 3695.0
+        shape : EvaluationOrder
+    texts :
+      text :
+        bounds : x : 5984.0 y : 3655.0 width : 0.0 height : 0.0 where : start
+      text :
+        bounds : x : 6024.0 y : 3657.0 width : 0.0 height : 0.0 where : middle
+      text :
+        bounds : x : 6055.0 y : 3610.0 width : 0.0 height : 0.0 where : end
+  connector : R14
+    render : association "lichess_bot::components::Engine::games::R14"
+    polyline :
+      segment :
+        start : x : 5509.0 y : 3521.0
+        end :   x : 5926.0 y : 3591.0
+    anchors :
+      start :
+        point : x : 5509.0 y : 3521.0
+        shape : EvaluationJob
+      end :
+        point : x : 5926.0 y : 3591.0
+        shape : EvaluationOrder
+    texts :
+      text :
+        bounds : x : 5519.0 y : 3531.0 width : 0.0 height : 0.0 where : start
+      text :
+        bounds : x : 5707.0 y : 3518.0 width : 0.0 height : 0.0 where : middle
+      text :
+        bounds : x : 5873.0 y : 3611.0 width : 0.0 height : 0.0 where : end

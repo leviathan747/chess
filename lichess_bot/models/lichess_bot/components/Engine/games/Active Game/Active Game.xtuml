@@ -22,7 +22,6 @@ within lichess_bot::components::Engine::games is
 
 		move_timer: timer;
 
-
 		preferred identifier is (id);
 
 		@dialect("oal");
