@@ -87,10 +87,6 @@ within lichess_bot::components::Engine::games::'Active Game' is
 			self.handle_draw_offer();
 		end if;
 		
-		// start the engine evaluating
-		select one engine related by self->Engine[R1];
-		generate Engine1:'start evaluation' to engine;
-		
 		// play a move after a certain amount of time, no matter what the status of the engine is
 		create event instance e of ActiveGame3:'play move'(move: "") to self;
 		max_think_time = Bot::getInteger(name: "max_think_time_ms", default_value: 1000) * 1000;
@@ -111,10 +107,6 @@ within lichess_bot::components::Engine::games::'Active Game' is
 		move = param.move;
 		
 		r = TIM::timer_cancel(timer_inst_ref: self.move_timer);
-		
-		// cancel the evaluation engine if it is still running
-		select one engine related by self->Engine[R1];
-		engine.cancel();
 		
 		// if a move is not given try to get the best move from the engine
 		if move == "" then

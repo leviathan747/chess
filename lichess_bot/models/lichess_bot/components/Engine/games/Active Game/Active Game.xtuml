@@ -69,6 +69,10 @@ within lichess_bot::components::Engine::games is
 			i = self.game_state.moves.length;
 			self.game_state = param.game_state;
 			
+			// stop the evaluation engine
+			select one engine related by self->Engine[R1];
+			engine.stop();
+			
 			// update the position tree based on the moves played
 			select one position related by self->Position[R3];
 			while i < self.game_state.moves.length loop
@@ -95,17 +99,15 @@ within lichess_bot::components::Engine::games is
 				i = i + 1;
 			end while;
 			
-			// TODO put this in a debug config
+			// restart the evaluation engine
+			generate Engine1:'start evaluation' to engine;
+			
 			// print the current board
 			select one current_board related by self->Position[R3]->Board[R6];
-			if empty current_board then
-				// TODO shouldn't need to do this here
-				select one current_position related by self->Position[R3];
-				current_board = Board::from_fen(fen: current_position.fen);
-				relate current_board to current_position across R6;
+			if not empty current_board then
+				current_board.print();
+				LOG::LogInfo(message: current_board.to_fen());
 			end if;
-			current_board.print();
-			LOG::LogInfo(message: current_board.to_fen());
 			
 			// check if the game is over
 			if not (self.game_state.status == GameStatus::CREATED or self.game_state.status == GameStatus::STARTED) then

@@ -156,7 +156,6 @@ within lichess_bot::components is
 				@noparse
 				select any bot from instances of Bot;
 				bot.user = chess::account();
-				//::send_challenge( user: "levifish" );
 				@endnoparse
 			end message;
 

@@ -177,7 +177,7 @@ within lichess_bot::components::Engine::games is
 
 		@dialect("oal");
 		@operation_num(8);
-		operation cancel() is
+		operation stop() is
 			@noparse
 			LOG::LogInfo(message: "Canceling evaluation early...");
 			self.active = false;
