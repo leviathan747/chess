@@ -51,6 +51,9 @@ within lichess_bot::components::Engine is
 		relationship R14 is 'Evaluation Job' conditionally 'has first' one 'Evaluation Order',
 		                    'Evaluation Order' conditionally 'first for' one 'Evaluation Job';
 
+		relationship R15 is 'Evaluation Job' conditionally 'has current best' one Move,
+		                    Move conditionally 'is currently best for' one 'Evaluation Job';
+
 	end package;
 
 end;

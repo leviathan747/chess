@@ -81,12 +81,6 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
 			
 			end if;
 		
-			// unlink the existing best move if it exists before recalculating
-			select one existing_best_move related by position->Move[R5];
-			if not empty existing_best_move then
-				unrelate existing_best_move from position across R5;
-			end if;
-			
 			// queue all next moves for evaluation
 			select many next_moves related by position->Move[R2.'is follwed by'];
 			for each next_move in next_moves loop
@@ -109,11 +103,11 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
 		if position.next_moves_created and empty next_moves then
 			// checkmate
 			if prev_move.is_check then
-				position.evaluation.mate_on_board = true;
-				position.evaluation.mate_in = 0;
+				self.current_evaluation.mate_on_board = true;
+				self.current_evaluation.mate_in = 0;
 			// stalemate
 			else
-				position.evaluation.evaluation = 0;
+				self.current_evaluation.evaluation = 0;
 			end if;
 		end if;
 		
@@ -123,8 +117,34 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
 
 	state done is
 		@noparse
-		// pop job off the stack and trigger the job below to begin evaluating
+		// update the position evaluation
+		select one position related by self->Position[R9];
+		position.evaluation = self.current_evaluation;
+		position.evaluation_depth = self.depth;
 		
+		// update the best move in the position
+		select one best_move related by self->Move[R15];
+		select one existing_best_move related by position->Move[R5];
+		if not empty best_move and (empty existing_best_move or best_move != existing_best_move) then
+			if not empty existing_best_move then
+				unrelate existing_best_move from position across R5;
+			end if;
+			relate best_move to position across R5;
+		
+			// if the move that is being replaced is part of the current best line, then print the new best line
+			select one current_position related by self->Engine[R12]->ActiveGame[R1]->Position[R3];
+			prev_position = position;
+			while not empty prev_position loop
+				if prev_position == current_position then
+					select one engine related by self->Engine[R12];
+					LOG::LogInfo(message: "New best line: " + engine.get_best_line());
+					break;
+				end if;
+				select one prev_position related by prev_position->Move[R2.'follows']->Position[R5];
+			end while;
+		end if;
+		
+		// pop job off the stack and trigger the job below to begin evaluating
 		select one engine related by self->Engine[R12];
 		unrelate self from engine across R12;
 		
@@ -134,7 +154,9 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
 		select one below_job related by self->EvaluationJob[R8.'is above'];
 		if not empty below_job then
 			unrelate self from below_job across R8.'is above';
-			generate EvaluationJob1:'evaluate' to below_job;
+			// use a timer here to allow other delayed events to be scheduled first
+			create event instance e of EvaluationJob1:'evaluate' to below_job;
+			t = TIM::timer_start(event_inst: e, microseconds: 0);
 		else
 			generate Engine2:'done evaluating' to engine;
 		end if;
@@ -180,8 +202,11 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
 			relate new_job to engine across R12;
 			select one next_position related by next_move->Position[R2.'is follwed by'];
 			relate next_position to new_job across R9;
+			new_job.current_evaluation = next_position.evaluation;
 			relate self to new_job across R8.'is below';
-			generate EvaluationJob1:'evaluate' to new_job;
+			// use a timer here to allow other delayed events to be scheduled first
+			create event instance e of EvaluationJob1:'evaluate' to new_job;
+			t = TIM::timer_start(event_inst: e, microseconds: 0);
 		
 		else
 			
@@ -220,23 +245,16 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
 				next_evaluation.evaluation = next_position.evaluation.evaluation;
 			end if;
 			
-			select one current_position related by self->Engine[R12]->ActiveGame[R1]->Position[R3];
 		
 			// compare to find the best next move
-			select one best_next_move related by position->Move[R5];
-			if empty best_next_move or Engine::compare_evaluation(pov: board.active_color, eval1: position.evaluation, eval2: next_evaluation) < 0 then
-				if not empty best_next_move then
-					unrelate best_next_move from position across R5;
+			select one current_best_move related by self->Move[R15];
+			if empty current_best_move or Engine::compare_evaluation(pov: board.active_color, eval1: self.current_evaluation, eval2: next_evaluation) < 0 then
+				if not empty current_best_move then
+					unrelate current_best_move from self across R15;
 				end if;
-				relate currently_evaluating_move to position across R5;
-				position.evaluation = next_evaluation;
-				position.evaluation_depth = next_position.evaluation_depth + 1;
+				relate currently_evaluating_move to self across R15;
+				self.current_evaluation = next_evaluation;
 				
-				// if this position is the game current position, print the updated best line
-				if position == current_position then
-					select one engine related by self->Engine[R12];
-					LOG::LogInfo(message: "New best line: " + engine.get_best_line());
-				end if;
 			end if;
 			
 			// If the opponent is the active player and the evaluation at this position
@@ -246,18 +264,7 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
 			// early.
 			if board.active_color != game.color then
 				select one prev_best_move_position related by position->Position[R2.'follows']->Move[R5]->Position[R2.'is follwed by'];
-				if not empty prev_best_move_position and Engine::compare_evaluation(pov: board.active_color, eval1: position.evaluation, eval2: prev_best_move_position.evaluation) > 0 then
-					skip_remaining_moves = true;
-				end if;
-			end if;
-			
-			// If the evaluation of this position is a favoarable forced checkmate,
-			// don't bother evaluating any more moves because checkmate will always be
-			// best. Technically if we keep evaluating we might find a quicker
-			// checkmate, but it's not worth the time.
-			if board.active_color == game.color then
-				if position.evaluation.mate_on_board and ((board.active_color == Color::WHITE and position.evaluation.mate_in > 0) or
-					(board.active_color == Color::BLACK and position.evaluation.mate_in < 0)) then
+				if not empty prev_best_move_position and Engine::compare_evaluation(pov: board.active_color, eval1: self.current_evaluation, eval2: prev_best_move_position.evaluation) > 0 then
 					skip_remaining_moves = true;
 				end if;
 			end if;

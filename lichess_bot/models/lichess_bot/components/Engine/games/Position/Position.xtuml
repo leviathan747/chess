@@ -57,6 +57,11 @@ within lichess_bot::components::Engine::games is
 				evaluation = evaluation - 500 * Bitboards::bitboard_population(bitboard: board.their_rooks);
 				evaluation = evaluation - 900 * Bitboards::bitboard_population(bitboard: board.their_queens);
 				
+				// TODO add random noise to prevent a bunch of evaluations from being equal for testing purposes
+				//noise = 0;
+				//noise = ((TIM::current_clock() / 1000) % 50) - 25;
+				//evaluation = evaluation + noise;
+				
 				if board.active_color == Color::BLACK then
 					evaluation = evaluation * -1;
 				end if;

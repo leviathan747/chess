@@ -14,42 +14,54 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
 	@dialect("oal");
 	state 'completing evaluation';
 
-	@state_num(4);
-	@dialect("oal");
-	state canceling;
-
 	@event_num(1);
-	event 'start evaluation'(depth: in integer);
+	event 'start evaluation';
 
 	@event_num(2);
 	event 'done evaluating';
 
-	@event_num(3);
-	event 'cancel evaluation';
-
 	state model is
 
-		|                         | 'start evaluation'      | 'done evaluating'       | 'cancel evaluation'     |
-		| ----------------------- | ----------------------- | ----------------------- | ----------------------- |
-		| idle                    | evaluating              | cannot_happen           | ignore                  |
-		| evaluating              | cannot_happen           | 'completing evaluation' | canceling               |
-		| 'completing evaluation' | cannot_happen           | idle                    | ignore                  |
-		| canceling               | cannot_happen           | 'completing evaluation' | ignore                  |
+		|                         | 'start evaluation'      | 'done evaluating'       |
+		| ----------------------- | ----------------------- | ----------------------- |
+		| idle                    | evaluating              | ignore                  |
+		| evaluating              | cannot_happen           | 'completing evaluation' |
+		| 'completing evaluation' | cannot_happen           | idle                    |
 
 	end state model;
 
-	state evaluating(depth: in integer) is
+	state idle is
+		@noparse
+		// if it's still our turn, evaluate again
+		select one game related by self->ActiveGame[R1];
+		if self.active and game.is_our_turn() then
+			generate Engine1:'start evaluation' to self;
+		end if;
+		@endnoparse
+	end state;
+
+	state evaluating is
 		@noparse
 		// set up the attributes to collect stats
+		self.active = true;
 		self.pre_evaluation_position_count = self.positions_evaluated;
 		self.pre_evaluation_time = TIM::current_clock();
 		
 		// create first job and put it on the stack
 		create object instance new_job of EvaluationJob;
-		new_job.depth = param.depth;
 		relate new_job to self across R12;
 		select one current_position related by self->ActiveGame[R1]->Position[R3];
 		relate current_position to new_job across R9;
+		new_job.current_evaluation = current_position.evaluation;
+		
+		// if the current position is not yet evaluated, start with a depth of 2, otherwise deepen by 1
+		if not current_position.evaluated then
+			new_job.depth = 2;
+		else
+			new_job.depth = current_position.evaluation_depth + 1;
+		end if;
+		
+		// start the job
 		generate EvaluationJob1:'evaluate' to new_job;
 		@endnoparse
 	end state;
@@ -58,37 +70,14 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
 		@noparse
 		// output stats on the evaluation
 		select many pos related by self->Position[R4];
+		select one game related by self->ActiveGame[R1];
+		select one current_position related by game->Position[R3];
+		LOG::LogInfo(message: "Current evaluation depth:  " + STRING::itoa(i: current_position.evaluation_depth));
 		LOG::LogInfo(message: "Current position count:    " + STRING::itoa(i: cardinality  pos));
 		LOG::LogInfo(message: "New evaluated positions:   " + STRING::itoa(i: self.positions_evaluated - self.pre_evaluation_position_count));
 		LOG::LogInfo(message: "Total evaluated positions: " + STRING::itoa(i: self.positions_evaluated));
 		LOG::LogInfo(message: "Time to analyze:           " + STRING::itoa(i: (TIM::current_clock() - self.pre_evaluation_time) / 1000) + "ms");
 		
-		// select the best move from the evaluation engine
-		select one game related by self->ActiveGame[R1];
-		select one current_position related by game->Position[R3];
-		select one best_move related by current_position->Move[R5];
-		if not empty best_move then
-			
-			move = best_move.lan;
-		
-			LOG::LogInfo(message: "Playing best line: " + self.get_best_line());
-			
-			generate ActiveGame3:'play move'(move: move) to game;
-			
-		end if;
-		
-		generate Engine2:'done evaluating' to self;
-		@endnoparse
-	end state;
-
-	state canceling is
-		@noparse
-		// dispose all current evaluation jobs
-		LOG::LogInfo(message: "Canceling evaluation early...");
-		select many jobs related by self->EvaluationJob[R12];
-		for each job in jobs loop
-			job.dispose();
-		end for;
 		generate Engine2:'done evaluating' to self;
 		@endnoparse
 	end state;

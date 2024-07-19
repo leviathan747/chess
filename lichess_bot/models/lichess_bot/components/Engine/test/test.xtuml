@@ -64,6 +64,7 @@ within lichess_bot::components::Engine is
 		function test_evaluate_position(fen: in string, depth: in integer) is
 			@noparse
 			LOG::LogInfo(message: "Evaluating position: " + param.fen);
+			// TODO fix this test
 			
 			// create the bot
 			create object instance bot of Bot;
@@ -91,7 +92,7 @@ within lichess_bot::components::Engine is
 			relate initial_position to engine across R4;
 			
 			// analyze the position
-			generate Engine1:'start evaluation'(depth: param.depth) to engine;
+			generate Engine1:'start evaluation' to engine;
 			@endnoparse
 		end function;
 

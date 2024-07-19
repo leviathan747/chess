@@ -10,9 +10,6 @@ shapes :
   shape : completingevaluation
     render : state "lichess_bot::components::Engine::games::Evaluation Engine::Instance State Machine::completing evaluation"
     bounds : x : 4392.0 y : 3456.0 width : 204.0 height : 156.0
-  shape : canceling
-    render : state "lichess_bot::components::Engine::games::Evaluation Engine::Instance State Machine::canceling"
-    bounds : x : 4932.0 y : 3468.0 width : 204.0 height : 145.0
 
 connectors :
   connector : idle____Engine1__startevaluation
@@ -66,38 +63,3 @@ connectors :
     texts :
       text :
         bounds : x : 4440.0 y : 3378.0 width : 85.0 height : 36.0 where : middle
-  connector : evaluating____Engine3__cancelevaluation
-    render : transition "lichess_bot::components::Engine::games::Evaluation Engine::Instance State Machine::evaluating::Engine3: cancel evaluation"
-    polyline :
-      segment :
-        start : x : 4884.0 y : 3288.0
-        end :   x : 5016.0 y : 3288.0
-      segment :
-        start : x : 5016.0 y : 3288.0
-        end :   x : 5016.0 y : 3468.0
-    anchors :
-      start :
-        point : x : 4884.0 y : 3288.0
-        shape : evaluating
-      end :
-        point : x : 5016.0 y : 3288.0
-        shape : canceling
-    texts :
-      text :
-        bounds : x : 4924.0 y : 3257.0 width : 0.0 height : 0.0 where : middle
-  connector : canceling____Engine2__doneevaluating
-    render : transition "lichess_bot::components::Engine::games::Evaluation Engine::Instance State Machine::canceling::Engine2: done evaluating"
-    polyline :
-      segment :
-        start : x : 4932.0 y : 3559.0
-        end :   x : 4596.0 y : 3559.0
-    anchors :
-      start :
-        point : x : 4932.0 y : 3559.0
-        shape : canceling
-      end :
-        point : x : 4596.0 y : 3559.0
-        shape : completingevaluation
-    texts :
-      text :
-        bounds : x : 4689.0 y : 3567.0 width : 0.0 height : 0.0 where : middle

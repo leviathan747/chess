@@ -89,11 +89,11 @@ within lichess_bot::components::Engine::games::'Active Game' is
 		
 		// start the engine evaluating
 		select one engine related by self->Engine[R1];
-		generate Engine1:'start evaluation'(depth: Bot::getInteger(name: "evaluation_depth", default_value: 2)) to engine;
+		generate Engine1:'start evaluation' to engine;
 		
 		// play a move after a certain amount of time, no matter what the status of the engine is
 		create event instance e of ActiveGame3:'play move'(move: "") to self;
-		max_think_time = 60000 * 1000;  // TODO parameterize this
+		max_think_time = Bot::getInteger(name: "max_think_time_ms", default_value: 1000) * 1000;
 		self.move_timer = TIM::timer_start(event_inst:e, microseconds: max_think_time);
 		@endnoparse
 	end state;
@@ -114,17 +114,29 @@ within lichess_bot::components::Engine::games::'Active Game' is
 		
 		// cancel the evaluation engine if it is still running
 		select one engine related by self->Engine[R1];
-		generate Engine3:'cancel evaluation' to engine;
+		engine.cancel();
 		
-		// if a move is not received with the event select a random legal move
+		// if a move is not given try to get the best move from the engine
 		if move == "" then
 		
-			LOG::LogInfo(message: "Falling back on random move selection...");
-			select one current_position related by self->Position[R3];
-			legal_moves = ChessLib::legalMoves(fen: current_position.fen);
-			i = 0;  // coerce integer
-			i = TIM::current_clock() % legal_moves.length;
-			move = legal_moves[i];
+			select one best_move related by self->Position[R3]->Move[R5];
+			if not empty best_move then
+			
+				move = best_move.lan;
+				select one engine related by self->Engine[R1];
+				LOG::LogInfo(message: "Playing best line: " + engine.get_best_line());
+				
+			else
+			
+				// select a random legal move
+				LOG::LogInfo(message: "Falling back on random move selection...");
+				select one current_position related by self->Position[R3];
+				legal_moves = ChessLib::legalMoves(fen: current_position.fen);
+				i = 0;  // coerce integer
+				i = TIM::current_clock() % legal_moves.length;
+				move = legal_moves[i];
+		
+			end if;
 		
 		end if;
 		

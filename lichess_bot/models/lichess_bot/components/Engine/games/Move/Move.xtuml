@@ -16,6 +16,14 @@ within lichess_bot::components::Engine::games is
 
 		is_pawn_move: boolean;
 
+		@dialect("oal");
+		@operation_num(1);
+		operation dispose() is
+			@noparse
+			// TODO
+			@endnoparse
+		end operation;
+
 	end class;
 
 end;

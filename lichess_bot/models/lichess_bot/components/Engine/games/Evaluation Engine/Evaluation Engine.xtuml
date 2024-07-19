@@ -12,6 +12,8 @@ within lichess_bot::components::Engine::games is
 
 		pre_evaluation_time: timestamp;
 
+		active: boolean;
+
 		@dialect("oal");
 		@operation_num(4);
 		operation dispose() is
@@ -159,13 +161,34 @@ within lichess_bot::components::Engine::games is
 			best_line = "";
 			select one current_position related by self->ActiveGame[R1]->Position[R3];
 			select one best_move related by current_position->Move[R5];
+			select any best_pos from instances of Position where false;
 			while not empty best_move loop
+				select one best_pos related by best_move->Position[R2.'is follwed by'];
 				best_line = best_line + sep + best_move.lan;
 				sep = " ";
-				select one best_move related by best_move->Position[R2.'is follwed by']->Move[R5];;
+				select one best_move related by best_pos->Move[R5];
 			end while;
-			best_line = best_line + " - " + Engine::eval_to_string(eval: current_position.evaluation);
+			if not empty best_pos then
+				best_line = best_line + " = " + Engine::eval_to_string(eval: best_pos.evaluation);
+			end if;
 			return best_line;
+			@endnoparse
+		end operation;
+
+		@dialect("oal");
+		@operation_num(8);
+		operation cancel() is
+			@noparse
+			LOG::LogInfo(message: "Canceling evaluation early...");
+			self.active = false;
+			
+			// dispose all current evaluation jobs
+			select many jobs related by self->EvaluationJob[R12];
+			for each job in jobs loop
+				job.dispose();
+			end for;
+			
+			generate Engine2:'done evaluating' to self;
 			@endnoparse
 		end operation;
 
