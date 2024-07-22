@@ -1,6 +1,6 @@
 // BP 7.1.6 content: ModelClass syschar: 3 persistence-version: 7.1.6
 
-within lichess_bot::components::Engine::'board representation' is
+within lichess_bot::components::Engine::games is
 
 	@key_letters("Board");
 	@class_num(1);

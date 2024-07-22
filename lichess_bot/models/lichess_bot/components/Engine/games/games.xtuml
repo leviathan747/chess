@@ -4,12 +4,14 @@ within lichess_bot::components::Engine is
 
 	package games is
 		class 'Active Game';
+		class Bitboards;
+		class Board;
+		class Bot;
 		class 'Evaluation Engine';
 		class 'Evaluation Job';
 		class 'Evaluation Order';
 		class Move;
 		class Position;
-		class Board is lichess_bot::components::Engine::'board representation'::Board;
 		relationship R1 is 'Active Game' unconditionally 'is analyzed by' one 'Evaluation Engine',
 		                   'Evaluation Engine' unconditionally analyzes one 'Active Game';
 

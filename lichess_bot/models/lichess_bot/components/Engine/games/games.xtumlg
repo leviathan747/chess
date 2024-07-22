@@ -14,7 +14,7 @@ shapes :
     render : class "lichess_bot::components::Engine::games::Move"
     bounds : x : 5736.0 y : 3192.0 width : 216.0 height : 133.0
   shape : Board
-    render : imported_class "lichess_bot::components::Engine::games::Board"
+    render : class "lichess_bot::components::Engine::games::Board"
     bounds : x : 5663.0 y : 2711.0 width : 205.0 height : 108.0
   shape : EvaluationJob
     render : class "lichess_bot::components::Engine::games::Evaluation Job"
@@ -22,6 +22,12 @@ shapes :
   shape : EvaluationOrder
     render : class "lichess_bot::components::Engine::games::Evaluation Order"
     bounds : x : 5832.0 y : 3552.0 width : 120.0 height : 96.0
+  shape : Bitboards
+    render : class "lichess_bot::components::Engine::games::Bitboards"
+    bounds : x : 4748.0 y : 2700.0 width : 200.0 height : 150.0
+  shape : Bot
+    render : class "lichess_bot::components::Engine::games::Bot"
+    bounds : x : 4968.0 y : 2700.0 width : 200.0 height : 150.0
 
 connectors :
   connector : R1
@@ -101,7 +107,7 @@ connectors :
         point : x : 4992.0 y : 3108.0
         shape : ActiveGame
       end :
-        point : x : 5640.0 y : 2952.0
+        point : x : 4992.0 y : 2952.0
         shape : Position
     texts :
       text :
@@ -124,7 +130,7 @@ connectors :
         point : x : 5316.0 y : 3144.0
         shape : EvaluationEngine
       end :
-        point : x : 5640.0 y : 3000.0
+        point : x : 5316.0 y : 3000.0
         shape : Position
     texts :
       text :
@@ -193,7 +199,7 @@ connectors :
         point : x : 5388.0 y : 3528.0
         shape : EvaluationJob
       end :
-        point : x : 5292.0 y : 3492.0
+        point : x : 5388.0 y : 3600.0
         shape : EvaluationJob
     texts :
       text :
@@ -216,7 +222,7 @@ connectors :
         point : x : 5436.0 y : 3384.0
         shape : EvaluationJob
       end :
-        point : x : 5640.0 y : 3048.0
+        point : x : 5436.0 y : 3048.0
         shape : Position
     texts :
       text :
@@ -348,7 +354,7 @@ connectors :
         point : x : 5508.0 y : 3528.0
         shape : EvaluationJob
       end :
-        point : x : 5832.0 y : 3612.0
+        point : x : 5508.0 y : 3612.0
         shape : EvaluationOrder
     texts :
       text :
@@ -371,7 +377,7 @@ connectors :
         point : x : 5520.0 y : 3384.0
         shape : EvaluationJob
       end :
-        point : x : 5736.0 y : 3260.0
+        point : x : 5520.0 y : 3260.0
         shape : Move
     texts :
       text :

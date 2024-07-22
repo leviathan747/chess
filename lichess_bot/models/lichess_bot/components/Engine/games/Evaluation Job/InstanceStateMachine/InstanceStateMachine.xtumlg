@@ -139,3 +139,22 @@ connectors :
     texts :
       text :
         bounds : x : 4801.0 y : 3153.0 width : 0.0 height : 0.0 where : middle
+  connector : updatingevaluation____EvaluationJob2__done
+    render : transition "lichess_bot::components::Engine::games::Evaluation Job::Instance State Machine::updating evaluation::EvaluationJob2: done"
+    polyline :
+      segment :
+        start : x : 5124.0 y : 3024.0
+        end :   x : 5412.0 y : 3024.0
+      segment :
+        start : x : 5412.0 y : 3024.0
+        end :   x : 5412.0 y : 3240.0
+    anchors :
+      start :
+        point : x : 5124.0 y : 3024.0
+        shape : updatingevaluation
+      end :
+        point : x : 5412.0 y : 3240.0
+        shape : finalizingevaluation
+    texts :
+      text :
+        bounds : x : 5268.0 y : 3038.0 width : 0.0 height : 0.0 where : middle
