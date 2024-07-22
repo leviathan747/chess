@@ -32,13 +32,37 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
 
 	state idle is
 		@noparse
-		// if it's still our turn, evaluate again
 		select one game related by self->ActiveGame[R1];
-		if self.active and game.is_our_turn() then
-			select one current_position related by self->ActiveGame[R1]->Position[R3];
-			if current_position.evaluation_depth < Bot::getInteger(name: "max_evaluation_depth", default_value: 6) then
-				generate Engine1:'start evaluation' to self;
+		select one current_position related by self->ActiveGame[R1]->Position[R3];
+		
+		// check if we can make a play immediately
+		play_now = false;
+		if game.is_our_turn() then
+			
+			// if we have checkmate, play immediately
+			if current_position.evaluation.mate_on_board and
+				(current_position.evaluation.mate_in > 0 and game.color == Color::WHITE or 
+				current_position.evaluation.mate_in < 0 and game.color == Color::BLACK) then
+				play_now = true;
 			end if;
+				
+			// if we only have one move, play immediately
+			select many moves related by current_position->Move[R2.'is follwed by'];
+			if cardinality moves < 2 then
+				play_now = true;
+			end if;
+		
+			if play_now then
+				generate ActiveGame3:'play move'(move: "") to game;
+			end if;
+		
+		end if;
+			
+		// keep deepening the tree
+		if self.active and not play_now and current_position.evaluation_depth < Bot::getInteger(name: "max_evaluation_depth", default_value: 6) then
+		
+			generate Engine1:'start evaluation' to self;
+		
 		end if;
 		@endnoparse
 	end state;
