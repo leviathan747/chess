@@ -2,10 +2,10 @@
 
 within lichess_bot::components::Engine::games is
 
-	@key_letters("EvaluationOrder");
-	@class_num(7);
-	class 'Evaluation Order' is
+  @key_letters("EvaluationOrder");
+  @class_num(7);
+  class 'Evaluation Order' is
 
-	end class;
+  end class;
 
 end;

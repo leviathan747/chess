@@ -2,20 +2,20 @@
 
 within lichess_bot is
 
-	package types is
-		type Evaluation is structure
-			evaluation: real;
-			mate_on_board: boolean;
-			mate_in: integer;
-		end structure;
+  package types is
+    type Evaluation is structure
+      evaluation: real;
+      mate_on_board: boolean;
+      mate_in: integer;
+    end structure;
 
-		type Properties is 'inst_ref<Mapping>';
+    type Properties is 'inst_ref<Mapping>';
 
-		constant group FEN is
-			STARTPOS: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-		end constant group;
+    constant group FEN is
+      STARTPOS: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    end constant group;
 
-		package lichess;
-	end package;
+    package lichess;
+  end package;
 
 end;

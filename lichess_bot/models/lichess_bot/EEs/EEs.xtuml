@@ -2,88 +2,88 @@
 
 within lichess_bot is
 
-	package EEs is
-		@key_letters("Bits");
-		@realized;
-		external Bits is
-			@dialect("oal");
-			bridge bitwise_and(a: in timestamp, b: in timestamp) return timestamp;
+  package EEs is
+    @key_letters("Bits");
+    @realized;
+    external Bits is
+      @dialect("oal");
+      bridge bitwise_and(a: in timestamp, b: in timestamp) return timestamp;
 
-			@dialect("oal");
-			bridge bitwise_not(a: in timestamp) return timestamp;
+      @dialect("oal");
+      bridge bitwise_not(a: in timestamp) return timestamp;
 
-			@dialect("oal");
-			bridge bitwise_or(a: in timestamp, b: in timestamp) return timestamp;
+      @dialect("oal");
+      bridge bitwise_or(a: in timestamp, b: in timestamp) return timestamp;
 
-			@dialect("oal");
-			bridge bitwise_xor(a: in timestamp, b: in timestamp) return timestamp;
+      @dialect("oal");
+      bridge bitwise_xor(a: in timestamp, b: in timestamp) return timestamp;
 
-			@dialect("oal");
-			bridge left_shift(a: in timestamp, n: in integer) return timestamp;
+      @dialect("oal");
+      bridge left_shift(a: in timestamp, n: in integer) return timestamp;
 
-			@dialect("oal");
-			bridge right_shift(a: in timestamp, n: in integer) return timestamp;
+      @dialect("oal");
+      bridge right_shift(a: in timestamp, n: in integer) return timestamp;
 
-			@dialect("oal");
-			bridge to_binary_string(a: in timestamp) return string;
+      @dialect("oal");
+      bridge to_binary_string(a: in timestamp) return string;
 
-			@dialect("oal");
-			bridge unsigned_right_shift(a: in timestamp, n: in integer) return timestamp;
+      @dialect("oal");
+      bridge unsigned_right_shift(a: in timestamp, n: in integer) return timestamp;
 
-			@dialect("oal");
-			bridge zero() return timestamp;
+      @dialect("oal");
+      bridge zero() return timestamp;
 
-		end external;
+    end external;
 
-		@key_letters("ChessLib");
-		@realized;
-		external ChessLib is
-			//! Takes as input a FEN string representing the current position
-			//! Returns a list of legal moves in the position
-			@dialect("oal");
-			bridge legalMoves(fen: in string) return sequence of string;
+    @key_letters("ChessLib");
+    @realized;
+    external ChessLib is
+      //! Takes as input a FEN string representing the current position
+      //! Returns a list of legal moves in the position
+      @dialect("oal");
+      bridge legalMoves(fen: in string) return sequence of string;
 
-			//! Takes as input a FEN string and a list of moves represenging the
-			//! current position. The position is determined by applying the
-			//! list of moves in order to the position indicated by the FEN
-			//! string. The exact string "startpos" is taken to be the standard
-			//! starting position. Returns a FEN string representing the
-			//! position
-			@dialect("oal");
-			bridge movesToFEN(initialFen: in string, moves: in sequence of string) return string;
+      //! Takes as input a FEN string and a list of moves represenging the
+      //! current position. The position is determined by applying the
+      //! list of moves in order to the position indicated by the FEN
+      //! string. The exact string "startpos" is taken to be the standard
+      //! starting position. Returns a FEN string representing the
+      //! position
+      @dialect("oal");
+      bridge movesToFEN(initialFen: in string, moves: in sequence of string) return string;
 
-		end external;
+    end external;
 
-		//! The Time external entity provides date, timestamp, and timer related operations.
-		@key_letters("TIM2");
-		@realized;
-		external LongTime is
-			@dialect("oal");
-			bridge timer_start(event_inst: in 'inst<Event>', seconds: in integer) return timer is
-				@noparse
-				return TIM::timer_start(event_inst: param.event_inst, microseconds: param.seconds * 1000000);
-				@endnoparse
-			end bridge;
+    //! The Time external entity provides date, timestamp, and timer related operations.
+    @key_letters("TIM2");
+    @realized;
+    external LongTime is
+      @dialect("oal");
+      bridge timer_start(event_inst: in 'inst<Event>', seconds: in integer) return timer is
+        @noparse
+        return TIM::timer_start(event_inst: param.event_inst, microseconds: param.seconds * 1000000);
+        @endnoparse
+      end bridge;
 
-		end external;
+    end external;
 
-		@key_letters("PROP");
-		@realized;
-		external Properties is
-			@dialect("oal");
-			bridge getBoolean(properties: in Properties, name: in string, default_value: in boolean) return boolean;
+    @key_letters("PROP");
+    @realized;
+    external Properties is
+      @dialect("oal");
+      bridge getBoolean(properties: in Properties, name: in string, default_value: in boolean) return boolean;
 
-			@dialect("oal");
-			bridge getInteger(properties: in Properties, name: in string, default_value: in integer) return integer;
+      @dialect("oal");
+      bridge getInteger(properties: in Properties, name: in string, default_value: in integer) return integer;
 
-			@dialect("oal");
-			bridge getString(properties: in Properties, name: in string, default_value: in string) return string;
+      @dialect("oal");
+      bridge getString(properties: in Properties, name: in string, default_value: in string) return string;
 
-			@dialect("oal");
-			bridge loadProperties(file_name: in string) return Properties;
+      @dialect("oal");
+      bridge loadProperties(file_name: in string) return Properties;
 
-		end external;
+    end external;
 
-	end package;
+  end package;
 
 end;

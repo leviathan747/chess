@@ -2,171 +2,171 @@
 
 within lichess_bot::components::Engine::games is
 
-	@key_letters("ActiveGame");
-	@class_num(2);
-	class 'Active Game' is
+  @key_letters("ActiveGame");
+  @class_num(2);
+  class 'Active Game' is
 
-		id: string;
+    id: string;
 
-		color: Color;
+    color: Color;
 
-		game_state: GameState;
+    game_state: GameState;
 
-		claim_victory_timer: timer;
+    claim_victory_timer: timer;
 
-		resign_timer: timer;
+    resign_timer: timer;
 
-		initial_fen: string;
+    initial_fen: string;
 
-		start_color: Color;
+    start_color: Color;
 
-		move_timer: timer;
+    move_timer: timer;
 
-		preferred identifier is (id);
+    preferred identifier is (id);
 
-		@dialect("oal");
-		@operation_num(1);
-		operation is_our_turn() return boolean is
-			@noparse
-			return self.color == self.start_color and self.game_state.moves.length % 2 == 0 or self.color != self.start_color and self.game_state.moves.length % 2 == 1;
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(1);
+    operation is_our_turn() return boolean is
+      @noparse
+      return self.color == self.start_color and self.game_state.moves.length % 2 == 0 or self.color != self.start_color and self.game_state.moves.length % 2 == 1;
+      @endnoparse
+    end operation;
 
-		@dialect("oal");
-		@operation_num(2);
-		operation resign() is
-			@noparse
-			if self.game_state.moves.length > 1 then
-				r = chess::resign(game_id:self.id);
-			else
-				r = chess::abort(game_id:self.id);
-			end if;
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(2);
+    operation resign() is
+      @noparse
+      if self.game_state.moves.length > 1 then
+      	r = chess::resign(game_id:self.id);
+      else
+      	r = chess::abort(game_id:self.id);
+      end if;
+      @endnoparse
+    end operation;
 
-		@dialect("oal");
-		@operation_num(3);
-		operation handle_draw_offer() is
-			@noparse
-			r = chess::draw(game_id:self.id, accept:false);
-			r = chess::chat(game_id:self.id, text:"Never give up, never surrender!", room:Room::PLAYER);
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(3);
+    operation handle_draw_offer() is
+      @noparse
+      r = chess::draw(game_id:self.id, accept:false);
+      r = chess::chat(game_id:self.id, text:"Never give up, never surrender!", room:Room::PLAYER);
+      @endnoparse
+    end operation;
 
-		@dialect("oal");
-		@operation_num(3);
-		operation handle_takeback_proposal() is
-			@noparse
-			r = chess::takeback(game_id:self.id, accept:false);
-			r = chess::chat(game_id:self.id, text:"No takebacks!", room:Room::PLAYER);
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(3);
+    operation handle_takeback_proposal() is
+      @noparse
+      r = chess::takeback(game_id:self.id, accept:false);
+      r = chess::chat(game_id:self.id, text:"No takebacks!", room:Room::PLAYER);
+      @endnoparse
+    end operation;
 
-		@dialect("oal");
-		@operation_num(4);
-		operation update_game_state(game_state: in GameState) is
-			@noparse
-			i = self.game_state.moves.length;
-			self.game_state = param.game_state;
-			
-			// stop the evaluation engine
-			select one engine related by self->Engine[R1];
-			engine.stop();
-			
-			// update the position tree based on the moves played
-			select one position related by self->Position[R3];
-			while i < self.game_state.moves.length loop
-				move_lan = self.game_state.moves[i];
-				
-				// get the next move
-				select any move related by position->Move[R2.'is follwed by'] where selected.lan == move_lan;
-				if empty move then
-					move = position.new_move(lan: move_lan);
-				end if;
-				select one new_position related by move->Position[R2.'is follwed by'];
-				unrelate position from self across R3;
-				relate new_position to self across R3;
-				
-				// delete any moves that were not taken
-				select any unmove related by position->Move[R2.'is follwed by'] where selected.lan != move_lan;
-				while not empty unmove loop
-					select one unposition related by unmove->Position[R2.'is follwed by'];
-					unposition.dispose();
-					select any unmove related by position->Move[R2.'is follwed by'] where selected.lan != move_lan;
-				end while;
-			
-				select one position related by self->Position[R3];
-				i = i + 1;
-			end while;
-			
-			// restart the evaluation engine
-			generate Engine1:'start evaluation' to engine;
-			
-			// print the current board
-			select one current_board related by self->Position[R3]->Board[R6];
-			if not empty current_board then
-				current_board.print();
-				LOG::LogInfo(message: current_board.to_fen());
-			end if;
-			
-			// check if the game is over
-			if not (self.game_state.status == GameStatus::CREATED or self.game_state.status == GameStatus::STARTED) then
-					generate ActiveGame2:'game over'(status: self.game_state.status) to self;
-			else
-				if self.is_our_turn() then
-					generate ActiveGame4:'ready to play' to self;
-				else
-					generate ActiveGame1:'waiting on move' to self;
-				end if;
-			end if;
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(4);
+    operation update_game_state(game_state: in GameState) is
+      @noparse
+      i = self.game_state.moves.length;
+      self.game_state = param.game_state;
+      
+      // stop the evaluation engine
+      select one engine related by self->Engine[R1];
+      engine.stop();
+      
+      // update the position tree based on the moves played
+      select one position related by self->Position[R3];
+      while i < self.game_state.moves.length loop
+      	move_lan = self.game_state.moves[i];
+      	
+      	// get the next move
+      	select any move related by position->Move[R2.'is follwed by'] where selected.lan == move_lan;
+      	if empty move then
+      		move = position.new_move(lan: move_lan);
+      	end if;
+      	select one new_position related by move->Position[R2.'is follwed by'];
+      	unrelate position from self across R3;
+      	relate new_position to self across R3;
+      	
+      	// delete any moves that were not taken
+      	select any unmove related by position->Move[R2.'is follwed by'] where selected.lan != move_lan;
+      	while not empty unmove loop
+      		select one unposition related by unmove->Position[R2.'is follwed by'];
+      		unposition.dispose();
+      		select any unmove related by position->Move[R2.'is follwed by'] where selected.lan != move_lan;
+      	end while;
+      
+      	select one position related by self->Position[R3];
+      	i = i + 1;
+      end while;
+      
+      // restart the evaluation engine
+      generate Engine1:'start evaluation' to engine;
+      
+      // print the current board
+      select one current_board related by self->Position[R3]->Board[R6];
+      if not empty current_board then
+      	current_board.print();
+      	LOG::LogInfo(message: current_board.to_fen());
+      end if;
+      
+      // check if the game is over
+      if not (self.game_state.status == GameStatus::CREATED or self.game_state.status == GameStatus::STARTED) then
+      		generate ActiveGame2:'game over'(status: self.game_state.status) to self;
+      else
+      	if self.is_our_turn() then
+      		generate ActiveGame4:'ready to play' to self;
+      	else
+      		generate ActiveGame1:'waiting on move' to self;
+      	end if;
+      end if;
+      @endnoparse
+    end operation;
 
-		@dialect("oal");
-		@operation_num(5);
-		class operation new_game(id: in string) return instance of 'Active Game' is
-			@noparse
-			// create the game
-			create object instance game of ActiveGame;
-			game.id = param.id;
-			
-			// create initial position
-			create object instance initial_position of Position;
-			initial_position.fen = game.initial_fen;
-			relate initial_position to game across R3;
-			
-			board = Board::from_fen(fen: initial_position.fen);
-			relate board to initial_position across R6;
-			
-			// create the evaluation engine
-			create object instance engine of Engine;
-			relate engine to game across R1;
-			
-			relate initial_position to engine across R4;
-			
-			return game;
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(5);
+    class operation new_game(id: in string) return instance of 'Active Game' is
+      @noparse
+      // create the game
+      create object instance game of ActiveGame;
+      game.id = param.id;
+      
+      // create initial position
+      create object instance initial_position of Position;
+      initial_position.fen = game.initial_fen;
+      relate initial_position to game across R3;
+      
+      board = Board::from_fen(fen: initial_position.fen);
+      relate board to initial_position across R6;
+      
+      // create the evaluation engine
+      create object instance engine of Engine;
+      relate engine to game across R1;
+      
+      relate initial_position to engine across R4;
+      
+      return game;
+      @endnoparse
+    end operation;
 
-		@dialect("oal");
-		@operation_num(6);
-		operation dispose() is
-			@noparse
-			select one engineR1 related by self->Engine[R1];
-			if not empty engineR1 then
-				unrelate self from engineR1 across R1;
-				engineR1.dispose();
-			end if;
-			
-			select one positionR3 related by self->Position[R3];
-			if not empty positionR3 then
-				unrelate self from positionR3 across R3;
-			end if;
-			
-			delete object instance self;
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(6);
+    operation dispose() is
+      @noparse
+      select one engineR1 related by self->Engine[R1];
+      if not empty engineR1 then
+      	unrelate self from engineR1 across R1;
+      	engineR1.dispose();
+      end if;
+      
+      select one positionR3 related by self->Position[R3];
+      if not empty positionR3 then
+      	unrelate self from positionR3 across R3;
+      end if;
+      
+      delete object instance self;
+      @endnoparse
+    end operation;
 
-	end class;
+  end class;
 
 end;

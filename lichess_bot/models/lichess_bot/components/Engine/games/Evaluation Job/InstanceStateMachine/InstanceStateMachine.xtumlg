@@ -153,7 +153,7 @@ connectors :
         point : x : 5124.0 y : 3024.0
         shape : updatingevaluation
       end :
-        point : x : 5412.0 y : 3240.0
+        point : x : 5412.0 y : 3024.0
         shape : finalizingevaluation
     texts :
       text :

@@ -2,196 +2,196 @@
 
 within lichess_bot::components::Engine::games is
 
-	@key_letters("Engine");
-	@class_num(3);
-	class 'Evaluation Engine' is
+  @key_letters("Engine");
+  @class_num(3);
+  class 'Evaluation Engine' is
 
-		positions_evaluated: integer;
+    positions_evaluated: integer;
 
-		pre_evaluation_position_count: integer;
+    pre_evaluation_position_count: integer;
 
-		pre_evaluation_time: timestamp;
+    pre_evaluation_time: timestamp;
 
-		active: boolean;
+    active: boolean;
 
-		@dialect("oal");
-		@operation_num(4);
-		operation dispose() is
-			@noparse
-			select any positionR4 related by self->Position[R4];
-			while not empty positionR4 loop
-				unrelate self from positionR4 across R4;
-				positionR4.dispose();
-				select any positionR4 related by self->Position[R4];
-			end while;
-			
-			select one gameR1 related by self->ActiveGame[R1];
-			if not empty gameR1 then
-				unrelate self from gameR1 across R1;
-				gameR1.dispose();
-			end if;
-			
-			select any jobR12 related by self->EvaluationJob[R12];
-			while not empty jobR12 loop
-				jobR12.dispose();
-				select any jobR12 related by self->EvaluationJob[R12];
-			end while;
-			
-			delete object instance self;
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(4);
+    operation dispose() is
+      @noparse
+      select any positionR4 related by self->Position[R4];
+      while not empty positionR4 loop
+      	unrelate self from positionR4 across R4;
+      	positionR4.dispose();
+      	select any positionR4 related by self->Position[R4];
+      end while;
+      
+      select one gameR1 related by self->ActiveGame[R1];
+      if not empty gameR1 then
+      	unrelate self from gameR1 across R1;
+      	gameR1.dispose();
+      end if;
+      
+      select any jobR12 related by self->EvaluationJob[R12];
+      while not empty jobR12 loop
+      	jobR12.dispose();
+      	select any jobR12 related by self->EvaluationJob[R12];
+      end while;
+      
+      delete object instance self;
+      @endnoparse
+    end operation;
 
-		@dialect("oal");
-		@operation_num(5);
-		class operation compare_evaluation(pov: in Color, eval1: in Evaluation, eval2: in Evaluation) return integer is
-			@noparse
-			result = 0;
-			
-			// if mate is already on the board
-			if param.eval1.mate_on_board then
-			
-				// if the mate is in our favor
-				if (param.pov == Color::WHITE and param.eval1.mate_in > 0) or
-					(param.pov == Color::BLACK and param.eval1.mate_in < 0) then
-					
-					// the new position maintains the favorable mate
-					if param.eval2.mate_on_board and ((param.pov == Color::WHITE and param.eval2.mate_in >= 0) or
-						(param.pov == Color::BLACK and param.eval2.mate_in <= 0)) then
-					
-						// the quickest mate wins
-						if param.pov == Color::WHITE then
-							result = param.eval2.mate_in - param.eval1.mate_in;
-						else
-							result = param.eval1.mate_in - param.eval2.mate_in;
-						end if;
-			
-					else
-						
-						// current evaluation is better
-						result = 1;
-						
-					end if;
-				
-				// the mate is in their favor
-				else
-			
-					// the new position maintains the unfavorable mate
-					if param.eval2.mate_on_board and ((param.pov == Color::WHITE and param.eval2.mate_in <= 0) or
-						(param.pov == Color::BLACK and param.eval2.mate_in >= 0)) then
-						
-						// doesn't matter because we lose :(
-						result = 0;
-						
-					// the new position gets out of the unfavorable mate
-					else
-						
-						// getting out of mate is always better
-						result = -1;
-						
-					end if;
-			
-				end if;
-			
-			// no mate currently on the board
-			else
-				
-				// the new position results in mate
-				if param.eval2.mate_on_board then
-			
-					// it is a favorable mate
-					if (param.pov == Color::WHITE and param.eval2.mate_in >= 0) or
-						(param.pov == Color::BLACK and param.eval2.mate_in <= 0) then
-						
-						result = -1;
-						
-					// it is an unfavorable mate
-					else
-						
-						result = 1;
-						
-					end if;
-					
-				// simply compare evaluations
-				else
-					
-					// new evaluation is improved
-					if (param.pov == Color::WHITE and param.eval2.evaluation > param.eval1.evaluation) or
-						(param.pov == Color::BLACK and param.eval2.evaluation < param.eval1.evaluation) then
-						
-						result = -1;
-						
-					// new evaluation is equal
-					elif param.eval2.evaluation == param.eval1.evaluation then
-						
-						result = 0;
-			
-					// new evaluation is worse
-					else
-						
-						result = 1;
-						
-					end if;
-					
-				end if;
-			
-			end if;
-			
-			return result;
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(5);
+    class operation compare_evaluation(pov: in Color, eval1: in Evaluation, eval2: in Evaluation) return integer is
+      @noparse
+      result = 0;
+      
+      // if mate is already on the board
+      if param.eval1.mate_on_board then
+      
+      	// if the mate is in our favor
+      	if (param.pov == Color::WHITE and param.eval1.mate_in > 0) or
+      		(param.pov == Color::BLACK and param.eval1.mate_in < 0) then
+      		
+      		// the new position maintains the favorable mate
+      		if param.eval2.mate_on_board and ((param.pov == Color::WHITE and param.eval2.mate_in >= 0) or
+      			(param.pov == Color::BLACK and param.eval2.mate_in <= 0)) then
+      		
+      			// the quickest mate wins
+      			if param.pov == Color::WHITE then
+      				result = param.eval2.mate_in - param.eval1.mate_in;
+      			else
+      				result = param.eval1.mate_in - param.eval2.mate_in;
+      			end if;
+      
+      		else
+      			
+      			// current evaluation is better
+      			result = 1;
+      			
+      		end if;
+      	
+      	// the mate is in their favor
+      	else
+      
+      		// the new position maintains the unfavorable mate
+      		if param.eval2.mate_on_board and ((param.pov == Color::WHITE and param.eval2.mate_in <= 0) or
+      			(param.pov == Color::BLACK and param.eval2.mate_in >= 0)) then
+      			
+      			// doesn't matter because we lose :(
+      			result = 0;
+      			
+      		// the new position gets out of the unfavorable mate
+      		else
+      			
+      			// getting out of mate is always better
+      			result = -1;
+      			
+      		end if;
+      
+      	end if;
+      
+      // no mate currently on the board
+      else
+      	
+      	// the new position results in mate
+      	if param.eval2.mate_on_board then
+      
+      		// it is a favorable mate
+      		if (param.pov == Color::WHITE and param.eval2.mate_in >= 0) or
+      			(param.pov == Color::BLACK and param.eval2.mate_in <= 0) then
+      			
+      			result = -1;
+      			
+      		// it is an unfavorable mate
+      		else
+      			
+      			result = 1;
+      			
+      		end if;
+      		
+      	// simply compare evaluations
+      	else
+      		
+      		// new evaluation is improved
+      		if (param.pov == Color::WHITE and param.eval2.evaluation > param.eval1.evaluation) or
+      			(param.pov == Color::BLACK and param.eval2.evaluation < param.eval1.evaluation) then
+      			
+      			result = -1;
+      			
+      		// new evaluation is equal
+      		elif param.eval2.evaluation == param.eval1.evaluation then
+      			
+      			result = 0;
+      
+      		// new evaluation is worse
+      		else
+      			
+      			result = 1;
+      			
+      		end if;
+      		
+      	end if;
+      
+      end if;
+      
+      return result;
+      @endnoparse
+    end operation;
 
-		@dialect("oal");
-		@operation_num(6);
-		class operation eval_to_string(eval: in Evaluation) return string is
-			@noparse
-			if param.eval.mate_on_board then
-				return "#" + STRING::itoa(i: param.eval.mate_in);
-			else
-				string_eval = STRING::itoa(i: param.eval.evaluation);
-				return STRING::substr(s: string_eval, begin: 0, end: STRING::strlen(s: string_eval) - 2) + "." + STRING::substr(s: string_eval, begin: STRING::strlen(s: string_eval) - 2, end: -1);
-			end if;
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(6);
+    class operation eval_to_string(eval: in Evaluation) return string is
+      @noparse
+      if param.eval.mate_on_board then
+      	return "#" + STRING::itoa(i: param.eval.mate_in);
+      else
+      	string_eval = STRING::itoa(i: param.eval.evaluation);
+      	return STRING::substr(s: string_eval, begin: 0, end: STRING::strlen(s: string_eval) - 2) + "." + STRING::substr(s: string_eval, begin: STRING::strlen(s: string_eval) - 2, end: -1);
+      end if;
+      @endnoparse
+    end operation;
 
-		@dialect("oal");
-		@operation_num(7);
-		operation get_best_line() return string is
-			@noparse
-			sep = "";
-			best_line = "";
-			select one current_position related by self->ActiveGame[R1]->Position[R3];
-			select one best_move related by current_position->Move[R5];
-			select any best_pos from instances of Position where false;
-			while not empty best_move loop
-				select one best_pos related by best_move->Position[R2.'is follwed by'];
-				best_line = best_line + sep + best_move.lan;
-				sep = " ";
-				select one best_move related by best_pos->Move[R5];
-			end while;
-			if not empty best_pos then
-				best_line = best_line + " = " + Engine::eval_to_string(eval: best_pos.evaluation);
-			end if;
-			return best_line;
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(7);
+    operation get_best_line() return string is
+      @noparse
+      sep = "";
+      best_line = "";
+      select one current_position related by self->ActiveGame[R1]->Position[R3];
+      select one best_move related by current_position->Move[R5];
+      select any best_pos from instances of Position where false;
+      while not empty best_move loop
+      	select one best_pos related by best_move->Position[R2.'is follwed by'];
+      	best_line = best_line + sep + best_move.lan;
+      	sep = " ";
+      	select one best_move related by best_pos->Move[R5];
+      end while;
+      if not empty best_pos then
+      	best_line = best_line + " = " + Engine::eval_to_string(eval: best_pos.evaluation);
+      end if;
+      return best_line;
+      @endnoparse
+    end operation;
 
-		@dialect("oal");
-		@operation_num(8);
-		operation stop() is
-			@noparse
-			LOG::LogInfo(message: "Canceling evaluation early...");
-			self.active = false;
-			
-			// dispose all current evaluation jobs
-			select many jobs related by self->EvaluationJob[R12];
-			for each job in jobs loop
-				job.dispose();
-			end for;
-			
-			generate Engine2:'done evaluating' to self;
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(8);
+    operation stop() is
+      @noparse
+      LOG::LogInfo(message: "Canceling evaluation early...");
+      self.active = false;
+      
+      // dispose all current evaluation jobs
+      select many jobs related by self->EvaluationJob[R12];
+      for each job in jobs loop
+      	job.dispose();
+      end for;
+      
+      generate Engine2:'done evaluating' to self;
+      @endnoparse
+    end operation;
 
-	end class;
+  end class;
 
 end;

@@ -2,28 +2,28 @@
 
 within lichess_bot::components::Engine::games is
 
-	@key_letters("Move");
-	@class_num(5);
-	class Move is
+  @key_letters("Move");
+  @class_num(5);
+  class Move is
 
-		lan: string;
+    lan: string;
 
-		is_check: boolean;
+    is_check: boolean;
 
-		is_capture: boolean;
+    is_capture: boolean;
 
-		is_attack: boolean;
+    is_attack: boolean;
 
-		is_pawn_move: boolean;
+    is_pawn_move: boolean;
 
-		@dialect("oal");
-		@operation_num(1);
-		operation dispose() is
-			@noparse
-			// TODO
-			@endnoparse
-		end operation;
+    @dialect("oal");
+    @operation_num(1);
+    operation dispose() is
+      @noparse
+      // TODO
+      @endnoparse
+    end operation;
 
-	end class;
+  end class;
 
 end;

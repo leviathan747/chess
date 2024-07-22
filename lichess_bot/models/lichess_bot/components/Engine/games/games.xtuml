@@ -2,60 +2,60 @@
 
 within lichess_bot::components::Engine is
 
-	package games is
-		class 'Active Game';
-		class Bitboards;
-		class Board;
-		class Bot;
-		class 'Evaluation Engine';
-		class 'Evaluation Job';
-		class 'Evaluation Order';
-		class Move;
-		class Position;
-		relationship R1 is 'Active Game' unconditionally 'is analyzed by' one 'Evaluation Engine',
-		                   'Evaluation Engine' unconditionally analyzes one 'Active Game';
+  package games is
+    class 'Active Game';
+    class Bitboards;
+    class Board;
+    class Bot;
+    class 'Evaluation Engine';
+    class 'Evaluation Job';
+    class 'Evaluation Order';
+    class Move;
+    class Position;
+    relationship R1 is 'Active Game' unconditionally 'is analyzed by' one 'Evaluation Engine',
+                       'Evaluation Engine' unconditionally analyzes one 'Active Game';
 
-		relationship R2 is Position conditionally 'is follwed by' many Position,
-		                   Position conditionally follows one Position
-		                   using one Move;
+    relationship R2 is Position conditionally 'is follwed by' many Position,
+                       Position conditionally follows one Position
+                       using one Move;
 
-		relationship R3 is 'Active Game' unconditionally 'has current' one Position,
-		                   Position conditionally 'is current for' one 'Active Game';
+    relationship R3 is 'Active Game' unconditionally 'has current' one Position,
+                       Position conditionally 'is current for' one 'Active Game';
 
-		relationship R4 is 'Evaluation Engine' conditionally evaluates many Position,
-		                   Position unconditionally 'evaluated by' one 'Evaluation Engine';
+    relationship R4 is 'Evaluation Engine' conditionally evaluates many Position,
+                       Position unconditionally 'evaluated by' one 'Evaluation Engine';
 
-		relationship R5 is Move conditionally 'best next in' one Position,
-		                   Position conditionally 'has best next' one Move;
+    relationship R5 is Move conditionally 'best next in' one Position,
+                       Position conditionally 'has best next' one Move;
 
-		relationship R6 is Board unconditionally represents one Position,
-		                   Position unconditionally 'is represented by' one Board;
+    relationship R6 is Board unconditionally represents one Position,
+                       Position unconditionally 'is represented by' one Board;
 
-		relationship R8 is 'Evaluation Job' conditionally 'is above' one 'Evaluation Job',
-		                   'Evaluation Job' conditionally 'is below' one 'Evaluation Job';
+    relationship R8 is 'Evaluation Job' conditionally 'is above' one 'Evaluation Job',
+                       'Evaluation Job' conditionally 'is below' one 'Evaluation Job';
 
-		relationship R9 is 'Evaluation Job' unconditionally evaluates one Position,
-		                   Position conditionally 'evaluated by' one 'Evaluation Job';
+    relationship R9 is 'Evaluation Job' unconditionally evaluates one Position,
+                       Position conditionally 'evaluated by' one 'Evaluation Job';
 
-		relationship R10 is 'Evaluation Job' conditionally 'currently evaluating' one Move,
-		                    Move conditionally 'being evaluated by' one 'Evaluation Job';
+    relationship R10 is 'Evaluation Job' conditionally 'currently evaluating' one Move,
+                        Move conditionally 'being evaluated by' one 'Evaluation Job';
 
-		relationship R11 is 'Evaluation Job' conditionally 'is waiting to evaluate' many Move,
-		                    Move conditionally 'is queued for evaluation by' one 'Evaluation Job'
-		                    using one 'Evaluation Order';
+    relationship R11 is 'Evaluation Job' conditionally 'is waiting to evaluate' many Move,
+                        Move conditionally 'is queued for evaluation by' one 'Evaluation Job'
+                        using one 'Evaluation Order';
 
-		relationship R12 is 'Evaluation Engine' conditionally performs many 'Evaluation Job',
-		                    'Evaluation Job' unconditionally 'performed by' one 'Evaluation Engine';
+    relationship R12 is 'Evaluation Engine' conditionally performs many 'Evaluation Job',
+                        'Evaluation Job' unconditionally 'performed by' one 'Evaluation Engine';
 
-		relationship R13 is 'Evaluation Order' conditionally follows one 'Evaluation Order',
-		                    'Evaluation Order' conditionally precedes one 'Evaluation Order';
+    relationship R13 is 'Evaluation Order' conditionally follows one 'Evaluation Order',
+                        'Evaluation Order' conditionally precedes one 'Evaluation Order';
 
-		relationship R14 is 'Evaluation Job' conditionally 'has first' one 'Evaluation Order',
-		                    'Evaluation Order' conditionally 'first for' one 'Evaluation Job';
+    relationship R14 is 'Evaluation Job' conditionally 'has first' one 'Evaluation Order',
+                        'Evaluation Order' conditionally 'first for' one 'Evaluation Job';
 
-		relationship R15 is 'Evaluation Job' conditionally 'has current best' one Move,
-		                    Move conditionally 'is currently best for' one 'Evaluation Job';
+    relationship R15 is 'Evaluation Job' conditionally 'has current best' one Move,
+                        Move conditionally 'is currently best for' one 'Evaluation Job';
 
-	end package;
+  end package;
 
 end;

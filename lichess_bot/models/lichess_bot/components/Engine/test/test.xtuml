@@ -2,102 +2,102 @@
 
 within lichess_bot::components::Engine is
 
-	package test is
-		class 'Game Manager';
-		@dialect("oal");
-		@function_num(1);
-		function test_do_move(name: in string, initial_fen: in string, move_text: in string, fens: in sequence of string) return boolean is
-			@noparse
-			board = Board::from_fen(fen: param.initial_fen);
-			board.print();
-			LOG::LogInfo(message: board.to_fen());
-			
-			// split the FEN into space delimited tokens
-			move_num = 0;
-			i = 0;
-			token_end = STRING::indexof( haystack: STRING::substr(s: param.move_text, begin: i, end: -1), needle: " ");
-			while token_end != -1 loop
-				token = STRING::substr(s: param.move_text, begin: i, end: i + token_end);
-				
-				// update the board
-				src_bitboard = Bitboards::coordinate_to_bitboard(coordinate: STRING::substr(s: token, begin: 0, end: 2));
-				dst_bitboard = Bitboards::coordinate_to_bitboard(coordinate: STRING::substr(s: token, begin: 2, end: 4));
-				promotion = "";
-				if STRING::strlen(s: token) > 4 then
-					promotion = STRING::substr(s: token, begin: 4, end: 5);
-				end if;
-				new_board = board.do_move(src_bitboard: src_bitboard, dst_bitboard: dst_bitboard, promotion: promotion);
-				board = new_board;
-			
-				// print the board
-				fen = board.to_fen();
-				LOG::LogInfo(message: token);
-				board.print();
-				LOG::LogInfo(message: fen);
-				
-				// check against FEN
-				if move_num < param.fens.length then
-					if fen != param.fens[move_num] then
-						LOG::LogFailure(message: "Error! " + param.name + ": FENs do not match on move " + STRING::itoa(i: move_num + 1));
-						LOG::LogFailure(message: "  Actual:   " + fen);
-						LOG::LogFailure(message: "  Expected: " + param.fens[move_num]);
-						return false;
-					end if;
-				end if;
-				
-				i = i + token_end + 1;
-				token_end = STRING::indexof( haystack: STRING::substr(s: param.move_text, begin: i, end: -1), needle: " ");
-				move_num = move_num + 1;
-			end while;
-			
-			select many boards from instances of Board;
-			for each board in boards loop
-				delete object instance board;
-			end for;
-			
-			return true;
-			@endnoparse
-		end function;
+  package test is
+    class 'Game Manager';
+    @dialect("oal");
+    @function_num(1);
+    function test_do_move(name: in string, initial_fen: in string, move_text: in string, fens: in sequence of string) return boolean is
+      @noparse
+      board = Board::from_fen(fen: param.initial_fen);
+      board.print();
+      LOG::LogInfo(message: board.to_fen());
+      
+      // split the FEN into space delimited tokens
+      move_num = 0;
+      i = 0;
+      token_end = STRING::indexof( haystack: STRING::substr(s: param.move_text, begin: i, end: -1), needle: " ");
+      while token_end != -1 loop
+      	token = STRING::substr(s: param.move_text, begin: i, end: i + token_end);
+      	
+      	// update the board
+      	src_bitboard = Bitboards::coordinate_to_bitboard(coordinate: STRING::substr(s: token, begin: 0, end: 2));
+      	dst_bitboard = Bitboards::coordinate_to_bitboard(coordinate: STRING::substr(s: token, begin: 2, end: 4));
+      	promotion = "";
+      	if STRING::strlen(s: token) > 4 then
+      		promotion = STRING::substr(s: token, begin: 4, end: 5);
+      	end if;
+      	new_board = board.do_move(src_bitboard: src_bitboard, dst_bitboard: dst_bitboard, promotion: promotion);
+      	board = new_board;
+      
+      	// print the board
+      	fen = board.to_fen();
+      	LOG::LogInfo(message: token);
+      	board.print();
+      	LOG::LogInfo(message: fen);
+      	
+      	// check against FEN
+      	if move_num < param.fens.length then
+      		if fen != param.fens[move_num] then
+      			LOG::LogFailure(message: "Error! " + param.name + ": FENs do not match on move " + STRING::itoa(i: move_num + 1));
+      			LOG::LogFailure(message: "  Actual:   " + fen);
+      			LOG::LogFailure(message: "  Expected: " + param.fens[move_num]);
+      			return false;
+      		end if;
+      	end if;
+      	
+      	i = i + token_end + 1;
+      	token_end = STRING::indexof( haystack: STRING::substr(s: param.move_text, begin: i, end: -1), needle: " ");
+      	move_num = move_num + 1;
+      end while;
+      
+      select many boards from instances of Board;
+      for each board in boards loop
+      	delete object instance board;
+      end for;
+      
+      return true;
+      @endnoparse
+    end function;
 
-		@dialect("oal");
-		@function_num(2);
-		function test_evaluate_position(fen: in string, depth: in integer) is
-			@noparse
-			LOG::LogInfo(message: "Evaluating position: " + param.fen);
-			// TODO fix this test
-			
-			// create the bot
-			create object instance bot of Bot;
-			bot.config = PROP::loadProperties(file_name:"lichess_bot.properties");
-			
-			// create the board
-			board = Board::from_fen(fen: param.fen);
-			
-			// create the initial position
-			create object instance initial_position of Position;
-			initial_position.fen = board.to_fen();
-			relate board to initial_position across R6;
-			
-			// create the game
-			create object instance game of ActiveGame;
-			game.id = "test_game";
-			game.initial_fen = initial_position.fen;
-			game.start_color = board.active_color;
-			game.color = game.start_color;
-			relate initial_position to game across R3;
-			
-			// create the evaluation engine
-			create object instance engine of Engine;
-			relate engine to game across R1;
-			relate initial_position to engine across R4;
-			
-			// analyze the position
-			generate Engine1:'start evaluation' to engine;
-			@endnoparse
-		end function;
+    @dialect("oal");
+    @function_num(2);
+    function test_evaluate_position(fen: in string, depth: in integer) is
+      @noparse
+      LOG::LogInfo(message: "Evaluating position: " + param.fen);
+      // TODO fix this test
+      
+      // create the bot
+      create object instance bot of Bot;
+      bot.config = PROP::loadProperties(file_name:"lichess_bot.properties");
+      
+      // create the board
+      board = Board::from_fen(fen: param.fen);
+      
+      // create the initial position
+      create object instance initial_position of Position;
+      initial_position.fen = board.to_fen();
+      relate board to initial_position across R6;
+      
+      // create the game
+      create object instance game of ActiveGame;
+      game.id = "test_game";
+      game.initial_fen = initial_position.fen;
+      game.start_color = board.active_color;
+      game.color = game.start_color;
+      relate initial_position to game across R3;
+      
+      // create the evaluation engine
+      create object instance engine of Engine;
+      relate engine to game across R1;
+      relate initial_position to engine across R4;
+      
+      // analyze the position
+      generate Engine1:'start evaluation' to engine;
+      @endnoparse
+    end function;
 
-		package do_move_test_cases;
-		package evaluate_position_test_cases;
-	end package;
+    package do_move_test_cases;
+    package evaluate_position_test_cases;
+  end package;
 
 end;
