@@ -21,20 +21,20 @@ within lichess_bot::components::Engine::games is
       // create file bitboards
       i = 7;
       while i >= 0 loop
-      	j = 0;
-      	self.FILES[i] = Bits::zero();
-      	while j < 8 loop
-      		self.FILES[i] = Bits::bitwise_or(a: self.FILES[i], b: Bits::left_shift(a: 1, n: j * 8 + i));
-      		j = j + 1;
-      	end while;
-      	i = i - 1;
+        j = 0;
+        self.FILES[i] = Bits::zero();
+        while j < 8 loop
+          self.FILES[i] = Bits::bitwise_or(a: self.FILES[i], b: Bits::left_shift(a: 1, n: j * 8 + i));
+          j = j + 1;
+        end while;
+        i = i - 1;
       end while;
       
       // create rank bitboards
       i = 7;
       while i >= 0 loop
-      	self.RANKS[i] = Bits::left_shift(a: 255, n: i * 8);
-      	i = i - 1;
+        self.RANKS[i] = Bits::left_shift(a: 255, n: i * 8);
+        i = i - 1;
       end while;
       
       // create patterns
@@ -72,8 +72,8 @@ within lichess_bot::components::Engine::games is
       @noparse
       select any bb from instances of Bitboards;
       if empty bb then
-      	create object instance bb of Bitboards;
-      	bb.initialize();
+        create object instance bb of Bitboards;
+        bb.initialize();
       end if;
       return bb;
       @endnoparse
@@ -106,8 +106,8 @@ within lichess_bot::components::Engine::games is
       bitboard = param.bitboard;
       count = 0;
       while bitboard != 0 loop
-      	count = count + 1;
-      	bitboard = Bits::bitwise_and(a: bitboard, b: bitboard - 1);  // reset LS1B
+        count = count + 1;
+        bitboard = Bits::bitwise_and(a: bitboard, b: bitboard - 1);  // reset LS1B
       end while;
       return count;
       @endnoparse
@@ -124,14 +124,14 @@ within lichess_bot::components::Engine::games is
       
       rank_num = 0;
       while Bits::bitwise_and(a: bitboard, b: full_rank) == 0  and rank_num <= 7 loop
-      	bitboard = Bits::unsigned_right_shift(a: bitboard, n: 8);
-      	rank_num = rank_num + 1;
+        bitboard = Bits::unsigned_right_shift(a: bitboard, n: 8);
+        rank_num = rank_num + 1;
       end while;
       
       file_num = 0;
       while bitboard != 1 and file_num <= 7 loop
-      	bitboard = Bits::unsigned_right_shift(a: bitboard, n: 1);
-      	file_num = file_num + 1;
+        bitboard = Bits::unsigned_right_shift(a: bitboard, n: 1);
+        file_num = file_num + 1;
       end while;
       
       file_rank[1] = rank_num;
@@ -149,16 +149,16 @@ within lichess_bot::components::Engine::games is
       bitboard_string = "";
       mask = Bits::left_shift(a: 1, n: 63);
       while mask != 0 loop
-      	if Bits::bitwise_and(a: param.bitboard, b: mask) != 0 then
-      		bitboard_string = "*" + bitboard_string;
-      	else
-      		bitboard_string = "." + bitboard_string;
-      	end if;
-      	if Bits::bitwise_and(a: bb.FILES[0], b: mask) != 0 then
-      		LOG::LogInfo(message: bitboard_string);
-      		bitboard_string = "";
-      	end if;
-      	mask = Bits::unsigned_right_shift(a: mask, n: 1);
+        if Bits::bitwise_and(a: param.bitboard, b: mask) != 0 then
+          bitboard_string = "*" + bitboard_string;
+        else
+          bitboard_string = "." + bitboard_string;
+        end if;
+        if Bits::bitwise_and(a: bb.FILES[0], b: mask) != 0 then
+          LOG::LogInfo(message: bitboard_string);
+          bitboard_string = "";
+        end if;
+        mask = Bits::unsigned_right_shift(a: mask, n: 1);
       end while;
       @endnoparse
     end operation;
@@ -172,10 +172,10 @@ within lichess_bot::components::Engine::games is
       highmask = Bits::left_shift(a: 1, n: 63);
       n = 63;
       while n > 0 loop
-      	bitboard = Bits::bitwise_or(a: bitboard, b: Bits::bitwise_or(a: Bits::left_shift(a: Bits::bitwise_and(a: param.bitboard, b: lowmask), n: n), b: Bits::unsigned_right_shift(a: Bits::bitwise_and(a: param.bitboard, b: highmask), n: n)));
-      	lowmask = Bits::left_shift(a: lowmask, n: 1);
-      	highmask = Bits::unsigned_right_shift(a: highmask, n: 1);
-      	n = n - 2;
+        bitboard = Bits::bitwise_or(a: bitboard, b: Bits::bitwise_or(a: Bits::left_shift(a: Bits::bitwise_and(a: param.bitboard, b: lowmask), n: n), b: Bits::unsigned_right_shift(a: Bits::bitwise_and(a: param.bitboard, b: highmask), n: n)));
+        lowmask = Bits::left_shift(a: lowmask, n: 1);
+        highmask = Bits::unsigned_right_shift(a: highmask, n: 1);
+        n = n - 2;
       end while;
       return bitboard;
       @endnoparse

@@ -38,30 +38,30 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
     // check if we can make a play immediately
     play_now = false;
     if game.is_our_turn() then
-    	
-    	// if we have checkmate, play immediately
-    	if current_position.evaluation.mate_on_board and
-    		(current_position.evaluation.mate_in > 0 and game.color == Color::WHITE or 
-    		current_position.evaluation.mate_in < 0 and game.color == Color::BLACK) then
-    		play_now = true;
-    	end if;
-    		
-    	// if we only have one move, play immediately
-    	select many moves related by current_position->Move[R2.'is follwed by'];
-    	if cardinality moves < 2 then
-    		play_now = true;
-    	end if;
+      
+      // if we have checkmate, play immediately
+      if current_position.evaluation.mate_on_board and
+        (current_position.evaluation.mate_in > 0 and game.color == Color::WHITE or 
+        current_position.evaluation.mate_in < 0 and game.color == Color::BLACK) then
+        play_now = true;
+      end if;
+        
+      // if we only have one move, play immediately
+      select many moves related by current_position->Move[R2.'is follwed by'];
+      if cardinality moves < 2 then
+        play_now = true;
+      end if;
     
-    	if play_now then
-    		generate ActiveGame3:'play move'(move: "") to game;
-    	end if;
+      if play_now then
+        generate ActiveGame3:'play move'(move: "") to game;
+      end if;
     
     end if;
-    	
+      
     // keep deepening the tree
     if self.active and not play_now and current_position.evaluation_depth < Bot::getInteger(name: "max_evaluation_depth", default_value: 6) then
     
-    	generate Engine1:'start evaluation' to self;
+      generate Engine1:'start evaluation' to self;
     
     end if;
     @endnoparse
@@ -83,9 +83,9 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
     
     // if the current position is not yet evaluated, start with a depth of 2, otherwise deepen by 1
     if not current_position.evaluated then
-    	new_job.depth = 2;
+      new_job.depth = 2;
     else
-    	new_job.depth = current_position.evaluation_depth + 1;
+      new_job.depth = current_position.evaluation_depth + 1;
     end if;
     
     // start the job

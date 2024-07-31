@@ -77,14 +77,14 @@ within lichess_bot::components::Engine::games::'Active Game' is
     
     // handle takeback proposals
     if (self.color == Color::WHITE and self.game_state.btakeback) or
-    	(self.color == Color::BLACK and self.game_state.wtakeback) then
-    	self.handle_takeback_proposal();
+      (self.color == Color::BLACK and self.game_state.wtakeback) then
+      self.handle_takeback_proposal();
     end if;
     
     // handle draw offers
     if (self.color == Color::WHITE and self.game_state.bdraw) or
-    	(self.color == Color::BLACK and self.game_state.wdraw) then
-    	self.handle_draw_offer();
+      (self.color == Color::BLACK and self.game_state.wdraw) then
+      self.handle_draw_offer();
     end if;
     
     // play a move after a certain amount of time, no matter what the status of the engine is
@@ -111,31 +111,31 @@ within lichess_bot::components::Engine::games::'Active Game' is
     // if a move is not given try to get the best move from the engine
     if move == "" then
     
-    	select one best_move related by self->Position[R3]->Move[R5];
-    	if not empty best_move then
-    	
-    		move = best_move.lan;
-    		select one engine related by self->Engine[R1];
-    		LOG::LogInfo(message: "Playing best line: " + engine.get_best_line());
-    		
-    	else
-    	
-    		// select a random legal move
-    		LOG::LogInfo(message: "Falling back on random move selection...");
-    		select one current_position related by self->Position[R3];
-    		legal_moves = ChessLib::legalMoves(fen: current_position.fen);
-    		i = 0;  // coerce integer
-    		i = TIM::current_clock() % legal_moves.length;
-    		move = legal_moves[i];
+      select one best_move related by self->Position[R3]->Move[R5];
+      if not empty best_move then
+      
+        move = best_move.lan;
+        select one engine related by self->Engine[R1];
+        LOG::LogInfo(message: "Playing best line: " + engine.get_best_line());
+        
+      else
+      
+        // select a random legal move
+        LOG::LogInfo(message: "Falling back on random move selection...");
+        select one current_position related by self->Position[R3];
+        legal_moves = ChessLib::legalMoves(fen: current_position.fen);
+        i = 0;  // coerce integer
+        i = TIM::current_clock() % legal_moves.length;
+        move = legal_moves[i];
     
-    	end if;
+      end if;
     
     end if;
     
     // play the move
     success = chess::move(game_id: self.id, move: move);
     if success then
-    	generate ActiveGame1:'waiting on move' to self;
+      generate ActiveGame1:'waiting on move' to self;
     else
       LOG::LogFailure(message: "Failed to make move.");
       create event instance e of ActiveGame4:'ready to play' to self;

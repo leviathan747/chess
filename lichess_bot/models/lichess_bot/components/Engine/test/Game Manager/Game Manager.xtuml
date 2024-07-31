@@ -16,7 +16,7 @@ within lichess_bot::components::Engine::test is
       @noparse
       select any mgr from instances of GameManager;
       if empty mgr then
-      	create object instance mgr of GameManager;
+        create object instance mgr of GameManager;
       end if;
       return mgr;
       @endnoparse

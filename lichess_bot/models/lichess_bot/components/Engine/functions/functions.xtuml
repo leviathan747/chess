@@ -10,8 +10,8 @@ within lichess_bot::components::Engine is
       // load configuration properties
       select any bot from instances of Bot;
       if empty bot then
-      	create object instance bot of Bot;
-      	bot.config = PROP::loadProperties(file_name:"lichess_bot.properties");
+        create object instance bot of Bot;
+        bot.config = PROP::loadProperties(file_name:"lichess_bot.properties");
       end if;
       
       // connect to the Lichess API and start listening for events
@@ -30,7 +30,7 @@ within lichess_bot::components::Engine is
       @noparse
       select many games from instances of ActiveGame;
       for each game in games loop
-      	game.resign();
+        game.resign();
       end for;
       @endnoparse
     end function;
@@ -42,18 +42,18 @@ within lichess_bot::components::Engine is
       max_games = Bot::getInteger(name: "max_games", default_value: 1);
       select many games from instances of ActiveGame where (selected.game_state.status == GameStatus::CREATED or selected.game_state.status == GameStatus::STARTED);
       if cardinality games < max_games then
-      	LOG::LogInfo(message: "Challenging " + param.user + "...");
-      	r = chess::createChallenge(
-      		user: param.user,
-      		rated: false,
-      		clock_limit: 900,
-      		clock_increment: 5,
-      		color: Color::RANDOM,
-      		variant: Variant::STANDARD,
-      		fen: ""
-      	);
+        LOG::LogInfo(message: "Challenging " + param.user + "...");
+        r = chess::createChallenge(
+          user: param.user,
+          rated: false,
+          clock_limit: 900,
+          clock_increment: 5,
+          color: Color::RANDOM,
+          variant: Variant::STANDARD,
+          fen: ""
+        );
       else
-      	LOG::LogInfo(message: "Could not challenge " + param.user + ": too many games already");
+        LOG::LogInfo(message: "Could not challenge " + param.user + ": too many games already");
       end if;
       @endnoparse
     end function;

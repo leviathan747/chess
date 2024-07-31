@@ -17,42 +17,42 @@ within lichess_bot::components::Engine is
       i = 0;
       token_end = STRING::indexof( haystack: STRING::substr(s: param.move_text, begin: i, end: -1), needle: " ");
       while token_end != -1 loop
-      	token = STRING::substr(s: param.move_text, begin: i, end: i + token_end);
-      	
-      	// update the board
-      	src_bitboard = Bitboards::coordinate_to_bitboard(coordinate: STRING::substr(s: token, begin: 0, end: 2));
-      	dst_bitboard = Bitboards::coordinate_to_bitboard(coordinate: STRING::substr(s: token, begin: 2, end: 4));
-      	promotion = "";
-      	if STRING::strlen(s: token) > 4 then
-      		promotion = STRING::substr(s: token, begin: 4, end: 5);
-      	end if;
-      	new_board = board.do_move(src_bitboard: src_bitboard, dst_bitboard: dst_bitboard, promotion: promotion);
-      	board = new_board;
+        token = STRING::substr(s: param.move_text, begin: i, end: i + token_end);
+        
+        // update the board
+        src_bitboard = Bitboards::coordinate_to_bitboard(coordinate: STRING::substr(s: token, begin: 0, end: 2));
+        dst_bitboard = Bitboards::coordinate_to_bitboard(coordinate: STRING::substr(s: token, begin: 2, end: 4));
+        promotion = "";
+        if STRING::strlen(s: token) > 4 then
+          promotion = STRING::substr(s: token, begin: 4, end: 5);
+        end if;
+        new_board = board.do_move(src_bitboard: src_bitboard, dst_bitboard: dst_bitboard, promotion: promotion);
+        board = new_board;
       
-      	// print the board
-      	fen = board.to_fen();
-      	LOG::LogInfo(message: token);
-      	board.print();
-      	LOG::LogInfo(message: fen);
-      	
-      	// check against FEN
-      	if move_num < param.fens.length then
-      		if fen != param.fens[move_num] then
-      			LOG::LogFailure(message: "Error! " + param.name + ": FENs do not match on move " + STRING::itoa(i: move_num + 1));
-      			LOG::LogFailure(message: "  Actual:   " + fen);
-      			LOG::LogFailure(message: "  Expected: " + param.fens[move_num]);
-      			return false;
-      		end if;
-      	end if;
-      	
-      	i = i + token_end + 1;
-      	token_end = STRING::indexof( haystack: STRING::substr(s: param.move_text, begin: i, end: -1), needle: " ");
-      	move_num = move_num + 1;
+        // print the board
+        fen = board.to_fen();
+        LOG::LogInfo(message: token);
+        board.print();
+        LOG::LogInfo(message: fen);
+        
+        // check against FEN
+        if move_num < param.fens.length then
+          if fen != param.fens[move_num] then
+            LOG::LogFailure(message: "Error! " + param.name + ": FENs do not match on move " + STRING::itoa(i: move_num + 1));
+            LOG::LogFailure(message: "  Actual:   " + fen);
+            LOG::LogFailure(message: "  Expected: " + param.fens[move_num]);
+            return false;
+          end if;
+        end if;
+        
+        i = i + token_end + 1;
+        token_end = STRING::indexof( haystack: STRING::substr(s: param.move_text, begin: i, end: -1), needle: " ");
+        move_num = move_num + 1;
       end while;
       
       select many boards from instances of Board;
       for each board in boards loop
-      	delete object instance board;
+        delete object instance board;
       end for;
       
       return true;

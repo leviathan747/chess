@@ -56,43 +56,43 @@ within lichess_bot::components is
         // handle incoming challenges
         if c.challenger.id != bot.user.id then
         
-        	accept_challenge = true;
-        	reason = DeclineReason::GENERIC;
+          accept_challenge = true;
+          reason = DeclineReason::GENERIC;
         
-        	// only accept the challenge if not at the max number of active games
-        	// default to one game at a time
-        	max_games = Bot::getInteger(name: "max_games", default_value: 1);
-        	select many games from instances of ActiveGame where (selected.game_state.status == GameStatus::CREATED or selected.game_state.status == GameStatus::STARTED);
-        	if cardinality games >= max_games then
-        			accept_challenge = false;
-        			reason = DeclineReason::LATER;
-        	end if;
+          // only accept the challenge if not at the max number of active games
+          // default to one game at a time
+          max_games = Bot::getInteger(name: "max_games", default_value: 1);
+          select many games from instances of ActiveGame where (selected.game_state.status == GameStatus::CREATED or selected.game_state.status == GameStatus::STARTED);
+          if cardinality games >= max_games then
+              accept_challenge = false;
+              reason = DeclineReason::LATER;
+          end if;
         
-        	// only accept unrated standard games
-        	if c.rated then
-        			accept_challenge = false;
-        			reason = DeclineReason::CASUAL;
-        	end if;
+          // only accept unrated standard games
+          if c.rated then
+              accept_challenge = false;
+              reason = DeclineReason::CASUAL;
+          end if;
         
-        	// only accept standard games or from position games
-        	if not (c.variant == Variant::STANDARD or c.variant == Variant::FROMPOSITION) then
-        			accept_challenge = false;
-        			reason = DeclineReason::STANDARD;
-        	end if;
+          // only accept standard games or from position games
+          if not (c.variant == Variant::STANDARD or c.variant == Variant::FROMPOSITION) then
+              accept_challenge = false;
+              reason = DeclineReason::STANDARD;
+          end if;
         
-        	// send the accept or decline message
-        	if accept_challenge then
-        		result = chess::acceptChallenge(challenge_id:c.id);
-        	else
-        		result = chess::declineChallenge(challenge_id:c.id, reason:reason);
-        	end if;
-        	
+          // send the accept or decline message
+          if accept_challenge then
+            result = chess::acceptChallenge(challenge_id:c.id);
+          else
+            result = chess::declineChallenge(challenge_id:c.id, reason:reason);
+          end if;
+          
         else
-        	
-        	LOG::LogInfo(message: "Watch outgoing challenge at: " + c.url );
-        	if Bot::getBoolean(name: "auto_open_challenge_url", default_value: false) then
-        		ARCH::openURL(url:c.url);
-        	end if;
+          
+          LOG::LogInfo(message: "Watch outgoing challenge at: " + c.url );
+          if Bot::getBoolean(name: "auto_open_challenge_url", default_value: false) then
+            ARCH::openURL(url:c.url);
+          end if;
         
         end if;
         @endnoparse
@@ -113,34 +113,34 @@ within lichess_bot::components is
         select any game from instances of ActiveGame where selected.id == param.game_id;
         if not empty game then
         
-        	// handle takeback proposals
-        	if param.username == "lichess" and param.room == Room::PLAYER and param.text == "Takeback sent" then
-        		game.handle_takeback_proposal();
-        	end if;
+          // handle takeback proposals
+          if param.username == "lichess" and param.room == Room::PLAYER and param.text == "Takeback sent" then
+            game.handle_takeback_proposal();
+          end if;
         
-        	// handle draw offers
-        	if param.username == "lichess" and param.room == Room::PLAYER and
-        		((game.color == Color::WHITE and param.text == "Black offers draw") or
-        		(game.color == Color::BLACK and param.text == "White offers draw")) then
-        		game.handle_draw_offer();
-        	end if;
-        	
-        	// handle resign command
-        	if param.username == "leviathan747" then
-        		if param.text == ".resign" then
-        			r = chess::chat(game_id: game.id, text: "My dad says I have to go home now...", room: Room::PLAYER);
-        			r = chess::chat(game_id: game.id, text: "My dad says I have to go home now...", room: Room::SPECTATOR);
-        			game.resign();
-        		elif param.text == ".start" then
-        			mgr = GameManager::get_instance();
-        			mgr.start();
-        		elif param.text == ".stop" then
-        			mgr = GameManager::get_instance();
-        			mgr.stop();
-        		elif param.text == ".challenge" then
-        			::send_challenge(user: "maia1");
-        		end if;
-        	end if;
+          // handle draw offers
+          if param.username == "lichess" and param.room == Room::PLAYER and
+            ((game.color == Color::WHITE and param.text == "Black offers draw") or
+            (game.color == Color::BLACK and param.text == "White offers draw")) then
+            game.handle_draw_offer();
+          end if;
+          
+          // handle resign command
+          if param.username == "leviathan747" then
+            if param.text == ".resign" then
+              r = chess::chat(game_id: game.id, text: "My dad says I have to go home now...", room: Room::PLAYER);
+              r = chess::chat(game_id: game.id, text: "My dad says I have to go home now...", room: Room::SPECTATOR);
+              game.resign();
+            elif param.text == ".start" then
+              mgr = GameManager::get_instance();
+              mgr.start();
+            elif param.text == ".stop" then
+              mgr = GameManager::get_instance();
+              mgr.stop();
+            elif param.text == ".challenge" then
+              ::send_challenge(user: "maia1");
+            end if;
+          end if;
         
         end if;
         @endnoparse
@@ -181,23 +181,23 @@ within lichess_bot::components is
         // find/create the game
         select any game from instances of ActiveGame where selected.id == g.id;
         if empty game then
-        	game = ActiveGame::new_game(id: g.id);
+          game = ActiveGame::new_game(id: g.id);
         end if;
         
         // set color for the game
         select any bot from instances of Bot;
         if g.white.name == bot.user.username then
-        	game.color = Color::WHITE;
+          game.color = Color::WHITE;
         else
-        	game.color = Color::BLACK;
+          game.color = Color::BLACK;
         end if;
         
         // update the initial position
         select one initial_position related by game->Position[R3];
         select one board related by initial_position->Board[R6];
         if not empty board then
-        	unrelate board from initial_position across R6;
-        	delete object instance board;
+          unrelate board from initial_position across R6;
+          delete object instance board;
         end if;
         board = Board::from_fen(fen: g.initialFen);
         relate board to initial_position across R6;
@@ -216,7 +216,7 @@ within lichess_bot::components is
         LOG::LogInfo(message:"Game start: " + param.game_event.id);
         version = Bot::getString(name: "version", default_value: "unknown");
         if version != "unknown" then
-        	r = chess::chat(game_id:param.game_event.id, text: "version: " + version, room:Room::PLAYER);
+          r = chess::chat(game_id:param.game_event.id, text: "version: " + version, room:Room::PLAYER);
         end if;
         r = chess::chat(game_id:param.game_event.id, text:"Good luck!", room:Room::PLAYER);
         g = param.game_event;
@@ -229,7 +229,7 @@ within lichess_bot::components is
         LOG::LogInfo(message:"Game state: " + param.game_id);
         select any game from instances of ActiveGame where selected.id == param.game_id;
         if not empty game then
-        	game.update_game_state(game_state: param.game_state);
+          game.update_game_state(game_state: param.game_state);
         end if;
         @endnoparse
       end message;
@@ -241,16 +241,16 @@ within lichess_bot::components is
         
         select any game from instances of ActiveGame where selected.id == param.game_id;
         if not empty game then
-        	
-        	// cancel the timer if it exists
-        	r = TIM::timer_cancel(timer_inst_ref: game.claim_victory_timer);
+          
+          // cancel the timer if it exists
+          r = TIM::timer_cancel(timer_inst_ref: game.claim_victory_timer);
         
-        	// if the opponent is gone, claim victory after the specified delay
-        	if param.gone then
-        		create event instance e of ActiveGame5:'claim victory' to game;
-        		game.claim_victory_timer = TIM::timer_start(event_inst: e, microseconds: param.claim_win_in_seconds * 1000000);
-        	end if;
-        	
+          // if the opponent is gone, claim victory after the specified delay
+          if param.gone then
+            create event instance e of ActiveGame5:'claim victory' to game;
+            game.claim_victory_timer = TIM::timer_start(event_inst: e, microseconds: param.claim_win_in_seconds * 1000000);
+          end if;
+          
         end if;
         @endnoparse
       end message;

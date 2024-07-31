@@ -37,9 +37,9 @@ within lichess_bot::components::Engine::games is
     operation resign() is
       @noparse
       if self.game_state.moves.length > 1 then
-      	r = chess::resign(game_id:self.id);
+        r = chess::resign(game_id:self.id);
       else
-      	r = chess::abort(game_id:self.id);
+        r = chess::abort(game_id:self.id);
       end if;
       @endnoparse
     end operation;
@@ -76,27 +76,27 @@ within lichess_bot::components::Engine::games is
       // update the position tree based on the moves played
       select one position related by self->Position[R3];
       while i < self.game_state.moves.length loop
-      	move_lan = self.game_state.moves[i];
-      	
-      	// get the next move
-      	select any move related by position->Move[R2.'is follwed by'] where selected.lan == move_lan;
-      	if empty move then
-      		move = position.new_move(lan: move_lan);
-      	end if;
-      	select one new_position related by move->Position[R2.'is follwed by'];
-      	unrelate position from self across R3;
-      	relate new_position to self across R3;
-      	
-      	// delete any moves that were not taken
-      	select any unmove related by position->Move[R2.'is follwed by'] where selected.lan != move_lan;
-      	while not empty unmove loop
-      		select one unposition related by unmove->Position[R2.'is follwed by'];
-      		unposition.dispose();
-      		select any unmove related by position->Move[R2.'is follwed by'] where selected.lan != move_lan;
-      	end while;
+        move_lan = self.game_state.moves[i];
+        
+        // get the next move
+        select any move related by position->Move[R2.'is follwed by'] where selected.lan == move_lan;
+        if empty move then
+          move = position.new_move(lan: move_lan);
+        end if;
+        select one new_position related by move->Position[R2.'is follwed by'];
+        unrelate position from self across R3;
+        relate new_position to self across R3;
+        
+        // delete any moves that were not taken
+        select any unmove related by position->Move[R2.'is follwed by'] where selected.lan != move_lan;
+        while not empty unmove loop
+          select one unposition related by unmove->Position[R2.'is follwed by'];
+          unposition.dispose();
+          select any unmove related by position->Move[R2.'is follwed by'] where selected.lan != move_lan;
+        end while;
       
-      	select one position related by self->Position[R3];
-      	i = i + 1;
+        select one position related by self->Position[R3];
+        i = i + 1;
       end while;
       
       // restart the evaluation engine
@@ -105,19 +105,19 @@ within lichess_bot::components::Engine::games is
       // print the current board
       select one current_board related by self->Position[R3]->Board[R6];
       if not empty current_board then
-      	current_board.print();
-      	LOG::LogInfo(message: current_board.to_fen());
+        current_board.print();
+        LOG::LogInfo(message: current_board.to_fen());
       end if;
       
       // check if the game is over
       if not (self.game_state.status == GameStatus::CREATED or self.game_state.status == GameStatus::STARTED) then
-      		generate ActiveGame2:'game over'(status: self.game_state.status) to self;
+          generate ActiveGame2:'game over'(status: self.game_state.status) to self;
       else
-      	if self.is_our_turn() then
-      		generate ActiveGame4:'ready to play' to self;
-      	else
-      		generate ActiveGame1:'waiting on move' to self;
-      	end if;
+        if self.is_our_turn() then
+          generate ActiveGame4:'ready to play' to self;
+        else
+          generate ActiveGame1:'waiting on move' to self;
+        end if;
       end if;
       @endnoparse
     end operation;
@@ -154,13 +154,13 @@ within lichess_bot::components::Engine::games is
       @noparse
       select one engineR1 related by self->Engine[R1];
       if not empty engineR1 then
-      	unrelate self from engineR1 across R1;
-      	engineR1.dispose();
+        unrelate self from engineR1 across R1;
+        engineR1.dispose();
       end if;
       
       select one positionR3 related by self->Position[R3];
       if not empty positionR3 then
-      	unrelate self from positionR3 across R3;
+        unrelate self from positionR3 across R3;
       end if;
       
       delete object instance self;

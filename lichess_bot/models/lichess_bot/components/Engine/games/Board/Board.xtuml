@@ -78,14 +78,14 @@ within lichess_bot::components::Engine::games is
       
       // check if the move is a capture
       is_capture = Bits::bitwise_and(a: self.their_pieces_bitboard(), b: dst_bitboard) != 0 or
-      	(is_pawn_move and Bits::bitwise_and(a: self.en_passant_target, b: dst_bitboard) != 0);
-      	
+        (is_pawn_move and Bits::bitwise_and(a: self.en_passant_target, b: dst_bitboard) != 0);
+        
       // get a bitboard for the pawn captured en passant
       en_passant_captured_pawn = Bits::zero();
       if is_capture and Bits::bitwise_and(a: self.en_passant_target, b: dst_bitboard) != 0 then
-      	src_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: src_bitboard);
-      	dst_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: dst_bitboard);
-      	en_passant_captured_pawn =  Bits::left_shift(a: 1, n: src_file_rank[1] * 8 + dst_file_rank[0]);
+        src_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: src_bitboard);
+        dst_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: dst_bitboard);
+        en_passant_captured_pawn =  Bits::left_shift(a: 1, n: src_file_rank[1] * 8 + dst_file_rank[0]);
       end if;
       
       // copy the piece bitboards and start changing them
@@ -104,48 +104,48 @@ within lichess_bot::components::Engine::games is
       
       // if this is a castling move, update the position of the rook first
       if Bits::bitwise_and(a: our_king, b: src_bitboard) != 0 then
-      	src_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: src_bitboard);
-      	dst_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: dst_bitboard);
-      	if dst_file_rank[0] - src_file_rank[0] > 1 then     // kingside castle
-      		dst_bitboard = Bits::left_shift(a: src_bitboard, n: 2);
-      		our_rooks = Bits::bitwise_and(a: our_rooks, b: Bits::bitwise_not(a: Bits::left_shift(a: src_bitboard, n: 3)));
-      		our_rooks = Bits::bitwise_or(a: our_rooks, b: Bits::unsigned_right_shift(a: dst_bitboard, n: 1));
-      	elif dst_file_rank[0] - src_file_rank[0] < -1 then  // queenside castle
-      		dst_bitboard = Bits::unsigned_right_shift(a: src_bitboard, n: 2);
-      		our_rooks = Bits::bitwise_and(a: our_rooks, b: Bits::bitwise_not(a: Bits::unsigned_right_shift(a: src_bitboard, n: 4)));
-      		our_rooks = Bits::bitwise_or(a: our_rooks, b: Bits::left_shift(a: dst_bitboard, n: 1));
-      	end if;
+        src_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: src_bitboard);
+        dst_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: dst_bitboard);
+        if dst_file_rank[0] - src_file_rank[0] > 1 then     // kingside castle
+          dst_bitboard = Bits::left_shift(a: src_bitboard, n: 2);
+          our_rooks = Bits::bitwise_and(a: our_rooks, b: Bits::bitwise_not(a: Bits::left_shift(a: src_bitboard, n: 3)));
+          our_rooks = Bits::bitwise_or(a: our_rooks, b: Bits::unsigned_right_shift(a: dst_bitboard, n: 1));
+        elif dst_file_rank[0] - src_file_rank[0] < -1 then  // queenside castle
+          dst_bitboard = Bits::unsigned_right_shift(a: src_bitboard, n: 2);
+          our_rooks = Bits::bitwise_and(a: our_rooks, b: Bits::bitwise_not(a: Bits::unsigned_right_shift(a: src_bitboard, n: 4)));
+          our_rooks = Bits::bitwise_or(a: our_rooks, b: Bits::left_shift(a: dst_bitboard, n: 1));
+        end if;
       end if;
       
       // vacate the source square and inhabit the destination square
       if Bits::bitwise_and(a: our_pawns, b: src_bitboard) != 0 then
-      	our_pawns = Bits::bitwise_and(a: our_pawns, b: inverse_src_bitboard);
-      	if param.promotion == "n" then
-      		our_knights = Bits::bitwise_or(a: our_knights, b: dst_bitboard);
-      	elif param.promotion == "b" then
-      		our_bishops = Bits::bitwise_or(a: our_bishops, b: dst_bitboard);
-      	elif param.promotion == "r" then
-      		our_rooks = Bits::bitwise_or(a: our_rooks, b: dst_bitboard);
-      	elif param.promotion == "q" then
-      		our_queens = Bits::bitwise_or(a: our_queens, b: dst_bitboard);
-      	else
-      		our_pawns = Bits::bitwise_or(a: our_pawns, b: dst_bitboard);
-      	end if;
+        our_pawns = Bits::bitwise_and(a: our_pawns, b: inverse_src_bitboard);
+        if param.promotion == "n" then
+          our_knights = Bits::bitwise_or(a: our_knights, b: dst_bitboard);
+        elif param.promotion == "b" then
+          our_bishops = Bits::bitwise_or(a: our_bishops, b: dst_bitboard);
+        elif param.promotion == "r" then
+          our_rooks = Bits::bitwise_or(a: our_rooks, b: dst_bitboard);
+        elif param.promotion == "q" then
+          our_queens = Bits::bitwise_or(a: our_queens, b: dst_bitboard);
+        else
+          our_pawns = Bits::bitwise_or(a: our_pawns, b: dst_bitboard);
+        end if;
       elif Bits::bitwise_and(a: our_knights, b: src_bitboard) != 0 then
-      	our_knights = Bits::bitwise_and(a: our_knights, b: inverse_src_bitboard);
-      	our_knights = Bits::bitwise_or(a: our_knights, b: dst_bitboard);
+        our_knights = Bits::bitwise_and(a: our_knights, b: inverse_src_bitboard);
+        our_knights = Bits::bitwise_or(a: our_knights, b: dst_bitboard);
       elif Bits::bitwise_and(a: our_bishops, b: src_bitboard) != 0 then
-      	our_bishops = Bits::bitwise_and(a: our_bishops, b: inverse_src_bitboard);
-      	our_bishops = Bits::bitwise_or(a: our_bishops, b: dst_bitboard);
+        our_bishops = Bits::bitwise_and(a: our_bishops, b: inverse_src_bitboard);
+        our_bishops = Bits::bitwise_or(a: our_bishops, b: dst_bitboard);
       elif Bits::bitwise_and(a: our_rooks, b: src_bitboard) != 0 then
-      	our_rooks = Bits::bitwise_and(a: our_rooks, b: inverse_src_bitboard);
-      	our_rooks = Bits::bitwise_or(a: our_rooks, b: dst_bitboard);
+        our_rooks = Bits::bitwise_and(a: our_rooks, b: inverse_src_bitboard);
+        our_rooks = Bits::bitwise_or(a: our_rooks, b: dst_bitboard);
       elif Bits::bitwise_and(a: our_queens, b: src_bitboard) != 0 then
-      	our_queens = Bits::bitwise_and(a: our_queens, b: inverse_src_bitboard);
-      	our_queens = Bits::bitwise_or(a: our_queens, b: dst_bitboard);
+        our_queens = Bits::bitwise_and(a: our_queens, b: inverse_src_bitboard);
+        our_queens = Bits::bitwise_or(a: our_queens, b: dst_bitboard);
       elif Bits::bitwise_and(a: our_king, b: src_bitboard) != 0 then
-      	our_king = Bits::bitwise_and(a: our_king, b: inverse_src_bitboard);
-      	our_king = Bits::bitwise_or(a: our_king, b: dst_bitboard);
+        our_king = Bits::bitwise_and(a: our_king, b: inverse_src_bitboard);
+        our_king = Bits::bitwise_or(a: our_king, b: dst_bitboard);
       end if;
       
       // clear the destination square on opposite color bitboards
@@ -173,20 +173,20 @@ within lichess_bot::components::Engine::games is
       // update en passant target
       board.en_passant_target = Bits::zero();
       if is_pawn_move then
-      	src_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: src_bitboard);
-      	dst_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: dst_bitboard);
-      	if dst_file_rank[1] - src_file_rank[1] == 2 then     // white pawn move: move the src bitboard up one rank by shifting to the left 8 bits
-      		board.en_passant_target = Bits::left_shift(a: src_bitboard, n: 8);
-      	elif dst_file_rank[1] - src_file_rank[1] == -2 then  // black pawn move: move the src bitboard down one rank by shifting to the right 8 bits
-      		board.en_passant_target = Bits::unsigned_right_shift(a: src_bitboard, n: 8);
-      	end if;
+        src_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: src_bitboard);
+        dst_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: dst_bitboard);
+        if dst_file_rank[1] - src_file_rank[1] == 2 then     // white pawn move: move the src bitboard up one rank by shifting to the left 8 bits
+          board.en_passant_target = Bits::left_shift(a: src_bitboard, n: 8);
+        elif dst_file_rank[1] - src_file_rank[1] == -2 then  // black pawn move: move the src bitboard down one rank by shifting to the right 8 bits
+          board.en_passant_target = Bits::unsigned_right_shift(a: src_bitboard, n: 8);
+        end if;
       end if;
       
       // set active color
       if self.active_color == Color::WHITE then
-      	board.active_color = Color::BLACK;
+        board.active_color = Color::BLACK;
       else
-      	board.active_color = Color::WHITE;
+        board.active_color = Color::WHITE;
       end if;
       
       // update castling rights
@@ -196,30 +196,30 @@ within lichess_bot::components::Engine::games is
       board.they_can_castle_queenside = self.we_can_castle_queenside;
       bb = Bitboards::get_instance();
       if self.we_can_castle_kingside and Bits::bitwise_and(a: Bits::bitwise_or(a: self.our_king, b: Bits::bitwise_and(a: self.our_rooks, b: bb.FILES[7])), b: src_bitboard) != 0 then
-      	board.they_can_castle_kingside = false;
+        board.they_can_castle_kingside = false;
       end if;
       if self.we_can_castle_queenside and Bits::bitwise_and(a: Bits::bitwise_or(a: self.our_king, b: Bits::bitwise_and(a: self.our_rooks, b: bb.FILES[0])), b: src_bitboard) != 0 then
-      	board.they_can_castle_queenside = false;
+        board.they_can_castle_queenside = false;
       end if;
       if self.they_can_castle_kingside and Bits::bitwise_and(a: Bits::bitwise_and(a: self.their_rooks, b: bb.FILES[7]), b: dst_bitboard) != 0 then
-      	board.we_can_castle_kingside = false;
+        board.we_can_castle_kingside = false;
       end if;
       if self.they_can_castle_queenside and Bits::bitwise_and(a: Bits::bitwise_and(a: self.their_rooks, b: bb.FILES[0]), b: dst_bitboard) != 0 then
-      	board.we_can_castle_queenside = false;
+        board.we_can_castle_queenside = false;
       end if;
       
       // update half move clock
       if is_capture or is_pawn_move then
-      	board.half_move_clock = 0;
+        board.half_move_clock = 0;
       else
-      	board.half_move_clock = self.half_move_clock + 1;
+        board.half_move_clock = self.half_move_clock + 1;
       end if;
       
       // update full move number
       if self.active_color == Color::BLACK then
-      	board.full_move_number = self.full_move_number + 1;
+        board.full_move_number = self.full_move_number + 1;
       else
-      	board.full_move_number = self.full_move_number;
+        board.full_move_number = self.full_move_number;
       end if;
       
       return board;
@@ -246,89 +246,89 @@ within lichess_bot::components::Engine::games is
       black_queens = self.their_queens;
       black_king = self.their_king;
       if self.active_color != Color::WHITE then
-      	white_pawns = self.their_pawns;
-      	white_knights = self.their_knights;
-      	white_bishops = self.their_bishops;
-      	white_rooks = self.their_rooks;
-      	white_queens = self.their_queens;
-      	white_king = self.their_king;
-      	black_pawns = self.our_pawns;
-      	black_knights = self.our_knights;
-      	black_bishops = self.our_bishops;
-      	black_rooks = self.our_rooks;
-      	black_queens = self.our_queens;
-      	black_king = self.our_king;
+        white_pawns = self.their_pawns;
+        white_knights = self.their_knights;
+        white_bishops = self.their_bishops;
+        white_rooks = self.their_rooks;
+        white_queens = self.their_queens;
+        white_king = self.their_king;
+        black_pawns = self.our_pawns;
+        black_knights = self.our_knights;
+        black_bishops = self.our_bishops;
+        black_rooks = self.our_rooks;
+        black_queens = self.our_queens;
+        black_king = self.our_king;
       end if;
       
       // populate piece positions section
       rank_num = 7;
       while rank_num >= 0 loop
-      	
-      	file_num = 0;
-      	blank_square_count = 0;
-      	while file_num < 8 loop
-      		
-      		// populate the piece
-      		square = "";
-      		if Bits::bitwise_and(a: white_pawns, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "P";
-      		elif Bits::bitwise_and(a: white_knights, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "N";
-      		elif Bits::bitwise_and(a: white_bishops, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "B";
-      		elif Bits::bitwise_and(a: white_rooks, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "R";
-      		elif Bits::bitwise_and(a: white_queens, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "Q";
-      		elif Bits::bitwise_and(a: white_king, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "K";
-      		elif Bits::bitwise_and(a: black_pawns, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "p";
-      		elif Bits::bitwise_and(a: black_knights, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "n";
-      		elif Bits::bitwise_and(a: black_bishops, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "b";
-      		elif Bits::bitwise_and(a: black_rooks, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "r";
-      		elif Bits::bitwise_and(a: black_queens, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "q";
-      		elif Bits::bitwise_and(a: black_king, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "k";
-      		end if;
-      		
-      		if square != "" then
-      			if blank_square_count > 0 then
-      				fen = fen + STRING::itoa(i: blank_square_count);
-      				blank_square_count = 0;
-      			end if;
-      			fen = fen + square;
-      		else
-      			blank_square_count = blank_square_count + 1;
-      		end if;
-      		
-      		file_num = file_num + 1;
-      	end while;
+        
+        file_num = 0;
+        blank_square_count = 0;
+        while file_num < 8 loop
+          
+          // populate the piece
+          square = "";
+          if Bits::bitwise_and(a: white_pawns, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "P";
+          elif Bits::bitwise_and(a: white_knights, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "N";
+          elif Bits::bitwise_and(a: white_bishops, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "B";
+          elif Bits::bitwise_and(a: white_rooks, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "R";
+          elif Bits::bitwise_and(a: white_queens, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "Q";
+          elif Bits::bitwise_and(a: white_king, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "K";
+          elif Bits::bitwise_and(a: black_pawns, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "p";
+          elif Bits::bitwise_and(a: black_knights, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "n";
+          elif Bits::bitwise_and(a: black_bishops, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "b";
+          elif Bits::bitwise_and(a: black_rooks, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "r";
+          elif Bits::bitwise_and(a: black_queens, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "q";
+          elif Bits::bitwise_and(a: black_king, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "k";
+          end if;
+          
+          if square != "" then
+            if blank_square_count > 0 then
+              fen = fen + STRING::itoa(i: blank_square_count);
+              blank_square_count = 0;
+            end if;
+            fen = fen + square;
+          else
+            blank_square_count = blank_square_count + 1;
+          end if;
+          
+          file_num = file_num + 1;
+        end while;
       
-      	// add the blank space count if the rank doesn't end with a piece
-      	if blank_square_count > 0 then
-      		fen = fen + STRING::itoa(i: blank_square_count);
-      	end if;
+        // add the blank space count if the rank doesn't end with a piece
+        if blank_square_count > 0 then
+          fen = fen + STRING::itoa(i: blank_square_count);
+        end if;
       
-      	// add the rank ender
-      	if rank_num >= 1 then
-      		fen = fen + "/";
-      	end if;
-      	
-      	rank_num = rank_num - 1;
+        // add the rank ender
+        if rank_num >= 1 then
+          fen = fen + "/";
+        end if;
+        
+        rank_num = rank_num - 1;
       end while;
       
       fen = fen + " ";
       
       // populate the active color
       if self.active_color == Color::WHITE then
-      	fen = fen + "w";
+        fen = fen + "w";
       else
-      	fen = fen + "b";
+        fen = fen + "b";
       end if;
       
       fen = fen + " ";
@@ -336,34 +336,34 @@ within lichess_bot::components::Engine::games is
       // populate castling rights
       castling_rights = "";
       if (self.we_can_castle_kingside and self.active_color == Color::WHITE) or
-      		(self.they_can_castle_kingside and self.active_color == Color::BLACK) then
-      	castling_rights = castling_rights + "K";
+          (self.they_can_castle_kingside and self.active_color == Color::BLACK) then
+        castling_rights = castling_rights + "K";
       end if;
       if (self.we_can_castle_queenside and self.active_color == Color::WHITE) or
-      		(self.they_can_castle_queenside and self.active_color == Color::BLACK) then
-      	castling_rights = castling_rights + "Q";
+          (self.they_can_castle_queenside and self.active_color == Color::BLACK) then
+        castling_rights = castling_rights + "Q";
       end if;
       if (self.we_can_castle_kingside and self.active_color == Color::BLACK) or
-      		(self.they_can_castle_kingside and self.active_color == Color::WHITE) then
-      	castling_rights = castling_rights + "k";
+          (self.they_can_castle_kingside and self.active_color == Color::WHITE) then
+        castling_rights = castling_rights + "k";
       end if;
       if (self.we_can_castle_queenside and self.active_color == Color::BLACK) or
-      		(self.they_can_castle_queenside and self.active_color == Color::WHITE) then
-      	castling_rights = castling_rights + "q";
+          (self.they_can_castle_queenside and self.active_color == Color::WHITE) then
+        castling_rights = castling_rights + "q";
       end if;
       if castling_rights != "" then
-      	fen = fen + castling_rights;
+        fen = fen + castling_rights;
       else
-      	fen = fen + "-";
+        fen = fen + "-";
       end if;
       
       fen = fen + " ";
       
       // populate en passant target
       if self.en_passant_target != Bits::zero() then
-      	fen = fen + Bitboards::bitboard_to_coordinate(bitboard: self.en_passant_target);
+        fen = fen + Bitboards::bitboard_to_coordinate(bitboard: self.en_passant_target);
       else
-      	fen = fen + "-";
+        fen = fen + "-";
       end if;
       
       fen = fen + " ";
@@ -398,79 +398,79 @@ within lichess_bot::components::Engine::games is
       black_queens = self.their_queens;
       black_king = self.their_king;
       if self.active_color != Color::WHITE then
-      	white_pawns = self.their_pawns;
-      	white_knights = self.their_knights;
-      	white_bishops = self.their_bishops;
-      	white_rooks = self.their_rooks;
-      	white_queens = self.their_queens;
-      	white_king = self.their_king;
-      	black_pawns = self.our_pawns;
-      	black_knights = self.our_knights;
-      	black_bishops = self.our_bishops;
-      	black_rooks = self.our_rooks;
-      	black_queens = self.our_queens;
-      	black_king = self.our_king;
+        white_pawns = self.their_pawns;
+        white_knights = self.their_knights;
+        white_bishops = self.their_bishops;
+        white_rooks = self.their_rooks;
+        white_queens = self.their_queens;
+        white_king = self.their_king;
+        black_pawns = self.our_pawns;
+        black_knights = self.our_knights;
+        black_bishops = self.our_bishops;
+        black_rooks = self.our_rooks;
+        black_queens = self.our_queens;
+        black_king = self.our_king;
       end if;
       
       rank_num = 7;
       while rank_num >= 0 loop
-      	
-      	// print the rank separator
-      	LOG::LogInfo(message: "---------------------------------");
-      	
-      	line_string = "";
-      	file_num = 0;
-      	file_sep = "|";
-      	while file_num < 8 loop
-      		
-      		// populate the square
-      		square = " ";
-      		left_buffer = " ";
-      		right_buffer = " ";
-      		
-      		if Bits::bitwise_and(a: white_pawns, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "P";
-      		elif Bits::bitwise_and(a: white_knights, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "N";
-      		elif Bits::bitwise_and(a: white_bishops, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "B";
-      		elif Bits::bitwise_and(a: white_rooks, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "R";
-      		elif Bits::bitwise_and(a: white_queens, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "Q";
-      		elif Bits::bitwise_and(a: white_king, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "K";
-      		elif Bits::bitwise_and(a: black_pawns, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "p";
-      		elif Bits::bitwise_and(a: black_knights, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "n";
-      		elif Bits::bitwise_and(a: black_bishops, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "b";
-      		elif Bits::bitwise_and(a: black_rooks, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "r";
-      		elif Bits::bitwise_and(a: black_queens, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "q";
-      		elif Bits::bitwise_and(a: black_king, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "k";
-      		elif Bits::bitwise_and(a: self.en_passant_target, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
-      			square = "*";
-      		end if;
+        
+        // print the rank separator
+        LOG::LogInfo(message: "---------------------------------");
+        
+        line_string = "";
+        file_num = 0;
+        file_sep = "|";
+        while file_num < 8 loop
+          
+          // populate the square
+          square = " ";
+          left_buffer = " ";
+          right_buffer = " ";
+          
+          if Bits::bitwise_and(a: white_pawns, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "P";
+          elif Bits::bitwise_and(a: white_knights, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "N";
+          elif Bits::bitwise_and(a: white_bishops, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "B";
+          elif Bits::bitwise_and(a: white_rooks, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "R";
+          elif Bits::bitwise_and(a: white_queens, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "Q";
+          elif Bits::bitwise_and(a: white_king, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "K";
+          elif Bits::bitwise_and(a: black_pawns, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "p";
+          elif Bits::bitwise_and(a: black_knights, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "n";
+          elif Bits::bitwise_and(a: black_bishops, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "b";
+          elif Bits::bitwise_and(a: black_rooks, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "r";
+          elif Bits::bitwise_and(a: black_queens, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "q";
+          elif Bits::bitwise_and(a: black_king, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "k";
+          elif Bits::bitwise_and(a: self.en_passant_target, b:  Bits::left_shift(a: 1, n: rank_num * 8 + file_num)) != 0 then
+            square = "*";
+          end if;
       
-      		square = left_buffer + square + right_buffer;
-      		
-      		// append the square
-      		line_string = line_string + file_sep + square;
-      		
-      		
-      		file_sep = "|";
-      		file_num = file_num + 1;
-      	end while;
-      	
-      	// at the end of the rank append the final separator and rank number
-      	line_string = line_string + "| " + STRING::itoa(i: rank_num + 1);
-      	LOG::LogInfo(message: line_string);
-      	
-      	rank_num = rank_num - 1;
+          square = left_buffer + square + right_buffer;
+          
+          // append the square
+          line_string = line_string + file_sep + square;
+          
+          
+          file_sep = "|";
+          file_num = file_num + 1;
+        end while;
+        
+        // at the end of the rank append the final separator and rank number
+        line_string = line_string + "| " + STRING::itoa(i: rank_num + 1);
+        LOG::LogInfo(message: line_string);
+        
+        rank_num = rank_num - 1;
       end while;
       
       // at the end print the last rank separator and the file letters
@@ -501,7 +501,7 @@ within lichess_bot::components::Engine::games is
       
       fen = param.fen;
       if fen == "startpos" then
-      	fen = STARTPOS;
+        fen = STARTPOS;
       end if;
       
       // add a space to the end of the FEN string for token parsing
@@ -512,141 +512,141 @@ within lichess_bot::components::Engine::games is
       i = 0;
       token_end = STRING::indexof( haystack: STRING::substr(s: fen, begin: i, end: -1), needle: " ");
       while token_end != -1 loop
-      	token = STRING::substr(s: fen, begin: i, end: i + token_end);
-      	
-      	// parse the piece positions
-      	if token_num == 0 then
-      	
-      		rank_num = 7;
-      		a = 0;
-      		b = STRING::indexof(haystack: STRING::substr(s: token, begin: a, end: -1), needle: "/");
-      		rank = STRING::substr(s: token, begin: a, end: b);
-      		while rank_num >= 0 loop  // loop through each rank
+        token = STRING::substr(s: fen, begin: i, end: i + token_end);
+        
+        // parse the piece positions
+        if token_num == 0 then
+        
+          rank_num = 7;
+          a = 0;
+          b = STRING::indexof(haystack: STRING::substr(s: token, begin: a, end: -1), needle: "/");
+          rank = STRING::substr(s: token, begin: a, end: b);
+          while rank_num >= 0 loop  // loop through each rank
       
-      			// loop through each character
-      			j = 0;
-      			file_num = 0;
-      			while j < STRING::strlen(s: rank) loop  // loop through each file
-      				character = STRING::substr(s: rank, begin: j, end: j + 1);
-      				if character == "P" then
-      					white_pawns = Bits::bitwise_or(a: white_pawns, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
-      				elif character == "N" then
-      					white_knights = Bits::bitwise_or(a: white_knights, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
-      				elif character == "B" then
-      					white_bishops = Bits::bitwise_or(a: white_bishops, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
-      				elif character == "R" then
-      					white_rooks = Bits::bitwise_or(a: white_rooks, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
-      				elif character == "Q" then
-      					white_queens = Bits::bitwise_or(a: white_queens, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
-      				elif character == "K" then
-      					white_king = Bits::bitwise_or(a: white_king, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
-      				elif character == "p" then
-      					black_pawns = Bits::bitwise_or(a: black_pawns, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
-      				elif character == "n" then
-      					black_knights = Bits::bitwise_or(a: black_knights, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
-      				elif character == "b" then
-      					black_bishops = Bits::bitwise_or(a: black_bishops, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
-      				elif character == "r" then
-      					black_rooks = Bits::bitwise_or(a: black_rooks, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
-      				elif character == "q" then
-      					black_queens = Bits::bitwise_or(a: black_queens, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
-      				elif character == "k" then
-      					black_king = Bits::bitwise_or(a: black_king, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
-      				else
-      					// consecutive blank spaces denoted by a number
-      					file_num = file_num + STRING::atoi(s: character) - 1;
-      				end if;
-      				
-      				file_num = file_num + 1;
-      				j = j + 1;
-      			end while;
+            // loop through each character
+            j = 0;
+            file_num = 0;
+            while j < STRING::strlen(s: rank) loop  // loop through each file
+              character = STRING::substr(s: rank, begin: j, end: j + 1);
+              if character == "P" then
+                white_pawns = Bits::bitwise_or(a: white_pawns, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+              elif character == "N" then
+                white_knights = Bits::bitwise_or(a: white_knights, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+              elif character == "B" then
+                white_bishops = Bits::bitwise_or(a: white_bishops, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+              elif character == "R" then
+                white_rooks = Bits::bitwise_or(a: white_rooks, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+              elif character == "Q" then
+                white_queens = Bits::bitwise_or(a: white_queens, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+              elif character == "K" then
+                white_king = Bits::bitwise_or(a: white_king, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+              elif character == "p" then
+                black_pawns = Bits::bitwise_or(a: black_pawns, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+              elif character == "n" then
+                black_knights = Bits::bitwise_or(a: black_knights, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+              elif character == "b" then
+                black_bishops = Bits::bitwise_or(a: black_bishops, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+              elif character == "r" then
+                black_rooks = Bits::bitwise_or(a: black_rooks, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+              elif character == "q" then
+                black_queens = Bits::bitwise_or(a: black_queens, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+              elif character == "k" then
+                black_king = Bits::bitwise_or(a: black_king, b: Bits::left_shift(a: 1, n: 8 * rank_num + file_num));
+              else
+                // consecutive blank spaces denoted by a number
+                file_num = file_num + STRING::atoi(s: character) - 1;
+              end if;
+              
+              file_num = file_num + 1;
+              j = j + 1;
+            end while;
       
-      			// get the next rank
-      			a = b + 1;
-      			if rank_num > 1 then
-      				b = a + STRING::indexof(haystack: STRING::substr(s: token, begin: a, end: -1), needle: "/");
-      			else
-      				b = -1;
-      			end if;
-      			rank = STRING::substr(s: token, begin: a, end: b);
-      			
-      			rank_num = rank_num - 1;
-      		end while;
-      		
-      	// parse active color
-      	elif token_num == 1 then
-      		
-      		if token == "w" then
-      			board.active_color = Color::WHITE;
-      		else
-      			board.active_color = Color::BLACK;
-      		end if;
-      		
-      	// parse castling rights
-      	elif token_num == 2 then
-      		
-      		if token != "-" then
-      			white_can_castle_kingside = STRING::indexof(haystack: token, needle: "K") != -1;
-      			white_can_castle_queenside = STRING::indexof(haystack: token, needle: "Q") != -1;
-      			black_can_castle_kingside = STRING::indexof(haystack: token, needle: "k") != -1;
-      			black_can_castle_queenside = STRING::indexof(haystack: token, needle: "q") != -1;
-      			board.we_can_castle_kingside = (board.active_color == Color::WHITE and white_can_castle_kingside) or (board.active_color == Color::BLACK and black_can_castle_kingside);
-      			board.we_can_castle_queenside = (board.active_color == Color::WHITE and white_can_castle_queenside) or (board.active_color == Color::BLACK and black_can_castle_queenside);
-      			board.they_can_castle_kingside = (board.active_color == Color::WHITE and black_can_castle_kingside) or (board.active_color == Color::BLACK and white_can_castle_kingside);
-      			board.they_can_castle_queenside = (board.active_color == Color::WHITE and black_can_castle_queenside) or (board.active_color == Color::BLACK and white_can_castle_queenside);
-      		end if;
+            // get the next rank
+            a = b + 1;
+            if rank_num > 1 then
+              b = a + STRING::indexof(haystack: STRING::substr(s: token, begin: a, end: -1), needle: "/");
+            else
+              b = -1;
+            end if;
+            rank = STRING::substr(s: token, begin: a, end: b);
+            
+            rank_num = rank_num - 1;
+          end while;
+          
+        // parse active color
+        elif token_num == 1 then
+          
+          if token == "w" then
+            board.active_color = Color::WHITE;
+          else
+            board.active_color = Color::BLACK;
+          end if;
+          
+        // parse castling rights
+        elif token_num == 2 then
+          
+          if token != "-" then
+            white_can_castle_kingside = STRING::indexof(haystack: token, needle: "K") != -1;
+            white_can_castle_queenside = STRING::indexof(haystack: token, needle: "Q") != -1;
+            black_can_castle_kingside = STRING::indexof(haystack: token, needle: "k") != -1;
+            black_can_castle_queenside = STRING::indexof(haystack: token, needle: "q") != -1;
+            board.we_can_castle_kingside = (board.active_color == Color::WHITE and white_can_castle_kingside) or (board.active_color == Color::BLACK and black_can_castle_kingside);
+            board.we_can_castle_queenside = (board.active_color == Color::WHITE and white_can_castle_queenside) or (board.active_color == Color::BLACK and black_can_castle_queenside);
+            board.they_can_castle_kingside = (board.active_color == Color::WHITE and black_can_castle_kingside) or (board.active_color == Color::BLACK and white_can_castle_kingside);
+            board.they_can_castle_queenside = (board.active_color == Color::WHITE and black_can_castle_queenside) or (board.active_color == Color::BLACK and white_can_castle_queenside);
+          end if;
       
-      	// parse en passant target
-      	elif token_num == 3 then
-      		
-      		if token != "-" then
-      			board.en_passant_target = Bitboards::coordinate_to_bitboard(coordinate: token);
-      		end if;
-      		
-      	// parse half move clock
-      	elif token_num == 4 then
-      		
-      		board.half_move_clock = STRING::atoi(s: token);
+        // parse en passant target
+        elif token_num == 3 then
+          
+          if token != "-" then
+            board.en_passant_target = Bitboards::coordinate_to_bitboard(coordinate: token);
+          end if;
+          
+        // parse half move clock
+        elif token_num == 4 then
+          
+          board.half_move_clock = STRING::atoi(s: token);
       
-      	// parse full move number
-      	elif token_num == 5 then
+        // parse full move number
+        elif token_num == 5 then
       
-      		board.full_move_number = STRING::atoi(s: token);
-      	
-      	end if;
-      	
-      	token_num = token_num + 1;
-      	i = i + token_end + 1;
-      	token_end = STRING::indexof( haystack: STRING::substr(s: fen, begin: i, end: -1), needle: " ");
+          board.full_move_number = STRING::atoi(s: token);
+        
+        end if;
+        
+        token_num = token_num + 1;
+        i = i + token_end + 1;
+        token_end = STRING::indexof( haystack: STRING::substr(s: fen, begin: i, end: -1), needle: " ");
       end while;
       
       // copy the bitboards based on active color
       if board.active_color == Color::WHITE then
-      	board.our_pawns = white_pawns;
-      	board.our_knights = white_knights;
-      	board.our_bishops = white_bishops;
-      	board.our_rooks = white_rooks;
-      	board.our_queens = white_queens;
-      	board.our_king = white_king;
-      	board.their_pawns = black_pawns;
-      	board.their_knights = black_knights;
-      	board.their_bishops = black_bishops;
-      	board.their_rooks = black_rooks;
-      	board.their_queens = black_queens;
-      	board.their_king = black_king;
+        board.our_pawns = white_pawns;
+        board.our_knights = white_knights;
+        board.our_bishops = white_bishops;
+        board.our_rooks = white_rooks;
+        board.our_queens = white_queens;
+        board.our_king = white_king;
+        board.their_pawns = black_pawns;
+        board.their_knights = black_knights;
+        board.their_bishops = black_bishops;
+        board.their_rooks = black_rooks;
+        board.their_queens = black_queens;
+        board.their_king = black_king;
       else
-      	board.our_pawns = black_pawns;
-      	board.our_knights = black_knights;
-      	board.our_bishops = black_bishops;
-      	board.our_rooks = black_rooks;
-      	board.our_queens = black_queens;
-      	board.our_king = black_king;
-      	board.their_pawns = white_pawns;
-      	board.their_knights = white_knights;
-      	board.their_bishops = white_bishops;
-      	board.their_rooks = white_rooks;
-      	board.their_queens = white_queens;
-      	board.their_king = white_king;
+        board.our_pawns = black_pawns;
+        board.our_knights = black_knights;
+        board.our_bishops = black_bishops;
+        board.our_rooks = black_rooks;
+        board.our_queens = black_queens;
+        board.our_king = black_king;
+        board.their_pawns = white_pawns;
+        board.their_knights = white_knights;
+        board.their_bishops = white_bishops;
+        board.their_rooks = white_rooks;
+        board.their_queens = white_queens;
+        board.their_king = white_king;
       end if;
       
       return board;
@@ -677,14 +677,14 @@ within lichess_bot::components::Engine::games is
       
       while rooks_bitboard != 0 loop
       
-      	// add the new positions to the attack bitboard
-      	attacks = Bits::bitwise_or(a: attacks, b: rooks_bitboard);
-      	
-      	// clear out any pieces intersecting with the blockers
-      	rooks_bitboard = Bits::bitwise_and(a: rooks_bitboard, b: inverse_blockers);
+        // add the new positions to the attack bitboard
+        attacks = Bits::bitwise_or(a: attacks, b: rooks_bitboard);
+        
+        // clear out any pieces intersecting with the blockers
+        rooks_bitboard = Bits::bitwise_and(a: rooks_bitboard, b: inverse_blockers);
       
-      	// clear the top rank and shift up
-      	rooks_bitboard = Bits::left_shift(a: Bits::bitwise_and(a: rooks_bitboard, b: Bits::bitwise_not(a: bb.RANKS[7])), n: 8);
+        // clear the top rank and shift up
+        rooks_bitboard = Bits::left_shift(a: Bits::bitwise_and(a: rooks_bitboard, b: Bits::bitwise_not(a: bb.RANKS[7])), n: 8);
       
       end while;
       
@@ -696,14 +696,14 @@ within lichess_bot::components::Engine::games is
       
       while rooks_bitboard != 0 loop
       
-      	// add the new positions to the attack bitboard
-      	attacks = Bits::bitwise_or(a: attacks, b: rooks_bitboard);
-      	
-      	// clear out any pieces intersecting with the blockers
-      	rooks_bitboard = Bits::bitwise_and(a: rooks_bitboard, b: inverse_blockers);
+        // add the new positions to the attack bitboard
+        attacks = Bits::bitwise_or(a: attacks, b: rooks_bitboard);
+        
+        // clear out any pieces intersecting with the blockers
+        rooks_bitboard = Bits::bitwise_and(a: rooks_bitboard, b: inverse_blockers);
       
-      	// clear the bottom rank and shift down
-      	rooks_bitboard = Bits::unsigned_right_shift(a: Bits::bitwise_and(a: rooks_bitboard, b: Bits::bitwise_not(a: bb.RANKS[0])), n: 8);
+        // clear the bottom rank and shift down
+        rooks_bitboard = Bits::unsigned_right_shift(a: Bits::bitwise_and(a: rooks_bitboard, b: Bits::bitwise_not(a: bb.RANKS[0])), n: 8);
       
       end while;
       
@@ -715,14 +715,14 @@ within lichess_bot::components::Engine::games is
       
       while rooks_bitboard != 0 loop
       
-      	// add the new positions to the attack bitboard
-      	attacks = Bits::bitwise_or(a: attacks, b: rooks_bitboard);
-      	
-      	// clear out any pieces intersecting with the blockers
-      	rooks_bitboard = Bits::bitwise_and(a: rooks_bitboard, b: inverse_blockers);
+        // add the new positions to the attack bitboard
+        attacks = Bits::bitwise_or(a: attacks, b: rooks_bitboard);
+        
+        // clear out any pieces intersecting with the blockers
+        rooks_bitboard = Bits::bitwise_and(a: rooks_bitboard, b: inverse_blockers);
       
-      	// clear the leftmost file and shift left
-      	rooks_bitboard = Bits::unsigned_right_shift(a: Bits::bitwise_and(a: rooks_bitboard, b: Bits::bitwise_not(a: bb.FILES[0])), n: 1);
+        // clear the leftmost file and shift left
+        rooks_bitboard = Bits::unsigned_right_shift(a: Bits::bitwise_and(a: rooks_bitboard, b: Bits::bitwise_not(a: bb.FILES[0])), n: 1);
       
       end while;
       
@@ -734,14 +734,14 @@ within lichess_bot::components::Engine::games is
       
       while rooks_bitboard != 0 loop
       
-      	// add the new positions to the attack bitboard
-      	attacks = Bits::bitwise_or(a: attacks, b: rooks_bitboard);
-      	
-      	// clear out any pieces intersecting with the blockers
-      	rooks_bitboard = Bits::bitwise_and(a: rooks_bitboard, b: inverse_blockers);
+        // add the new positions to the attack bitboard
+        attacks = Bits::bitwise_or(a: attacks, b: rooks_bitboard);
+        
+        // clear out any pieces intersecting with the blockers
+        rooks_bitboard = Bits::bitwise_and(a: rooks_bitboard, b: inverse_blockers);
       
-      	// clear the rightmost file and shift right
-      	rooks_bitboard = Bits::left_shift(a: Bits::bitwise_and(a: rooks_bitboard, b: Bits::bitwise_not(a: bb.FILES[7])), n: 1);
+        // clear the rightmost file and shift right
+        rooks_bitboard = Bits::left_shift(a: Bits::bitwise_and(a: rooks_bitboard, b: Bits::bitwise_not(a: bb.FILES[7])), n: 1);
       
       end while;
       
@@ -773,14 +773,14 @@ within lichess_bot::components::Engine::games is
       
       while bishops_bitboard != 0 loop
       
-      	// add the new positions to the attack bitboard
-      	attacks = Bits::bitwise_or(a: attacks, b: bishops_bitboard);
-      	
-      	// clear out any pieces intersecting with the blockers
-      	bishops_bitboard = Bits::bitwise_and(a: bishops_bitboard, b: inverse_blockers);
+        // add the new positions to the attack bitboard
+        attacks = Bits::bitwise_or(a: attacks, b: bishops_bitboard);
+        
+        // clear out any pieces intersecting with the blockers
+        bishops_bitboard = Bits::bitwise_and(a: bishops_bitboard, b: inverse_blockers);
       
-      	// clear the top rank, rightmost file and shift NE
-      	bishops_bitboard = Bits::left_shift(a: Bits::bitwise_and(a: bishops_bitboard, b: Bits::bitwise_not(a: Bits::bitwise_or( a: bb.RANKS[7], b: bb.FILES[7] ))), n: 8 + 1);
+        // clear the top rank, rightmost file and shift NE
+        bishops_bitboard = Bits::left_shift(a: Bits::bitwise_and(a: bishops_bitboard, b: Bits::bitwise_not(a: Bits::bitwise_or( a: bb.RANKS[7], b: bb.FILES[7] ))), n: 8 + 1);
       
       end while;
       
@@ -792,14 +792,14 @@ within lichess_bot::components::Engine::games is
       
       while bishops_bitboard != 0 loop
       
-      	// add the new positions to the attack bitboard
-      	attacks = Bits::bitwise_or(a: attacks, b: bishops_bitboard);
-      	
-      	// clear out any pieces intersecting with the blockers
-      	bishops_bitboard = Bits::bitwise_and(a: bishops_bitboard, b: inverse_blockers);
+        // add the new positions to the attack bitboard
+        attacks = Bits::bitwise_or(a: attacks, b: bishops_bitboard);
+        
+        // clear out any pieces intersecting with the blockers
+        bishops_bitboard = Bits::bitwise_and(a: bishops_bitboard, b: inverse_blockers);
       
-      	// clear the bottom rank, rightmost file and shift SE
-      	bishops_bitboard = Bits::unsigned_right_shift(a: Bits::bitwise_and(a: bishops_bitboard, b: Bits::bitwise_not(a: Bits::bitwise_or( a: bb.RANKS[0], b: bb.FILES[7] ))), n: 8 - 1);
+        // clear the bottom rank, rightmost file and shift SE
+        bishops_bitboard = Bits::unsigned_right_shift(a: Bits::bitwise_and(a: bishops_bitboard, b: Bits::bitwise_not(a: Bits::bitwise_or( a: bb.RANKS[0], b: bb.FILES[7] ))), n: 8 - 1);
       
       end while;
       
@@ -811,14 +811,14 @@ within lichess_bot::components::Engine::games is
       
       while bishops_bitboard != 0 loop
       
-      	// add the new positions to the attack bitboard
-      	attacks = Bits::bitwise_or(a: attacks, b: bishops_bitboard);
-      	
-      	// clear out any pieces intersecting with the blockers
-      	bishops_bitboard = Bits::bitwise_and(a: bishops_bitboard, b: inverse_blockers);
+        // add the new positions to the attack bitboard
+        attacks = Bits::bitwise_or(a: attacks, b: bishops_bitboard);
+        
+        // clear out any pieces intersecting with the blockers
+        bishops_bitboard = Bits::bitwise_and(a: bishops_bitboard, b: inverse_blockers);
       
-      	// clear the bottom rank, leftmost file and shift SW
-      	bishops_bitboard = Bits::unsigned_right_shift(a: Bits::bitwise_and(a: bishops_bitboard, b: Bits::bitwise_not(a: Bits::bitwise_or( a: bb.RANKS[0], b: bb.FILES[0] ))), n: 8 + 1);
+        // clear the bottom rank, leftmost file and shift SW
+        bishops_bitboard = Bits::unsigned_right_shift(a: Bits::bitwise_and(a: bishops_bitboard, b: Bits::bitwise_not(a: Bits::bitwise_or( a: bb.RANKS[0], b: bb.FILES[0] ))), n: 8 + 1);
       
       end while;
       
@@ -830,14 +830,14 @@ within lichess_bot::components::Engine::games is
       
       while bishops_bitboard != 0 loop
       
-      	// add the new positions to the attack bitboard
-      	attacks = Bits::bitwise_or(a: attacks, b: bishops_bitboard);
-      	
-      	// clear out any pieces intersecting with the blockers
-      	bishops_bitboard = Bits::bitwise_and(a: bishops_bitboard, b: inverse_blockers);
+        // add the new positions to the attack bitboard
+        attacks = Bits::bitwise_or(a: attacks, b: bishops_bitboard);
+        
+        // clear out any pieces intersecting with the blockers
+        bishops_bitboard = Bits::bitwise_and(a: bishops_bitboard, b: inverse_blockers);
       
-      	// clear the top rank, leftmost file and shift NW
-      	bishops_bitboard = Bits::left_shift(a: Bits::bitwise_and(a: bishops_bitboard, b: Bits::bitwise_not(a: Bits::bitwise_or( a: bb.RANKS[7], b: bb.FILES[0] ))), n: 8 - 1);
+        // clear the top rank, leftmost file and shift NW
+        bishops_bitboard = Bits::left_shift(a: Bits::bitwise_and(a: bishops_bitboard, b: Bits::bitwise_not(a: Bits::bitwise_or( a: bb.RANKS[7], b: bb.FILES[0] ))), n: 8 - 1);
       
       end while;
       
@@ -860,42 +860,42 @@ within lichess_bot::components::Engine::games is
       
       mask = Bits::left_shift(a: 1, n: 0);
       while mask != 0 loop
-      	if Bits::bitwise_and(a: param.pieces_bitboard, b: mask) != 0 then
+        if Bits::bitwise_and(a: param.pieces_bitboard, b: mask) != 0 then
       
-      		pattern = param.pattern;
-      		pattern_file = 3;
-      		pattern_rank = 3;
-      		file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: mask);
-      		
-      		// shift pattern up
-      		while pattern_rank < file_rank[1] loop
-      			pattern = Bits::left_shift(a: Bits::bitwise_and(a: pattern, b: Bits::bitwise_not(a: bb.RANKS[7])), n: 8);
-      			pattern_rank = pattern_rank + 1;
-      		end while;
-      		
-      		// shift pattern down
-      		while pattern_rank > file_rank[1] loop
-      			pattern = Bits::right_shift(a: Bits::bitwise_and(a: pattern, b: Bits::bitwise_not(a: bb.RANKS[0])), n: 8);
-      			pattern_rank = pattern_rank - 1;
-      		end while;
-      		
-      		// shift pattern left
-      		while pattern_file > file_rank[0] loop
-      			pattern = Bits::right_shift(a: Bits::bitwise_and(a: pattern, b: Bits::bitwise_not(a: bb.FILES[0])), n: 1);
-      			pattern_file = pattern_file - 1;
-      		end while;
-      		
-      		// shift pattern right
-      		while pattern_file < file_rank[0] loop
-      			pattern = Bits::left_shift(a: Bits::bitwise_and(a: pattern, b: Bits::bitwise_not(a: bb.FILES[7])), n: 1);
-      			pattern_file = pattern_file + 1;
-      		end while;
-      		
-      		// apply the pattern to the attacks
-      		attacks = Bits::bitwise_or(a: attacks, b: pattern);
-      	
-      	end if;
-      	mask = Bits::left_shift(a: mask, n: 1);
+          pattern = param.pattern;
+          pattern_file = 3;
+          pattern_rank = 3;
+          file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: mask);
+          
+          // shift pattern up
+          while pattern_rank < file_rank[1] loop
+            pattern = Bits::left_shift(a: Bits::bitwise_and(a: pattern, b: Bits::bitwise_not(a: bb.RANKS[7])), n: 8);
+            pattern_rank = pattern_rank + 1;
+          end while;
+          
+          // shift pattern down
+          while pattern_rank > file_rank[1] loop
+            pattern = Bits::right_shift(a: Bits::bitwise_and(a: pattern, b: Bits::bitwise_not(a: bb.RANKS[0])), n: 8);
+            pattern_rank = pattern_rank - 1;
+          end while;
+          
+          // shift pattern left
+          while pattern_file > file_rank[0] loop
+            pattern = Bits::right_shift(a: Bits::bitwise_and(a: pattern, b: Bits::bitwise_not(a: bb.FILES[0])), n: 1);
+            pattern_file = pattern_file - 1;
+          end while;
+          
+          // shift pattern right
+          while pattern_file < file_rank[0] loop
+            pattern = Bits::left_shift(a: Bits::bitwise_and(a: pattern, b: Bits::bitwise_not(a: bb.FILES[7])), n: 1);
+            pattern_file = pattern_file + 1;
+          end while;
+          
+          // apply the pattern to the attacks
+          attacks = Bits::bitwise_or(a: attacks, b: pattern);
+        
+        end if;
+        mask = Bits::left_shift(a: mask, n: 1);
       end while;
       
       return attacks;
@@ -920,8 +920,8 @@ within lichess_bot::components::Engine::games is
       // if the active color is black, rotate the bitboard 180 deg so all logic can be from white's perspective
       initial_pawns_bitboard = param.pawns_bitboard;
       if self.active_color == Color::BLACK then
-      	initial_pawns_bitboard = Bitboards::bitboard_rotate_180(bitboard: initial_pawns_bitboard);
-      	blockers = Bitboards::bitboard_rotate_180(bitboard: blockers);
+        initial_pawns_bitboard = Bitboards::bitboard_rotate_180(bitboard: initial_pawns_bitboard);
+        blockers = Bitboards::bitboard_rotate_180(bitboard: blockers);
       end if;
       
       inverse_blockers = Bits::bitwise_not(a: blockers);
@@ -948,7 +948,7 @@ within lichess_bot::components::Engine::games is
       
       // if the active color is black, rotate the attacks bitboard 180 deg
       if self.active_color == Color::BLACK then
-      	attacks = Bitboards::bitboard_rotate_180(bitboard: attacks);
+        attacks = Bitboards::bitboard_rotate_180(bitboard: attacks);
       end if;
       
       return attacks;
@@ -965,17 +965,17 @@ within lichess_bot::components::Engine::games is
       attacks = Bits::zero();
       
       if param.our_pov then
-      	attacks = Bits::bitwise_or(a: attacks, b: self.get_pawn_attacks(pawns_bitboard: self.our_pawns));
-      	attacks = Bits::bitwise_or(a: attacks, b: self.get_pattern_attacks(pieces_bitboard: self.our_knights, pattern: bb.KNIGHT_PATTERN));
-      	attacks = Bits::bitwise_or(a: attacks, b: self.get_bishop_attacks(bishops_bitboard: Bits::bitwise_or(a: self.our_bishops, b: self.our_queens)));
-      	attacks = Bits::bitwise_or(a: attacks, b: self.get_rook_attacks(rooks_bitboard: Bits::bitwise_or(a: self.our_rooks, b: self.our_queens)));
-      	attacks = Bits::bitwise_or(a: attacks, b: self.get_pattern_attacks(pieces_bitboard: self.our_king, pattern: bb.KING_PATTERN));
+        attacks = Bits::bitwise_or(a: attacks, b: self.get_pawn_attacks(pawns_bitboard: self.our_pawns));
+        attacks = Bits::bitwise_or(a: attacks, b: self.get_pattern_attacks(pieces_bitboard: self.our_knights, pattern: bb.KNIGHT_PATTERN));
+        attacks = Bits::bitwise_or(a: attacks, b: self.get_bishop_attacks(bishops_bitboard: Bits::bitwise_or(a: self.our_bishops, b: self.our_queens)));
+        attacks = Bits::bitwise_or(a: attacks, b: self.get_rook_attacks(rooks_bitboard: Bits::bitwise_or(a: self.our_rooks, b: self.our_queens)));
+        attacks = Bits::bitwise_or(a: attacks, b: self.get_pattern_attacks(pieces_bitboard: self.our_king, pattern: bb.KING_PATTERN));
       else
-      	attacks = Bits::bitwise_or(a: attacks, b: self.get_pawn_attacks(pawns_bitboard: self.their_pawns));
-      	attacks = Bits::bitwise_or(a: attacks, b: self.get_pattern_attacks(pieces_bitboard: self.their_knights, pattern: bb.KNIGHT_PATTERN));
-      	attacks = Bits::bitwise_or(a: attacks, b: self.get_bishop_attacks(bishops_bitboard: Bits::bitwise_or(a: self.their_bishops, b: self.their_queens)));
-      	attacks = Bits::bitwise_or(a: attacks, b: self.get_rook_attacks(rooks_bitboard: Bits::bitwise_or(a: self.their_rooks, b: self.their_queens)));
-      	attacks = Bits::bitwise_or(a: attacks, b: self.get_pattern_attacks(pieces_bitboard: self.their_king, pattern: bb.KING_PATTERN));
+        attacks = Bits::bitwise_or(a: attacks, b: self.get_pawn_attacks(pawns_bitboard: self.their_pawns));
+        attacks = Bits::bitwise_or(a: attacks, b: self.get_pattern_attacks(pieces_bitboard: self.their_knights, pattern: bb.KNIGHT_PATTERN));
+        attacks = Bits::bitwise_or(a: attacks, b: self.get_bishop_attacks(bishops_bitboard: Bits::bitwise_or(a: self.their_bishops, b: self.their_queens)));
+        attacks = Bits::bitwise_or(a: attacks, b: self.get_rook_attacks(rooks_bitboard: Bits::bitwise_or(a: self.their_rooks, b: self.their_queens)));
+        attacks = Bits::bitwise_or(a: attacks, b: self.get_pattern_attacks(pieces_bitboard: self.their_king, pattern: bb.KING_PATTERN));
       end if;
       
       return attacks;
