@@ -57,6 +57,11 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
         play_now = true;
       end if;
 
+      // play now if we get to a certain depth
+      if current_position.evaluation_depth >= Bot::getInteger(name: "min_playable_depth", default_value: 4) then
+        play_now = true;
+      end if;
+
       if play_now then
         generate ActiveGame3:'play move'(move: "") to game;
       end if;
