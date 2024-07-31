@@ -94,7 +94,9 @@ within lichess_bot::components::Engine::games is
         select any unmove related by position->Move[R2.'is follwed by'] where selected.lan != move_lan;
         while not empty unmove loop
           select one unposition related by unmove->Position[R2.'is follwed by'];
-          unposition.dispose();
+          unrelate position from unposition across R2.'is follwed by' using unmove;
+          unposition.quick_dispose();
+          //unposition.dispose();
           select any unmove related by position->Move[R2.'is follwed by'] where selected.lan != move_lan;
         end while;
 

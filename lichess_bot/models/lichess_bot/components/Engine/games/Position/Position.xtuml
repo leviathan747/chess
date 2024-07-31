@@ -122,6 +122,37 @@ within lichess_bot::components::Engine::games is
     end operation;
 
     @dialect("oal");
+    @operation_num(6);
+    operation quick_dispose() is
+      @noparse
+      // This routine disposes the position in a more efficient manner. It assumes
+      // that the position is not related to any evaluation job related instances. It
+      // also assumes that it is not the current position. It does not bother
+      // unlinking relationships, it simply recursively deletes all the positions and
+      // moves in the tree.
+
+      // recursively delete future moves
+      select many moves related by self->Move[R2.'is follwed by'];
+      for each move in moves loop
+        select one position related by move->Position[R2.'is follwed by'];
+        position.quick_dispose();
+        delete object instance move;
+      end for;
+
+      // delete the board
+      select one board related by self->Board[R6];
+      delete object instance board;
+
+      // unlink from the eval engine
+      select one engine related by self->Engine[R4];
+      unrelate self from engine across R4;
+
+      // delete self
+      delete object instance self;
+      @endnoparse
+    end operation;
+
+    @dialect("oal");
     @operation_num(5);
     operation new_move(lan: in string) return instance of Move is
       @noparse
