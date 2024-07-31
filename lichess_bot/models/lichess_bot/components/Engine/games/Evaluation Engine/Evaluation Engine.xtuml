@@ -180,6 +180,7 @@ within lichess_bot::components::Engine::games is
     operation stop() is
       @noparse
       LOG::LogInfo(message: "Canceling evaluation early...");
+      t0 = TIM::current_clock();
       self.active = false;
 
       // dispose all current evaluation jobs
@@ -187,6 +188,8 @@ within lichess_bot::components::Engine::games is
       for each job in jobs loop
         job.dispose();
       end for;
+
+      LOG::LogInfo(message: "Done canceling. " + STRING::itoa(i: (TIM::current_clock() - t0) / 1000) + "ms");
 
       generate Engine2:'done evaluating' to self;
       @endnoparse

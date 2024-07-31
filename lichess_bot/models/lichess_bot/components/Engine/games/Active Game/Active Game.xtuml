@@ -22,6 +22,8 @@ within lichess_bot::components::Engine::games is
 
     move_timer: timer;
 
+    think_time: integer;
+
     preferred identifier is (id);
 
     @dialect("oal");
@@ -74,6 +76,7 @@ within lichess_bot::components::Engine::games is
       engine.stop();
 
       // update the position tree based on the moves played
+      t0 = TIM::current_clock();
       select one position related by self->Position[R3];
       while i < self.game_state.moves.length loop
         move_lan = self.game_state.moves[i];
@@ -98,6 +101,7 @@ within lichess_bot::components::Engine::games is
         select one position related by self->Position[R3];
         i = i + 1;
       end while;
+      LOG::LogInfo(message: "Done updating tree: " + STRING::itoa(i: (TIM::current_clock() - t0) / 1000) + "ms");
 
       // restart the evaluation engine
       generate Engine1:'start evaluation' to engine;

@@ -52,6 +52,11 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
         play_now = true;
       end if;
 
+      // play now if we think we don't have time to do another evaluation cycle
+      if TIM::timer_remaining_time(timer_inst_ref: game.move_timer) < game.think_time / 2 then
+        play_now = true;
+      end if;
+
       if play_now then
         generate ActiveGame3:'play move'(move: "") to game;
       end if;
@@ -59,7 +64,7 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
     end if;
 
     // keep deepening the tree
-    if self.active and not play_now and current_position.evaluation_depth < Bot::getInteger(name: "max_evaluation_depth", default_value: 6) then
+    if self.active and current_position.evaluation_depth < Bot::getInteger(name: "max_evaluation_depth", default_value: 5) then
 
       generate Engine1:'start evaluation' to self;
 
