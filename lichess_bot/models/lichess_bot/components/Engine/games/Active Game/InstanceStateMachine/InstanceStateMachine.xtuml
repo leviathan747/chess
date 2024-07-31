@@ -56,7 +56,7 @@ within lichess_bot::components::Engine::games::'Active Game' is
     | 'game over'        | ignore             | cannot_happen      | ignore             | ignore             | ignore             | ignore             |
     | 'our turn'         | ignore             | 'game over'        | 'playing move'     | 'our turn'         | 'claiming victory' | ignore             |
     | 'their turn'       | ignore             | 'game over'        | ignore             | 'our turn'         | 'claiming victory' | resigning          |
-    | 'playing move'     | 'their turn'       | 'game over'        | cannot_happen      | ignore             | 'claiming victory' | ignore             |
+    | 'playing move'     | 'their turn'       | 'game over'        | cannot_happen      | 'our turn'         | 'claiming victory' | ignore             |
     | 'claiming victory' | ignore             | 'game over'        | ignore             | ignore             | ignore             | ignore             |
     | resigning          | cannot_happen      | 'game over'        | cannot_happen      | cannot_happen      | cannot_happen      | ignore             |
 
