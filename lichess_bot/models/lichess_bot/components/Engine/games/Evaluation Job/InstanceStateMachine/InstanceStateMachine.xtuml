@@ -49,46 +49,46 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
     @noparse
     select one position related by self->Position[R9];
     if self.depth == 0 then
-    
+
       // this is the final position in the line, so we evaluate it
       position.evaluate();
-    
+
       generate EvaluationJob2:'done' to self;
-    
+
     // analyze deeper and update this evaluation based on future positions
     else
-    
+
       // create and prioritize the legal moves which follow this position
       if not position.next_moves_created then
-    
+
         // get the list of legal next moves
         legal_moves = ChessLib::legalMoves(fen: position.fen);
-        
+
         i = 0;
         max_next_moves = Bot::getInteger(name:"debug_max_next_moves", default_value: -1);
         while i < legal_moves.length and (max_next_moves == -1 or i < max_next_moves) loop
           move_lan = legal_moves[i];
-          
+
           select any move related by position->Move[R2.'is follwed by'] where selected.lan == move_lan;
           if empty move then
             move = position.new_move(lan: move_lan);
           end if;
-    
+
           i = i + 1;
         end while;
-        
+
         position.next_moves_created = true;
-      
+
       end if;
-    
+
       // queue all next moves for evaluation
       select many next_moves related by position->Move[R2.'is follwed by'];
       for each next_move in next_moves loop
         self.queue_move(move: next_move);
       end for;
-      
+
       generate EvaluationJob1:'evaluate' to self;
-      
+
     end if;
     @endnoparse
   end state;
@@ -110,7 +110,7 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
         self.current_evaluation.evaluation = 0;
       end if;
     end if;
-    
+
     generate EvaluationJob2:'done' to self;
     @endnoparse
   end state;
@@ -121,7 +121,7 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
     select one position related by self->Position[R9];
     position.evaluation = self.current_evaluation;
     position.evaluation_depth = self.depth;
-    
+
     // update the best move in the position
     select one best_move related by self->Move[R15];
     select one existing_best_move related by position->Move[R5];
@@ -130,7 +130,7 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
         unrelate existing_best_move from position across R5;
       end if;
       relate best_move to position across R5;
-    
+
       // if the move that is being replaced is part of the current best line, then print the new best line
       select one current_position related by self->Engine[R12]->ActiveGame[R1]->Position[R3];
       prev_position = position;
@@ -143,14 +143,14 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
         select one prev_position related by prev_position->Move[R2.'follows']->Position[R5];
       end while;
     end if;
-    
+
     // pop job off the stack and trigger the job below to begin evaluating
     select one engine related by self->Engine[R12];
     unrelate self from engine across R12;
-    
+
     select one position related by self->Position[R9];
     unrelate self from position across R9;
-    
+
     select one below_job related by self->EvaluationJob[R8.'is above'];
     if not empty below_job then
       unrelate self from below_job across R8.'is above';
@@ -160,7 +160,7 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
     else
       generate Engine2:'done evaluating' to engine;
     end if;
-    
+
     self.dispose();
     @endnoparse
   end state;
@@ -169,20 +169,20 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
     @noparse
     // get the next move
     next_move = self.get_next_move();
-    
+
     if not empty next_move then
-    
+
       select one position related by self->Position[R9];
-      
+
       // move this move to be currently processing
       select one currently_evaluating_move related by self->Move[R10];
       if not empty currently_evaluating_move then
         unrelate currently_evaluating_move from self across R10;
       end if;
       relate next_move to self across R10;
-    
+
       new_depth = self.depth - 1;
-      
+
       // assure all capture chains on the same destination square are
       // fully explored this does not consider edge cases like en
       // passant capture it also does not consider sequences of
@@ -194,7 +194,7 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
           new_depth = 1;  // go one extra step
         end if;
       end if;
-       
+
       // analyze the next position
       create object instance new_job of EvaluationJob;
       new_job.depth = new_depth;
@@ -207,12 +207,12 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
       // use a timer here to allow other delayed events to be scheduled first
       create event instance e of EvaluationJob1:'evaluate' to new_job;
       t = TIM::timer_start(event_inst: e, microseconds: 0);
-    
+
     else
-      
+
       // no more moves to process
       generate EvaluationJob2:'done' to self;
-    
+
     end if;
     @endnoparse
   end state;
@@ -220,7 +220,7 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
   state 'updating evaluation' is
     @noparse
     skip_remaining_moves = false;
-    
+
     // handle the most recently processed move
     select one currently_evaluating_move related by self->Move[R10];
     if not empty currently_evaluating_move then
@@ -228,12 +228,12 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
       select one position related by self->Position[R9];
       select one board related by position->Board[R6];
       select one next_position related by currently_evaluating_move->Position[R2.'is follwed by'];
-      
+
       // TODO make ciera properly clone structure types
       create object instance delete_me of Position;
       next_evaluation = delete_me.evaluation;
       delete object instance delete_me;
-    
+
       if next_position.evaluation.mate_on_board then
         next_evaluation.mate_on_board = true;
         if next_position.evaluation.mate_in > 0 or next_position.evaluation.mate_in == 0 and board.active_color == Color::WHITE then
@@ -244,8 +244,8 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
       else
         next_evaluation.evaluation = next_position.evaluation.evaluation;
       end if;
-      
-    
+
+
       // compare to find the best next move
       select one current_best_move related by self->Move[R15];
       if empty current_best_move or Engine::compare_evaluation(pov: board.active_color, eval1: self.current_evaluation, eval2: next_evaluation) < 0 then
@@ -254,9 +254,9 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
         end if;
         relate currently_evaluating_move to self across R15;
         self.current_evaluation = next_evaluation;
-        
+
       end if;
-      
+
       // If the opponent is the active player and the evaluation at this position
       // is better for the opponent than the position resulting from the previous
       // best move for the bot, then we can conclude that any positions resulting
@@ -268,9 +268,9 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
           skip_remaining_moves = true;
         end if;
       end if;
-      
+
     end if;
-    
+
     // short circuit the evaluation
     if skip_remaining_moves then
       generate EvaluationJob2:'done' to self;

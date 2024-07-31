@@ -18,27 +18,27 @@ within lichess_bot::components::Engine::games is
       if not empty jobR8_is_below then
         unrelate self from jobR8_is_below across R8.'is below';
       end if;
-      
+
       select one jobR8_is_above related by self->EvaluationJob[R8.'is above'];
       if not empty jobR8_is_above then
         unrelate self from jobR8_is_above across R8.'is above';
       end if;
-      
+
       select one positionR9 related by self->Position[R9];
       if not empty positionR9 then
         unrelate self from positionR9 across R9;
       end if;
-      
+
       select one moveR10 related by self->Move[R10];
       if not empty moveR10 then
         unrelate self from moveR10 across R10;
       end if;
-      
+
       select one evalorderR14 related by self->EvaluationOrder[R14];
       if not empty evalorderR14 then
         unrelate self from evalorderR14 across R14;
       end if;
-      
+
       select any evalorderR11 related by self->EvaluationOrder[R11];
       while not empty evalorderR11 loop
         select one moveR11 related by evalorderR11->Move[R11];
@@ -46,17 +46,17 @@ within lichess_bot::components::Engine::games is
         delete object instance evalorderR11;
         select any evalorderR11 related by self->EvaluationOrder[R11];
       end while;
-      
+
       select one engineR12 related by self->Engine[R12];
       if not empty engineR12 then
         unrelate self from engineR12 across R12;
       end if;
-      
+
       select one moveR15 related by self->Move[R15];
       if not empty moveR15 then
         unrelate self from moveR15 across R15;
       end if;
-      
+
       delete object instance self;
       @endnoparse
     end operation;
@@ -72,34 +72,34 @@ within lichess_bot::components::Engine::games is
       //   * captures
       //   * attacks
       //   * all others
-      
+
       move = param.move;
-      
+
       create object instance eval_order of EvaluationOrder;
       relate move to self across R11 using eval_order;
-      
+
       select one first_evaluation related by self->EvaluationOrder[R14];
       if empty first_evaluation then
-      
+
         // this is the first move to be added
         relate eval_order to self across R14;
-        
+
       else
-        
+
         select one board related by self->Position[R9]->Board[R6];
-      
+
         current_order = first_evaluation;
         select any prev_order from instances of EvaluationOrder where false;
-        
+
         // walk through the list to insert the new move
         while not empty current_order loop
-          
+
           // check to see if the new move should go before the current move in the order
           select one current_move related by current_order->Move[R11];
           select one current_position related by current_move->Position[R2.'is follwed by'];
           select one new_position related by move->Position[R2.'is follwed by'];
-          
-          if new_position.evaluated and (not current_position.evaluated or 
+
+          if new_position.evaluated and (not current_position.evaluated or
             Engine::compare_evaluation(pov: board.active_color, eval1: new_position.evaluation, eval2: current_position.evaluation) > 0) then
             break;  // new evaluation is better
           elif not current_position.evaluated then
@@ -111,11 +111,11 @@ within lichess_bot::components::Engine::games is
               break;  // new move is an attack
             end if;
           end if;
-          
+
           prev_order = current_order;
           select one current_order related by current_order->EvaluationOrder[R13.'precedes'];
         end while;
-        
+
         // insert the new move between the previous and next move
         if empty prev_order then
           // this is the beginning of the list
@@ -131,7 +131,7 @@ within lichess_bot::components::Engine::games is
           relate prev_order to eval_order across R13.'precedes';
           relate eval_order to current_order across R13.'precedes';
         end if;
-        
+
       end if;
       @endnoparse
     end operation;
@@ -143,12 +143,12 @@ within lichess_bot::components::Engine::games is
       // try to select the next move from the current move
       select one currently_evaluating_move related by self->Move[R10];
       select one next_move related by currently_evaluating_move->EvaluationOrder[R11]->EvaluationOrder[R13.'precedes']->Move[R11];
-      
+
       // if there is no current move, get the first move to evaluate
       if empty currently_evaluating_move then
         select one next_move related by self->EvaluationOrder[R14]->Move[R11];
       end if;
-      
+
       return next_move;
       @endnoparse
     end operation;

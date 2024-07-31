@@ -29,17 +29,17 @@ within lichess_bot::components::Engine::games is
         end while;
         i = i - 1;
       end while;
-      
+
       // create rank bitboards
       i = 7;
       while i >= 0 loop
         self.RANKS[i] = Bits::left_shift(a: 255, n: i * 8);
         i = i - 1;
       end while;
-      
+
       // create patterns
       d4 = Bits::left_shift(a: 1, n: 3 * 8 + 3);
-      
+
       // create knight pattern
       knight_pattern = Bits::zero();
       knight_pattern = Bits::bitwise_or(a: knight_pattern, b: Bits::left_shift(a: d4, n: 1 * 8 + 2));
@@ -51,7 +51,7 @@ within lichess_bot::components::Engine::games is
       knight_pattern = Bits::bitwise_or(a: knight_pattern, b: Bits::unsigned_right_shift(a: d4, n: 2 * 8 - 1));
       knight_pattern = Bits::bitwise_or(a: knight_pattern, b: Bits::unsigned_right_shift(a: d4, n: 1 * 8 - 2));
       self.KNIGHT_PATTERN = knight_pattern;
-      
+
       // create king pattern
       king_pattern = Bits::zero();
       king_pattern = Bits::bitwise_or(a: king_pattern, b: Bits::left_shift(a: d4, n: 1 * 8 - 1));
@@ -118,22 +118,22 @@ within lichess_bot::components::Engine::games is
     class operation bitboard_to_file_and_rank(bitboard: in timestamp) return sequence (2) of integer is
       @noparse
       bitboard = param.bitboard;
-      
+
       full_rank = Bits::zero();
       full_rank = 255;  // 0b11111111
-      
+
       rank_num = 0;
       while Bits::bitwise_and(a: bitboard, b: full_rank) == 0  and rank_num <= 7 loop
         bitboard = Bits::unsigned_right_shift(a: bitboard, n: 8);
         rank_num = rank_num + 1;
       end while;
-      
+
       file_num = 0;
       while bitboard != 1 and file_num <= 7 loop
         bitboard = Bits::unsigned_right_shift(a: bitboard, n: 1);
         file_num = file_num + 1;
       end while;
-      
+
       file_rank[1] = rank_num;
       file_rank[0] = file_num;
       return file_rank;

@@ -32,7 +32,7 @@ within lichess_bot::components::Engine::games is
     operation evaluate() is
       @noparse
       if not self.evaluated then
-        
+
         // Count up total material on each side (measured in centipawns)
         // The evaluation is the difference in material
         //   pawn   = 100
@@ -40,38 +40,38 @@ within lichess_bot::components::Engine::games is
         //   bishop = 300
         //   rook   = 500
         //   queen  = 900
-      
+
         select one board related by self->Board[R6];
-      
+
         evaluation = 0;
-        
+
         evaluation = evaluation + 100 * Bitboards::bitboard_population(bitboard: board.our_pawns);
         evaluation = evaluation + 300 * Bitboards::bitboard_population(bitboard: board.our_knights);
         evaluation = evaluation + 300 * Bitboards::bitboard_population(bitboard: board.our_bishops);
         evaluation = evaluation + 500 * Bitboards::bitboard_population(bitboard: board.our_rooks);
         evaluation = evaluation + 900 * Bitboards::bitboard_population(bitboard: board.our_queens);
-      
+
         evaluation = evaluation - 100 * Bitboards::bitboard_population(bitboard: board.their_pawns);
         evaluation = evaluation - 300 * Bitboards::bitboard_population(bitboard: board.their_knights);
         evaluation = evaluation - 300 * Bitboards::bitboard_population(bitboard: board.their_bishops);
         evaluation = evaluation - 500 * Bitboards::bitboard_population(bitboard: board.their_rooks);
         evaluation = evaluation - 900 * Bitboards::bitboard_population(bitboard: board.their_queens);
-        
+
         // TODO add random noise to prevent a bunch of evaluations from being equal for testing purposes
         //noise = 0;
         //noise = ((TIM::current_clock() / 1000) % 50) - 25;
         //evaluation = evaluation + noise;
-        
+
         if board.active_color == Color::BLACK then
           evaluation = evaluation * -1;
         end if;
-      
+
         self.evaluation.evaluation = evaluation;
         self.evaluation_depth = 0;
         select one engine related by self->Engine[R4];
-      
+
         engine.positions_evaluated = engine.positions_evaluated + 1;
-      
+
       end if;
       @endnoparse
     end operation;
@@ -84,14 +84,14 @@ within lichess_bot::components::Engine::games is
       if not empty moveR5 then
         unrelate self from moveR5 across R5;
       end if;
-      
+
       select one moveR2_1 related by self->Move[R2.'follows'];
       if not empty moveR2_1 then
         select one positionR2_1 related by moveR2_1->Position[R2.'follows'];
         unrelate self from positionR2_1 across R2.'follows' using moveR2_1;
         delete object instance moveR2_1;
       end if;
-      
+
       select any moveR2_2 related by self->Move[R2.'is follwed by'];
       while not empty moveR2_2 loop
         select one positionR2_2 related by moveR2_2->Position[R2.'is follwed by'];
@@ -100,23 +100,23 @@ within lichess_bot::components::Engine::games is
         positionR2_2.dispose();
         select any moveR2_2 related by self->Move[R2.'is follwed by'];
       end while;
-      
+
       select one engineR4 related by self->Engine[R4];
       if not empty engineR4 then
         unrelate self from engineR4 across R4;
       end if;
-      
+
       select one gameR3 related by self->ActiveGame[R3];
       if not empty gameR3 then
         unrelate self from gameR3 across R3;
       end if;
-      
+
       select one boardR6 related by self->Board[R6];
       if not empty boardR6 then
         unrelate self from boardR6 across R6;
         delete object instance boardR6;
       end if;
-      
+
       delete object instance self;
       @endnoparse
     end operation;
@@ -128,21 +128,21 @@ within lichess_bot::components::Engine::games is
       // create a new move
       create object instance move of Move;
       move.lan = param.lan;
-      
+
       // get source and destination bitboards
       src_bitboard = Bitboards::coordinate_to_bitboard(coordinate: STRING::substr(s: move.lan, begin: 0, end: 2));
       dst_bitboard = Bitboards::coordinate_to_bitboard(coordinate: STRING::substr(s: move.lan, begin: 2, end: 4));
-      
+
       // get the promotion character
       promotion = "";
       if STRING::strlen(s: move.lan) > 4 then
         promotion = STRING::substr(s: move.lan, begin: 4, end: 5);
       end if;
-      
+
       // create the new board
       select one current_board related by self->Board[R6];
       board = current_board.do_move(src_bitboard: src_bitboard, dst_bitboard: dst_bitboard, promotion: promotion);
-      
+
       // populate properties of the move
       pre_move_attacks = current_board.get_attacks(our_pov: true);
       post_move_attacks = board.get_attacks(our_pov: false);
@@ -151,9 +151,9 @@ within lichess_bot::components::Engine::games is
       move.is_capture = Bits::bitwise_and(a: current_board.their_pieces_bitboard(), b: dst_bitboard) != 0 or
         (move.is_pawn_move and Bits::bitwise_and(a: current_board.en_passant_target, b: dst_bitboard) != 0);
       move.is_attack = Bits::bitwise_and(a: post_move_attacks, b: board.our_pieces_bitboard()) != 0;
-      
+
       // TODO Consider possible optimization: is this necessary if the move is being created after the fact
-      
+
       // TODO in the future, we will want to detect if a position already exists
       // create the new position
       create object instance new_position of Position;
@@ -161,10 +161,10 @@ within lichess_bot::components::Engine::games is
       relate board to new_position across R6;
       select one engine related by self->Engine[R4];
       relate new_position to engine across R4;
-      
+
       // link the new position in the tree
       relate new_position to self across R2.'follows' using move;
-      
+
       return move;
       @endnoparse
     end operation;
