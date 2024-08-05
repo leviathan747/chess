@@ -33,6 +33,11 @@ within lichess_bot::components::Engine::games is
       @noparse
       if not self.evaluated then
 
+        evaluation = 0;
+
+        select one board related by self->Board[R6];
+        bb = Bitboards::get_instance();
+
         // Count up total material on each side (measured in centipawns)
         // The evaluation is the difference in material
         //   pawn   = 100
@@ -40,10 +45,6 @@ within lichess_bot::components::Engine::games is
         //   bishop = 300
         //   rook   = 500
         //   queen  = 900
-
-        select one board related by self->Board[R6];
-
-        evaluation = 0;
 
         evaluation = evaluation + 100 * Bitboards::bitboard_population(bitboard: board.our_pawns);
         evaluation = evaluation + 300 * Bitboards::bitboard_population(bitboard: board.our_knights);
@@ -56,6 +57,38 @@ within lichess_bot::components::Engine::games is
         evaluation = evaluation - 300 * Bitboards::bitboard_population(bitboard: board.their_bishops);
         evaluation = evaluation - 500 * Bitboards::bitboard_population(bitboard: board.their_rooks);
         evaluation = evaluation - 900 * Bitboards::bitboard_population(bitboard: board.their_queens);
+
+        // Give a bonus for pawn advancement (50 per rank)
+        pawn_bonus = 0;
+        i = 2;  // start on rank 3 and go to rank 7
+        while i <  7 loop
+          our_rank_mask = bb.RANKS[i];
+          their_rank_mask = bb.RANKS[7 - i];
+          if board.active_color == Color::BLACK then
+            our_rank_mask = bb.RANKS[7 - i];
+            their_rank_mask = bb.RANKS[i];
+          end if;
+          pawn_bonus = pawn_bonus + (i - 1) * 10 *
+            (Bitboards::bitboard_population(bitboard: Bits::bitwise_and(a: board.our_pawns, b: our_rank_mask)) -
+              Bitboards::bitboard_population(bitboard: Bits::bitwise_and(a: board.their_pawns, b: their_rank_mask)));
+          i = i + 1;
+        end while;
+        evaluation = evaluation + pawn_bonus;
+
+        // Adjust for king safety
+        // - Compute the 'attacks' of the king as if it were a queen. This essentially
+        //   gives the number of squares the king can be targeted from by another piece
+        //   (not including knight).
+        our_king_vision = Bits::bitwise_and(a: Bits::bitwise_or(a: board.get_bishop_attacks(bishops_bitboard: board.our_king), b: board.get_rook_attacks(rooks_bitboard: board.our_king)), b: Bits::bitwise_not(a: board.our_pieces_bitboard()));
+        their_king_vision = Bits::bitwise_and(a: Bits::bitwise_or(a: board.get_bishop_attacks(bishops_bitboard: board.their_king), b: board.get_rook_attacks(rooks_bitboard: board.their_king)), b: Bits::bitwise_not(a: board.their_pieces_bitboard()));
+        king_safety_bonus = ( Bitboards::bitboard_population(bitboard: their_king_vision)- Bitboards::bitboard_population(bitboard: our_king_vision) ) * 10;
+        evaluation = evaluation + king_safety_bonus;
+
+        // Give a bonus for total controlled space
+        our_attacks = board.get_attacks(our_pov: true);
+        their_attacks = board.get_attacks(our_pov: false);
+        space_bonus = ( Bitboards::bitboard_population(bitboard: our_attacks)- Bitboards::bitboard_population(bitboard: their_attacks) ) * 5;
+        evaluation = evaluation + space_bonus;
 
         // TODO add random noise to prevent a bunch of evaluations from being equal for testing purposes
         //noise = 0;
