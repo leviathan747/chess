@@ -1,5 +1,6 @@
 package system.engine.ees.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.ciera.runtime.summit.components.IComponent;
@@ -12,8 +13,29 @@ public class ChessLibImpl<C extends IComponent<C>> extends Utility<C> implements
 		super(context);
 	}
 
-	public String[] legalMoves(final String fen) {
-		return lib.ChessLib.legalMoves(fen).toArray(new String[0]);
+	public String sourceFile(final String move) {
+		return lib.ChessLib.sourceFile(move);
+	}
+
+	public int sourceRank(final String move) {
+		return lib.ChessLib.sourceRank(move);
+	}
+
+	public String destFile(final String move) {
+		return lib.ChessLib.destFile(move);
+	}
+
+	public int destRank(final String move) {
+		return lib.ChessLib.destRank(move);
+	}
+
+	public int legalMoves(final String fen, String[] legalMoves) {
+		final List<String> legalMovesList = new ArrayList<>();
+		final int legalMoveCount = lib.ChessLib.legalMoves(fen, legalMovesList);
+		for (int i = 0; i < legalMovesList.size() && i < legalMoves.length; i++) {
+			legalMoves[i] = legalMovesList.get(i);
+		}
+		return legalMoveCount;
 	}
 
 	public String movesToFEN(final String initialFen, final String[] moves) {
