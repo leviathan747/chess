@@ -93,7 +93,8 @@ within lichess_bot::components::Engine::games is
     @operation_num(6);
     class operation bitboard_to_coordinate(bitboard: in timestamp) return string is
       @noparse
-      file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: param.bitboard);
+      file_rank[1] = -1;
+      Bitboards::bitboard_to_file_and_rank(bitboard: param.bitboard, file_and_rank: file_rank);
       return STRING::substr(s: "abcdefgh", begin: file_rank[0], end: file_rank[0] + 1) + STRING::itoa(i: file_rank[1] + 1);
       @endnoparse
     end operation;
@@ -115,7 +116,7 @@ within lichess_bot::components::Engine::games is
 
     @dialect("oal");
     @operation_num(9);
-    class operation bitboard_to_file_and_rank(bitboard: in timestamp) return sequence (2) of integer is
+    class operation bitboard_to_file_and_rank(bitboard: in timestamp, file_and_rank: out sequence (2) of integer) is
       @noparse
       bitboard = param.bitboard;
 
@@ -134,9 +135,8 @@ within lichess_bot::components::Engine::games is
         file_num = file_num + 1;
       end while;
 
-      file_rank[1] = rank_num;
-      file_rank[0] = file_num;
-      return file_rank;
+      param.file_and_rank[1] = rank_num;
+      param.file_and_rank[0] = file_num;
       @endnoparse
     end operation;
 

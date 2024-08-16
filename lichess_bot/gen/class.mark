@@ -1,3 +1,6 @@
 .invoke MarkSystemObjectDefaultExtentSize( 100 )
 .invoke MarkObjectExtentSize( "Engine", "ActiveGame", 10 )
+.invoke MarkObjectExtentSize( "Engine", "Position", 100000 )
+.invoke MarkObjectExtentSize( "Engine", "Board", 100000  )
+.invoke MarkObjectExtentSize( "Engine", "Move", 100000 )
 

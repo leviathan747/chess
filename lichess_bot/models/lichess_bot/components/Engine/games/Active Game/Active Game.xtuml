@@ -68,7 +68,7 @@ within lichess_bot::components::Engine::games is
     @operation_num(4);
     operation update_game_state(game_state: in GameState) is
       @noparse
-      i = self.game_state.moves.length;
+      i = self.game_state.move_count;
       self.game_state = param.game_state;
 
       // stop the evaluation engine
@@ -78,7 +78,7 @@ within lichess_bot::components::Engine::games is
       // update the position tree based on the moves played
       t0 = TIM::current_clock();
       select one position related by self->Position[R3];
-      while i < self.game_state.moves.length loop
+      while i < self.game_state.move_count loop
         move_lan = self.game_state.moves[i];
 
         // get the next move

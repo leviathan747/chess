@@ -83,8 +83,10 @@ within lichess_bot::components::Engine::games is
       // get a bitboard for the pawn captured en passant
       en_passant_captured_pawn = Bits::zero();
       if is_capture and Bits::bitwise_and(a: self.en_passant_target, b: dst_bitboard) != 0 then
-        src_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: src_bitboard);
-        dst_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: dst_bitboard);
+        src_file_rank[1] = -1;
+        Bitboards::bitboard_to_file_and_rank(bitboard: src_bitboard, file_and_rank: src_file_rank);
+        dst_file_rank[1] = -1;
+        Bitboards::bitboard_to_file_and_rank(bitboard: dst_bitboard, file_and_rank: dst_file_rank);
         en_passant_captured_pawn =  Bits::left_shift(a: 1, n: src_file_rank[1] * 8 + dst_file_rank[0]);
       end if;
 
@@ -104,8 +106,10 @@ within lichess_bot::components::Engine::games is
 
       // if this is a castling move, update the position of the rook first
       if Bits::bitwise_and(a: our_king, b: src_bitboard) != 0 then
-        src_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: src_bitboard);
-        dst_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: dst_bitboard);
+        src_file_rank[1] = -1;
+        Bitboards::bitboard_to_file_and_rank(bitboard: src_bitboard, file_and_rank: src_file_rank);
+        dst_file_rank[1] = -1;
+        Bitboards::bitboard_to_file_and_rank(bitboard: dst_bitboard, file_and_rank: dst_file_rank);
         if dst_file_rank[0] - src_file_rank[0] > 1 then     // kingside castle
           dst_bitboard = Bits::left_shift(a: src_bitboard, n: 2);
           our_rooks = Bits::bitwise_and(a: our_rooks, b: Bits::bitwise_not(a: Bits::left_shift(a: src_bitboard, n: 3)));
@@ -173,8 +177,10 @@ within lichess_bot::components::Engine::games is
       // update en passant target
       board.en_passant_target = Bits::zero();
       if is_pawn_move then
-        src_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: src_bitboard);
-        dst_file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: dst_bitboard);
+        src_file_rank[1] = -1;
+        Bitboards::bitboard_to_file_and_rank(bitboard: src_bitboard, file_and_rank: src_file_rank);
+        dst_file_rank[1] = -1;
+        Bitboards::bitboard_to_file_and_rank(bitboard: dst_bitboard, file_and_rank: dst_file_rank);
         if dst_file_rank[1] - src_file_rank[1] == 2 then     // white pawn move: move the src bitboard up one rank by shifting to the left 8 bits
           board.en_passant_target = Bits::left_shift(a: src_bitboard, n: 8);
         elif dst_file_rank[1] - src_file_rank[1] == -2 then  // black pawn move: move the src bitboard down one rank by shifting to the right 8 bits
@@ -865,7 +871,8 @@ within lichess_bot::components::Engine::games is
           pattern = param.pattern;
           pattern_file = 3;
           pattern_rank = 3;
-          file_rank = Bitboards::bitboard_to_file_and_rank(bitboard: mask);
+          file_rank[1] = -1;
+          Bitboards::bitboard_to_file_and_rank(bitboard: mask, file_and_rank: file_rank);
 
           // shift pattern up
           while pattern_rank < file_rank[1] loop
