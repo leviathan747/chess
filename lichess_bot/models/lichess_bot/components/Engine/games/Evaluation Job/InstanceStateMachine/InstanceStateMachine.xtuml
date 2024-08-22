@@ -52,6 +52,7 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
 
       // this is the final position in the line, so we evaluate it
       position.evaluate();
+      self.current_evaluation = Engine::clone_evaluation(eval: position.evaluation);
 
       generate EvaluationJob2:'done' to self;
 
@@ -120,7 +121,7 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
     @noparse
     // update the position evaluation
     select one position related by self->Position[R9];
-    position.evaluation = self.current_evaluation;
+    position.evaluation = Engine::clone_evaluation(eval: self.current_evaluation);
     position.evaluation_depth = self.depth;
 
     // update the best move in the position
@@ -203,7 +204,7 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
       relate new_job to engine across R12;
       select one next_position related by next_move->Position[R2.'is follwed by'];
       relate next_position to new_job across R9;
-      new_job.current_evaluation = next_position.evaluation;
+      new_job.current_evaluation = Engine::clone_evaluation(eval: next_position.evaluation);
       relate self to new_job across R8.'is below';
       // use a timer here to allow other delayed events to be scheduled first
       create event instance e of EvaluationJob1:'evaluate' to new_job;
@@ -230,20 +231,12 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
       select one board related by position->Board[R6];
       select one next_position related by currently_evaluating_move->Position[R2.'is follwed by'];
 
-      // TODO make ciera properly clone structure types
-      create object instance delete_me of Position;
-      next_evaluation = delete_me.evaluation;
-      delete object instance delete_me;
+      next_evaluation = Engine::clone_evaluation(eval: next_position.evaluation);
 
-      if next_position.evaluation.mate_on_board then
-        next_evaluation.mate_on_board = true;
-        if next_position.evaluation.mate_in > 0 or next_position.evaluation.mate_in == 0 and board.active_color == Color::WHITE then
-          next_evaluation.mate_in = next_position.evaluation.mate_in + 1;
-        else
-          next_evaluation.mate_in = next_position.evaluation.mate_in - 1;
-        end if;
-      else
-        next_evaluation.evaluation = next_position.evaluation.evaluation;
+      if next_position.evaluation.mate_on_board and (next_position.evaluation.mate_in > 0 or next_position.evaluation.mate_in == 0 and board.active_color == Color::WHITE) then
+        next_evaluation.mate_in = next_position.evaluation.mate_in + 1;
+      elif next_position.evaluation.mate_on_board and (next_position.evaluation.mate_in < 0 or next_position.evaluation.mate_in == 0 and board.active_color == Color::BLACK) then
+        next_evaluation.mate_in = next_position.evaluation.mate_in - 1;
       end if;
 
 
@@ -254,7 +247,7 @@ within lichess_bot::components::Engine::games::'Evaluation Job' is
           unrelate current_best_move from self across R15;
         end if;
         relate currently_evaluating_move to self across R15;
-        self.current_evaluation = next_evaluation;
+        self.current_evaluation = Engine::clone_evaluation(eval: next_evaluation);
 
       end if;
 

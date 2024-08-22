@@ -154,6 +154,33 @@ within lichess_bot::components::Engine::games is
     end operation;
 
     @dialect("oal");
+    @operation_num(9);
+    class operation clone_evaluation(eval: in Evaluation) return Evaluation is
+      @noparse
+      // TODO fix Ciera to clone SDTs
+      // This operation is to work around a bug in Ciera. Because SDTs are implemented
+      // as Java classes, when they are assigned, they are assigned by reference and
+      // the value is not copied. This results in unexpected behavior when modifying
+      // one structure value can change another. This poperation ensures a new
+      // instance of the structure is created. This should be used any time a
+      // structure value is assigned from another structure value.
+
+      // initialize a new evaluation
+      create object instance delete_me of Position;
+      return_evaluation = delete_me.evaluation;
+      delete object instance delete_me;
+
+      // copy the values from the input
+      return_evaluation.evaluation = param.eval.evaluation;
+      return_evaluation.mate_on_board = param.eval.mate_on_board;
+      return_evaluation.mate_in = param.eval.mate_in;
+
+      // return it
+      return return_evaluation;
+      @endnoparse
+    end operation;
+
+    @dialect("oal");
     @operation_num(7);
     operation get_best_line() return string is
       @noparse
