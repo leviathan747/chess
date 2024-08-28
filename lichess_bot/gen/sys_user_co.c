@@ -106,7 +106,7 @@ static int file_select(const struct dirent * entry)
   return ( NULL == strstr(entry->d_name, "json") ) ? 0 : 1;
 }
 
-extern void lichess_api_json( char * );
+extern int lichess_api_json( char * );
 /*
  * UserBackgroundProcessingCallout
  *
@@ -138,9 +138,12 @@ UserBackgroundProcessingCalloutf( void )
       debug_fprintf("%s\n", namelist[0]->d_name);
       Escher_strcpy(filename, Escher_stradd( "./outgoing/", namelist[0]->d_name ));
       replace(filerename, filename, "json", "DONE");
-      lichess_api_json( filename );
-      if ( 0 != rename( filename, filerename ) ) {
-        perror ("Could not remove file from directory ./outgoing");
+      if (0 == lichess_api_json( filename )) {
+        if ( 0 != rename( filename, filerename ) ) {
+          perror ("Could not remove file from directory ./outgoing");
+        }
+      } else {
+        printf("Failed to process file: %s\n", filename);
       }
     }
     for ( i=0; i<n; i++ ) {

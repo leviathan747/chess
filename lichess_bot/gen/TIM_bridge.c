@@ -396,7 +396,7 @@ timer_start(
     /* Note:  Add one to the duration to make sure that delay is     */
     /* at least as long as duration.                                 */
     /*---------------------------------------------------------------*/
-    t->expiration = ETimer_msec_time() + duration + 1UL;
+    t->expiration = ETimer_msec_time() + duration;
     timer_access_key = timer_access_key + 1 ? timer_access_key + 1 : 1;
     t->accesskey = timer_access_key;
     timer_insert_sorted( t );
@@ -424,14 +424,14 @@ timer_insert_sorted(
     animate = t;
   } else {
     ETimer_time_t poptime = t->expiration;
-    if ( poptime <= animate->expiration ) {          /* before head  */
+    if ( poptime < animate->expiration ) {          /* before head  */
       t->next = animate;
       animate = t;         
     } else {                                         /* find bigger  */
       ETimer_t * prev = animate;
       ETimer_t * cursor;
       while ( ( cursor = prev->next ) != 0 ) {
-        if ( poptime <= cursor->expiration ) {
+        if ( poptime < cursor->expiration ) {
           break;
         }
         prev = cursor;

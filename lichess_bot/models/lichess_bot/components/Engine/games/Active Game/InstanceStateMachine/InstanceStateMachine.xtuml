@@ -90,7 +90,7 @@ within lichess_bot::components::Engine::games::'Active Game' is
     // play a move after a certain amount of time, no matter what the status of the engine is
     // TODO make this consider an absolute max, estimated number of moves remaining, and remaining time on the clock
     create event instance e of ActiveGame3:'play move'(move: "") to self;
-    self.think_time = Bot::getInteger(name: "max_think_time_ms", default_value: 5000) * 1000;
+    self.think_time = Bot::getInteger(name: "max_think_time_ms", default_value: 600000) * 1000;
     self.move_timer = TIM::timer_start(event_inst:e, microseconds: self.think_time);
     @endnoparse
   end state;

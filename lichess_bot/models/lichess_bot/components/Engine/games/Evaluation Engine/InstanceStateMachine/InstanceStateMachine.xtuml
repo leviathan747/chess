@@ -52,11 +52,6 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
         play_now = true;
       end if;
 
-      // play now if we think we don't have time to do another evaluation cycle
-      if TIM::timer_remaining_time(timer_inst_ref: game.move_timer) < game.think_time / 2 then
-        play_now = true;
-      end if;
-
       // play now if we get to a certain depth
       if current_position.evaluation_depth >= Bot::getInteger(name: "min_playable_depth", default_value: 3) then
         play_now = true;
@@ -69,7 +64,7 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
     end if;
 
     // keep deepening the tree
-    if self.active and current_position.evaluation_depth < Bot::getInteger(name: "max_evaluation_depth", default_value: 5) then
+    if self.active and current_position.evaluation_depth < Bot::getInteger(name: "max_evaluation_depth", default_value: 3) then
 
       generate Engine1:'start evaluation' to self;
 
@@ -113,7 +108,7 @@ within lichess_bot::components::Engine::games::'Evaluation Engine' is
     LOG::LogInfo(message: "Current position count:    " + STRING::itoa(i: cardinality  pos));
     LOG::LogInfo(message: "New evaluated positions:   " + STRING::itoa(i: self.positions_evaluated - self.pre_evaluation_position_count));
     LOG::LogInfo(message: "Total evaluated positions: " + STRING::itoa(i: self.positions_evaluated));
-    LOG::LogInfo(message: "Time to analyze:           " + STRING::itoa(i: (TIM::current_clock() - self.pre_evaluation_time) / 1000) + "ms");
+    LOG::LogInfo(message: "Time to analyze:           " + STRING::itoa(i: (TIM::current_clock() - self.pre_evaluation_time) / Bot::getInteger(name:"ms_conversion_factor", default_value: 1)) + "ms");
 
     generate Engine2:'done evaluating' to self;
     @endnoparse

@@ -216,7 +216,7 @@ within lichess_bot::components::Engine::games is
         job.dispose();
       end for;
 
-      LOG::LogInfo(message: "Done canceling. " + STRING::itoa(i: (TIM::current_clock() - t0) / 1000) + "ms");
+      LOG::LogInfo(message: "Done canceling. " + STRING::itoa(i: (TIM::current_clock() - t0) / Bot::getInteger(name:"ms_conversion_factor", default_value: 1)) + "ms");
 
       generate Engine2:'done evaluating' to self;
       @endnoparse
