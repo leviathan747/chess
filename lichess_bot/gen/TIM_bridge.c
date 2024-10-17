@@ -75,9 +75,21 @@ TIM_timer_start(
   const Escher_uSec_t ee_microseconds )
 {
   /* Insert implementation specific code here.  */
-  ETimer_t * t = timer_start( ee_microseconds/USEC_CONVERT, ee_event_inst );
-  Escher_Timer_t result = { t, t->accesskey };
-  t->recurrence = 0;
+  ETimer_t * t = 0;
+  Escher_Timer_t result = { 0, 0 };
+  if ( 0 == ee_microseconds ) {
+    /* This is the Zero-duration Timer Idiom which is circumventing
+       the expedited event to self rule.  */
+    Escher_SendEvent( ee_event_inst );
+  } else {
+    /* Note the ceiling function calculation to make sure that our timer
+       ticks for at least as long as the given duration accounting for
+       the truncation of the division.  */
+    t = timer_start( (ee_microseconds + USEC_CONVERT - 1)/USEC_CONVERT, ee_event_inst );
+    t->recurrence = 0;
+    result.timer = t;
+    result.key = t->accesskey;
+  }
   return result;
 }
 
@@ -94,7 +106,10 @@ TIM_timer_start_recurring(
   const Escher_uSec_t ee_microseconds )
 {
   /* Insert implementation specific code here.  */
-  ETimer_t * t = timer_start( ee_microseconds/USEC_CONVERT, ee_event_inst );
+  /* Note the ceiling function calculation to make sure that our timer
+     ticks for at least as long as the given duration accounting for
+     the truncation of the division.  */
+  ETimer_t * t = timer_start( (ee_microseconds + USEC_CONVERT - 1)/USEC_CONVERT, ee_event_inst );
   Escher_Timer_t result = { t, t->accesskey };
   t->recurrence = ee_microseconds/USEC_CONVERT;
   return result;
@@ -142,7 +157,10 @@ TIM_timer_reset_time(
   #endif
   t = ee_timer_inst.timer;
   if ( ( 0 != t ) && ( ee_timer_inst.key == t->accesskey ) && ( t->expiration > 0UL ) ) {
-    t->expiration = ETimer_msec_time() + ee_microseconds/USEC_CONVERT + 1UL;
+    /* Note the ceiling function calculation to make sure that our timer
+       ticks for at least as long as the given duration accounting for
+       the truncation of the division.  */
+    t->expiration = ETimer_msec_time() + (ee_microseconds + USEC_CONVERT - 1)/USEC_CONVERT;
     rc = timer_find_and_reinsert_sorted( t );
   }
   #ifdef ESCHER_TASKING_POSIX
@@ -393,8 +411,6 @@ timer_start(
     t->event = event;
     /*---------------------------------------------------------------*/
     /* Calculate the timer expiration time.                          */
-    /* Note:  Add one to the duration to make sure that delay is     */
-    /* at least as long as duration.                                 */
     /*---------------------------------------------------------------*/
     t->expiration = ETimer_msec_time() + duration;
     timer_access_key = timer_access_key + 1 ? timer_access_key + 1 : 1;

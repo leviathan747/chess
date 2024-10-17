@@ -22,6 +22,9 @@ within lichess_bot::components is
       message account() return User to provider;
 
       @dialect("oal");
+      message bulkPairing(players: in string, clock_limit: in integer, clock_increment: in integer, days: in integer, pair_at: in integer, start_clocks_at: in integer, rated: in boolean, variant: in Variant, fen: in string, msg: in string, rules: in string) return BulkPairing to provider;
+
+      @dialect("oal");
       message chat(game_id: in string, text: in string, room: in Room) return boolean to provider;
 
       @dialect("oal");
@@ -37,6 +40,9 @@ within lichess_bot::components is
       message draw(game_id: in string, accept: in boolean) return boolean to provider;
 
       @dialect("oal");
+      message initialize(properties: in Properties) return boolean to provider;
+
+      @dialect("oal");
       message move(game_id: in string, move: in string) return boolean to provider;
 
       @dialect("oal");
@@ -44,6 +50,9 @@ within lichess_bot::components is
 
       @dialect("oal");
       message takeback(game_id: in string, accept: in boolean) return boolean to provider;
+
+      @dialect("oal");
+      message upgradeToBot() return User to provider;
 
       @dialect("oal");
       message challenge(challenge: in Challenge) from provider is
@@ -125,35 +134,7 @@ within lichess_bot::components is
             game.handle_draw_offer();
           end if;
 
-          // handle resign command
-          if param.username == "leviathan747" then
-            if param.text == ".resign" then
-              r = chess::chat(game_id: game.id, text: "My dad says I have to go home now...", room: Room::PLAYER);
-              r = chess::chat(game_id: game.id, text: "My dad says I have to go home now...", room: Room::SPECTATOR);
-              game.resign();
-            elif param.text == ".start" then
-              mgr = GameManager::get_instance();
-              mgr.start();
-            elif param.text == ".stop" then
-              mgr = GameManager::get_instance();
-              mgr.stop();
-            elif param.text == ".challenge" then
-              ::send_challenge(user: "maia1");
-            end if;
-          end if;
-
         end if;
-        @endnoparse
-      end message;
-
-      @dialect("oal");
-      message connect(properties: in Properties) to provider;
-
-      @dialect("oal");
-      message connected() from provider is
-        @noparse
-        select any bot from instances of Bot;
-        bot.user = chess::account();
         @endnoparse
       end message;
 
@@ -211,6 +192,9 @@ within lichess_bot::components is
       end message;
 
       @dialect("oal");
+      message gameOverview(game_id: in string, game_overview: in GameOverview) from provider;
+
+      @dialect("oal");
       message gameStart(game_event: in GameEventInfo) from provider is
         @noparse
         LOG::LogInfo(message:"Game start: " + param.game_event.id);
@@ -220,6 +204,15 @@ within lichess_bot::components is
         end if;
         r = chess::chat(game_id:param.game_event.id, text:"Good luck!", room:Room::PLAYER);
         g = param.game_event;
+
+        // find/create a game
+        select any game from instances of ActiveGame where selected.id == g.id;
+        if empty game then
+          game = ActiveGame::new_game(id: g.id);
+        end if;
+
+        // subscribe to events for this game
+        send chess::handleBotGameEvents(game_id: g.id);
         @endnoparse
       end message;
 
@@ -233,6 +226,18 @@ within lichess_bot::components is
         end if;
         @endnoparse
       end message;
+
+      @dialect("oal");
+      message gameUpdate(game_id: in string, game_update: in GameUpdate) from provider;
+
+      @dialect("oal");
+      message handleBotEvents() to provider;
+
+      @dialect("oal");
+      message handleBotGameEvents(game_id: in string) to provider;
+
+      @dialect("oal");
+      message handleGameEvents(game_id: in string) to provider;
 
       @dialect("oal");
       message opponentGone(game_id: in string, gone: in boolean, claim_win_in_seconds: in integer) from provider is

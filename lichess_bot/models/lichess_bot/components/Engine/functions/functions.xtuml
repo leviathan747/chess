@@ -14,11 +14,14 @@ within lichess_bot::components::Engine is
         bot.config = PROP::loadProperties(file_name:"lichess_bot.properties");
       end if;
 
-      // connect to the Lichess API and start listening for events
-      send chess::connect(properties: bot.config);
+      // initialize the Lichess API
+      r = chess::initialize(properties: bot.config);
 
-      // TODO create a game manager for testing
-      mgr = GameManager::get_instance();
+      // upgrade to a bot account
+      bot.user = chess::upgradeToBot();
+
+      // start listening for bot events
+      send chess::handleBotEvents();
 
       LOG::LogInfo(message: "Initialization complete");
       @endnoparse
