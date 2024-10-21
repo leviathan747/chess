@@ -167,6 +167,7 @@ within lichess_bot::components is
 
         // set color for the game
         select any bot from instances of Bot;
+        bot.user = chess::account();
         if g.white.name == bot.user.username then
           game.color = Color::WHITE;
         else
